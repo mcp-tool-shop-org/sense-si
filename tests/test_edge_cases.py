@@ -64,10 +64,10 @@ class TestEngineErrors:
         with pytest.raises(FileNotFoundError):
             engine.score_batch(["F:/nonexistent/fake.png"], "test")
 
-    def test_score_directory_path(self, engine):
+    def test_score_directory_path(self, engine, tmp_path):
         """Passing a directory path instead of a file should raise FileNotFoundError."""
         with pytest.raises(FileNotFoundError, match="not a file"):
-            engine.score("F:/AI/ai-eyes-mcp/tests/", "anything")
+            engine.score(str(tmp_path), "anything")
 
 
 # ===========================================================================
