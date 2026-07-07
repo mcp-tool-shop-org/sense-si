@@ -45,8 +45,10 @@ PHOTO_GENERIC_MAX = 0.01        # natural photo + generic label ("an animal")
 SELF_SIMILARITY_MIN = 0.99      # image compared to itself
 EMBEDDING_NORM_TOLERANCE = 0.01 # unit-norm tolerance for embeddings
 
-# Engine construction default — shared with conftest.py engine fixture
-DEFAULT_CACHE_DIR = os.environ.get("AI_EYES_MODEL_DIR", "F:/AI-Models/huggingface")
+# Engine construction default — shared with conftest.py engine fixture.
+# None lets transformers resolve the HuggingFace cache from the environment
+# (HF_HOME / HF_HUB_CACHE); set AI_EYES_MODEL_DIR to override. No rig paths.
+DEFAULT_CACHE_DIR = os.environ.get("AI_EYES_MODEL_DIR") or None
 
 
 # ===========================================================================
@@ -246,20 +248,21 @@ class TestCompare:
         sim = engine.compare(photo_cheetah, photo_bus)
         assert sim < 0.7, f"Cheetah/bus similarity {sim} — should be low"
 
-    def test_self_similarity(self, engine, knight_sword_front):
-        """Image compared to itself should be ~1.0."""
-        sim = engine.compare(knight_sword_front, knight_sword_front)
+    def test_self_similarity(self, engine, photo_cheetah):
+        """Image compared to itself should be ~1.0. (Image-agnostic — re-pointed
+        to a vendored photo in Wave 0; original used a sprite fixture.)"""
+        sim = engine.compare(photo_cheetah, photo_cheetah)
         assert sim > SELF_SIMILARITY_MIN, f"Self-similarity {sim} — should be ~1.0"
 
-    def test_embedding_is_normalized(self, engine, knight_sword_front):
-        """Embeddings should be unit-normalized."""
-        emb = engine.embed_image(knight_sword_front)
+    def test_embedding_is_normalized(self, engine, photo_cheetah):
+        """Embeddings should be unit-normalized. (Image-agnostic — re-pointed.)"""
+        emb = engine.embed_image(photo_cheetah)
         norm = np.linalg.norm(emb)
         assert abs(norm - 1.0) < EMBEDDING_NORM_TOLERANCE, f"Embedding norm {norm} — should be ~1.0"
 
-    def test_embedding_dimensionality(self, engine, knight_sword_front):
-        """Embedding must be a 1-D vector with positive length."""
-        emb = engine.embed_image(knight_sword_front)
+    def test_embedding_dimensionality(self, engine, photo_cheetah):
+        """Embedding must be a 1-D vector with positive length. (Image-agnostic.)"""
+        emb = engine.embed_image(photo_cheetah)
         assert emb.ndim == 1, f"Expected 1-D embedding, got ndim={emb.ndim}"
         assert emb.shape[0] > 0, f"Embedding length must be >0, got {emb.shape[0]}"
 
@@ -272,10 +275,11 @@ class TestBatch:
     """Batch scoring should match individual scores."""
 
     def test_batch_matches_individual(
-        self, engine, knight_sword_front, goblin_cook_front, photo_cheetah
+        self, engine, photo_lion, photo_bus, photo_cheetah
     ):
-        """Batch scores should match individual score() calls."""
-        paths = [knight_sword_front, goblin_cook_front, photo_cheetah]
+        """Batch scores should match individual score() calls. (Image-agnostic —
+        re-pointed to vendored photos in Wave 0.)"""
+        paths = [photo_lion, photo_bus, photo_cheetah]
         query = "a character holding a sword"
 
         batch = engine.score_batch(paths, query)
@@ -383,25 +387,27 @@ class TestDeterminism:
     augmentation, or floating-point non-determinism across calls.
     """
 
-    def test_score_deterministic(self, engine, knight_sword_front):
-        """Two calls with the same image and query must return the exact same score."""
+    def test_score_deterministic(self, engine, photo_cheetah):
+        """Two calls with the same image and query must return the exact same score.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         query = "pixel art knight with sword and shield"
-        score_a = engine.score(knight_sword_front, query)
-        score_b = engine.score(knight_sword_front, query)
+        score_a = engine.score(photo_cheetah, query)
+        score_b = engine.score(photo_cheetah, query)
         assert score_a == score_b, (
             f"Determinism violation: score_a={score_a}, score_b={score_b} — "
             f"same image+query must produce identical results"
         )
 
-    def test_score_vs_score_multi_consistency(self, engine, knight_sword_front):
+    def test_score_vs_score_multi_consistency(self, engine, photo_cheetah):
         """engine.score(img, X) must match engine.score_multi(img, [X])[X] within tolerance.
 
         Both paths ultimately run the same SigLIP2 forward pass, so their
         sigmoid outputs should agree within floating-point tolerance.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)
         """
         query = "pixel art knight with sword"
-        single = engine.score(knight_sword_front, query)
-        multi = engine.score_multi(knight_sword_front, [query])[query]
+        single = engine.score(photo_cheetah, query)
+        multi = engine.score_multi(photo_cheetah, [query])[query]
         assert abs(single - multi) < 0.001, (
             f"score() returned {single:.6f} but score_multi() returned {multi:.6f} — "
             f"should agree within 0.001"
@@ -421,13 +427,14 @@ class TestConcurrency:
     """
 
     def test_concurrent_scoring_valid_results(
-        self, engine, knight_sword_front, goblin_cook_front, photo_cheetah
+        self, engine, photo_cheetah, photo_lion, photo_bus
     ):
-        """3 threads scoring different images must all return valid floats in [0,1]."""
+        """3 threads scoring different images must all return valid floats in [0,1].
+        (Image-agnostic — re-pointed to vendored photos in Wave 0.)"""
         jobs = [
-            (knight_sword_front, "pixel art knight"),
-            (goblin_cook_front, "goblin cook"),
-            (photo_cheetah, "a cheetah"),
+            (photo_cheetah, "pixel art knight"),
+            (photo_lion, "goblin cook"),
+            (photo_bus, "a cheetah"),
         ]
 
         results = {}
@@ -450,13 +457,14 @@ class TestConcurrency:
             )
 
     def test_concurrent_matches_sequential(
-        self, engine, knight_sword_front, goblin_cook_front, photo_cheetah
+        self, engine, photo_cheetah, photo_lion, photo_bus
     ):
-        """Concurrent results must match sequential results within tolerance."""
+        """Concurrent results must match sequential results within tolerance.
+        (Image-agnostic — re-pointed to vendored photos in Wave 0.)"""
         jobs = [
-            (knight_sword_front, "pixel art knight"),
-            (goblin_cook_front, "goblin cook"),
-            (photo_cheetah, "a cheetah"),
+            (photo_cheetah, "pixel art knight"),
+            (photo_lion, "goblin cook"),
+            (photo_bus, "a cheetah"),
         ]
 
         # Sequential baseline

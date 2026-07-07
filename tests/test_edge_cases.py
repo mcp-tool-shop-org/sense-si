@@ -19,8 +19,11 @@ from ai_eyes_mcp.server import (
 )
 
 
-FAKE_PATH = "F:/nonexistent/totally_fake_image.png"
-NON_IMAGE_PATH = "F:/AI/ai-eyes-mcp/pyproject.toml"
+FAKE_PATH = "F:/nonexistent/totally_fake_image.png"  # intentionally nonexistent on any rig
+# Portable: the repo's own pyproject.toml — a real file that is NOT an image.
+# (Was a hardcoded F:/ path that didn't exist on this rig, so the "non-image"
+# tests were silently exercising the file-not-found path instead — Wave 0 fix.)
+NON_IMAGE_PATH = str(Path(__file__).resolve().parent.parent / "pyproject.toml")
 
 
 # ===========================================================================
@@ -41,13 +44,15 @@ class TestEngineErrors:
         with pytest.raises(FileNotFoundError):
             engine.embed_image(FAKE_PATH)
 
-    def test_compare_missing_first(self, engine, knight_sword_front):
+    def test_compare_missing_first(self, engine, photo_cheetah):
+        # Image-agnostic — re-pointed to a vendored photo in Wave 0.
         with pytest.raises(FileNotFoundError):
-            engine.compare(FAKE_PATH, knight_sword_front)
+            engine.compare(FAKE_PATH, photo_cheetah)
 
-    def test_compare_missing_second(self, engine, knight_sword_front):
+    def test_compare_missing_second(self, engine, photo_cheetah):
+        # Image-agnostic — re-pointed to a vendored photo in Wave 0.
         with pytest.raises(FileNotFoundError):
-            engine.compare(knight_sword_front, FAKE_PATH)
+            engine.compare(photo_cheetah, FAKE_PATH)
 
     def test_score_invalid_image_type(self, engine):
         """Passing a non-image file (e.g. pyproject.toml) should raise.
@@ -93,13 +98,15 @@ class TestToolErrors:
         with pytest.raises(ToolError, match="Maximum 20"):
             image_classify(photo_cheetah, labels)
 
-    def test_compare_missing_image_a(self, knight_sword_front):
+    def test_compare_missing_image_a(self, photo_cheetah):
+        # Image-agnostic — re-pointed to a vendored photo in Wave 0.
         with pytest.raises(ToolError, match="not found"):
-            image_compare(FAKE_PATH, knight_sword_front)
+            image_compare(FAKE_PATH, photo_cheetah)
 
-    def test_compare_missing_image_b(self, knight_sword_front):
+    def test_compare_missing_image_b(self, photo_cheetah):
+        # Image-agnostic — re-pointed to a vendored photo in Wave 0.
         with pytest.raises(ToolError, match="not found"):
-            image_compare(knight_sword_front, FAKE_PATH)
+            image_compare(photo_cheetah, FAKE_PATH)
 
     def test_batch_empty_list(self):
         with pytest.raises(ToolError, match="At least one"):
@@ -115,16 +122,18 @@ class TestToolErrors:
         with pytest.raises(ToolError):
             image_contains(NON_IMAGE_PATH, "anything")
 
-    def test_contains_empty_query(self, knight_sword_front):
-        """Empty query string should raise ToolError at tool level."""
+    def test_contains_empty_query(self, photo_cheetah):
+        """Empty query string should raise ToolError at tool level.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         with pytest.raises(ToolError, match="empty"):
-            image_contains(knight_sword_front, "")
+            image_contains(photo_cheetah, "")
 
-    def test_contains_overlength_query(self, knight_sword_front):
-        """Query exceeding 500 chars should raise ToolError at tool level."""
+    def test_contains_overlength_query(self, photo_cheetah):
+        """Query exceeding 500 chars should raise ToolError at tool level.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         long_query = "x" * 501
         with pytest.raises(ToolError, match="too long"):
-            image_contains(knight_sword_front, long_query)
+            image_contains(photo_cheetah, long_query)
 
     def test_classify_empty_label_in_list(self, photo_cheetah):
         """A list containing an empty string label should raise ToolError.
@@ -135,20 +144,23 @@ class TestToolErrors:
         with pytest.raises(ToolError, match="empty"):
             image_classify(photo_cheetah, ["cheetah", "", "bus"])
 
-    def test_compare_non_image_as_image_a(self, knight_sword_front):
-        """Passing a non-image file as image_a should raise ToolError."""
+    def test_compare_non_image_as_image_a(self, photo_cheetah):
+        """Passing a non-image file as image_a should raise ToolError.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         with pytest.raises(ToolError):
-            image_compare(NON_IMAGE_PATH, knight_sword_front)
+            image_compare(NON_IMAGE_PATH, photo_cheetah)
 
-    def test_compare_non_image_as_image_b(self, knight_sword_front):
-        """Passing a non-image file as image_b should raise ToolError."""
+    def test_compare_non_image_as_image_b(self, photo_cheetah):
+        """Passing a non-image file as image_b should raise ToolError.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         with pytest.raises(ToolError):
-            image_compare(knight_sword_front, NON_IMAGE_PATH)
+            image_compare(photo_cheetah, NON_IMAGE_PATH)
 
-    def test_batch_non_image_captured_in_errors(self, knight_sword_front):
-        """Non-image file in batch should be captured in error_details, not crash."""
+    def test_batch_non_image_captured_in_errors(self, photo_cheetah):
+        """Non-image file in batch should be captured in error_details, not crash.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         result = image_score_batch(
-            [knight_sword_front, NON_IMAGE_PATH],
+            [photo_cheetah, NON_IMAGE_PATH],
             "test query",
         )
         assert result["errors"] == 1, f"Expected 1 error, got {result['errors']}"
@@ -204,24 +216,28 @@ class TestBoundaryValues:
         score = engine.score(photo_cheetah, "un guépard rapide 🐆")
         assert isinstance(score, float)
 
-    def test_score_range(self, engine, knight_sword_front):
-        """Sigmoid score should always be in [0, 1]."""
+    def test_score_range(self, engine, photo_cheetah):
+        """Sigmoid score should always be in [0, 1].
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         for query in ["sword", "nothing", "xyzzy", "a", "the quick brown fox"]:
-            score = engine.score(knight_sword_front, query)
+            score = engine.score(photo_cheetah, query)
             assert 0.0 <= score <= 1.0, f"Score {score} out of range for query '{query}'"
 
-    def test_zero_threshold(self, knight_sword_front):
-        """threshold=0.0 means any positive score triggers present=True."""
-        result = image_contains(knight_sword_front, "pixel art knight", threshold=0.0)
-        assert result["score"] > 0.0, "Knight should score above zero"
+    def test_zero_threshold(self, photo_cheetah):
+        """threshold=0.0 means any positive score triggers present=True.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0; query matches
+        the photo so the rounded score is reliably above zero.)"""
+        result = image_contains(photo_cheetah, "a cheetah", threshold=0.0)
+        assert result["score"] > 0.0, "A matching image should score above zero"
         assert result["present"] is True, (
             f"Score {result['score']} > threshold 0.0 but present is False"
         )
 
-    def test_negative_threshold_rejected(self, knight_sword_front):
-        """threshold=-1.0 should be rejected — sigmoid scores are [0, 1]."""
+    def test_negative_threshold_rejected(self, photo_cheetah):
+        """threshold=-1.0 should be rejected — sigmoid scores are [0, 1].
+        (Image-agnostic — threshold is validated before the image is read.)"""
         with pytest.raises(ToolError, match="between 0.0 and 1.0"):
-            image_contains(knight_sword_front, "pixel art knight", threshold=-1.0)
+            image_contains(photo_cheetah, "pixel art knight", threshold=-1.0)
 
     def test_duplicate_labels_in_classify(self, photo_cheetah):
         """Duplicate labels are deduplicated by score_multi before scoring.

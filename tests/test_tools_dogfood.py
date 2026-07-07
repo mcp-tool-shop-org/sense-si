@@ -25,8 +25,9 @@ from ai_eyes_mcp.server import (
 
 class TestImageContains:
 
-    def test_returns_expected_shape(self, knight_sword_front):
-        result = image_contains(knight_sword_front, "a sword")
+    def test_returns_expected_shape(self, photo_cheetah):
+        # Image-agnostic shape check — re-pointed to a vendored photo in Wave 0.
+        result = image_contains(photo_cheetah, "a sword")
         assert "present" in result
         assert "score" in result
         assert "threshold" in result
@@ -62,9 +63,10 @@ class TestImageContains:
         result = image_contains(photo_cheetah, "test", threshold=0.42)
         assert result["threshold"] == 0.42
 
-    def test_default_threshold_wired(self, knight_sword_front):
-        """Calling without explicit threshold must use the 0.02 default."""
-        result = image_contains(knight_sword_front, "a sword")
+    def test_default_threshold_wired(self, photo_cheetah):
+        """Calling without explicit threshold must use the 0.02 default.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
+        result = image_contains(photo_cheetah, "a sword")
         assert result["threshold"] == 0.02
 
 
@@ -111,15 +113,17 @@ class TestImageClassify:
 
 class TestImageCompare:
 
-    def test_returns_expected_shape(self, knight_sword_front, goblin_cook_front):
-        result = image_compare(knight_sword_front, goblin_cook_front)
+    def test_returns_expected_shape(self, photo_cheetah, photo_lion):
+        # Image-agnostic shape check — re-pointed to vendored photos in Wave 0.
+        result = image_compare(photo_cheetah, photo_lion)
         assert "similarity" in result
         assert "image_a" in result
         assert "image_b" in result
         assert isinstance(result["similarity"], float)
 
-    def test_self_similarity(self, knight_sword_front):
-        result = image_compare(knight_sword_front, knight_sword_front)
+    def test_self_similarity(self, photo_cheetah):
+        # Image-agnostic — re-pointed to a vendored photo in Wave 0.
+        result = image_compare(photo_cheetah, photo_cheetah)
         assert result["similarity"] > 0.99
 
     def test_paths_echoed(self, photo_cheetah, photo_lion):
@@ -139,9 +143,10 @@ class TestImageCompare:
 
 class TestImageScoreBatch:
 
-    def test_returns_expected_shape(self, knight_sword_front, goblin_cook_front):
+    def test_returns_expected_shape(self, photo_cheetah, photo_lion):
+        # Image-agnostic shape check — re-pointed to vendored photos in Wave 0.
         result = image_score_batch(
-            [knight_sword_front, goblin_cook_front],
+            [photo_cheetah, photo_lion],
             "a sword",
         )
         assert "query" in result
@@ -155,9 +160,10 @@ class TestImageScoreBatch:
         assert result["total"] == 2
         assert result["scored"] == 2
 
-    def test_results_have_per_image_data(self, knight_sword_front, photo_bus):
+    def test_results_have_per_image_data(self, photo_cheetah, photo_bus):
+        # Image-agnostic — re-pointed to vendored photos in Wave 0.
         result = image_score_batch(
-            [knight_sword_front, photo_bus],
+            [photo_cheetah, photo_bus],
             "test query",
         )
         for r in result["results"]:
@@ -175,9 +181,10 @@ class TestImageScoreBatch:
         assert result["present"] >= 1, "At least the knight should be present"
         assert result["total"] == 3
 
-    def test_handles_missing_in_batch(self, knight_sword_front):
+    def test_handles_missing_in_batch(self, photo_cheetah):
+        # Image-agnostic (missing-path handling) — re-pointed in Wave 0.
         result = image_score_batch(
-            [knight_sword_front, "F:/nonexistent/fake_image.png"],
+            [photo_cheetah, "F:/nonexistent/fake_image.png"],
             "test",
         )
         assert result["errors"] == 1
