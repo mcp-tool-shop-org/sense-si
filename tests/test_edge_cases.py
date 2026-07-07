@@ -4,6 +4,10 @@ Edge-case tests — error handling and boundary conditions.
 Tests that the engine and tools fail gracefully with correct error types.
 """
 
+import logging
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -259,4 +263,89 @@ class TestBoundaryValues:
         result = image_classify(photo_cheetah, ["cat", "cat", "dog"])
         assert len(result["scores"]) == 2, (
             f"Expected 2 deduped entries, got {len(result['scores'])}: {result['scores']}"
+        )
+
+
+# ===========================================================================
+# Stage B — proactive hardening
+# ===========================================================================
+
+class TestProactiveHardening:
+    """Defensive-coding + observability guards (Stage B)."""
+
+    # --- E-05: degenerate-input guards (fire before model load) ---
+
+    def test_score_multi_empty_queries_rejected(self, engine):
+        """score_multi([]) must raise a clear error, not reach the tokenizer."""
+        with pytest.raises(ValueError, match="At least one query"):
+            engine.score_multi("unused.png", [])
+
+    def test_score_batch_empty_paths_rejected(self, engine):
+        """score_batch([], q) must raise a clear error, not return []."""
+        with pytest.raises(ValueError, match="At least one image"):
+            engine.score_batch([], "a query")
+
+    # --- E-06: token-truncation observability ---
+
+    def test_long_query_logs_truncation_warning(self, engine, photo_cheetah, caplog):
+        """A query that tokenizes past the text-encoder limit must WARN — otherwise
+        the score silently reflects only the first N tokens."""
+        long_query = "cat dog fox " * 39  # ~117 tokens, 468 chars (< MAX_QUERY_LENGTH)
+        with caplog.at_level(logging.WARNING, logger="ai_eyes_mcp"):
+            score = engine.score(photo_cheetah, long_query)
+        # Must be truncated and scored — NOT crash the forward pass
+        # (>64 tokens raises "Sequence length ... > max_position_embeddings").
+        assert isinstance(score, float) and 0.0 <= score <= 1.0
+        assert any("truncat" in r.getMessage().lower() for r in caplog.records), (
+            "expected a truncation warning for an over-length query"
+        )
+
+    def test_short_query_no_truncation_warning(self, engine, photo_cheetah, caplog):
+        with caplog.at_level(logging.WARNING, logger="ai_eyes_mcp"):
+            engine.score(photo_cheetah, "a cheetah")
+        assert not any("truncat" in r.getMessage().lower() for r in caplog.records)
+
+    # --- F2: batch error messages are sanitized (no raw path/exception leak) ---
+
+    def test_batch_error_message_is_sanitized(self, photo_cheetah):
+        """A bad image in a batch must yield a sanitized classification, not a raw
+        exception string that leaks the resolved path / PIL internals."""
+        result = image_score_batch([photo_cheetah, NON_IMAGE_PATH], "test")
+        assert result["errors"] == 1
+        assert result["scored"] == 1  # degrade, don't abort the batch
+        msg = result["error_details"][0]["error"]
+        assert msg in ("not found", "invalid image", "scoring failed"), (
+            f"batch error message must be a sanitized classification, got {msg!r}"
+        )
+
+    # --- AI_EYES_LOG_LEVEL: configurable verbosity (closes a SHIP_GATE gap) ---
+
+    def test_log_level_env_configures_logger(self):
+        env = os.environ.copy()
+        env["AI_EYES_LOG_LEVEL"] = "DEBUG"
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "import ai_eyes_mcp.server, logging; "
+             "lvl = logging.getLogger('ai_eyes_mcp').level; "
+             "assert lvl == logging.DEBUG, lvl"],
+            env=env, capture_output=True, text=True, timeout=90,
+        )
+        assert r.returncode == 0, f"stdout={r.stdout}\nstderr={r.stderr}"
+
+    # --- E-04: eager load surfaces a broken model at construction ---
+
+    def test_eager_load_surfaces_failure_at_construction(self):
+        """AI_EYES_EAGER_LOAD makes a broken model/cache fail at construction
+        (server start), not on the first tool call."""
+        env = os.environ.copy()
+        env["AI_EYES_EAGER_LOAD"] = "1"
+        env["HF_HUB_OFFLINE"] = "1"  # fail fast, no network
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from ai_eyes_mcp.engine import SigLIPEngine; "
+             "SigLIPEngine(model_id='ai-eyes-nonexistent/does-not-exist-xyz')"],
+            env=env, capture_output=True, text=True, timeout=90,
+        )
+        assert r.returncode != 0, (
+            "eager load of a nonexistent model should fail at construction, not silently succeed"
         )

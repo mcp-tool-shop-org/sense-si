@@ -38,7 +38,7 @@
 - [x] `[all]` CHANGELOG.md (Keep a Changelog format) (2026-04-09)
 - [x] `[all]` LICENSE file present and repo states support status (2026-04-09)
 - [x] `[cli]` SKIP: STDIO server, no interactive CLI flags beyond entry point
-- [ ] `[cli|mcp|desktop]` Logging levels: minimal (stderr load messages only, no configurable levels)
+- [x] `[cli|mcp|desktop]` Logging levels: configurable via `AI_EYES_LOG_LEVEL` (DEBUG/INFO/WARNING/ERROR), stderr, `ai_eyes_mcp` logger (2026-07-07)
 - [x] `[mcp]` All tools documented with description + parameters (2026-04-09)
 - [x] `[complex]` SKIP: no background daemons or operational modes
 

@@ -10,12 +10,13 @@ Key design decisions:
   - Lazy model loading (first call triggers download/load)
   - Sigmoid scores are independent per query (not softmax)
   - All images converted to RGB (alpha stripped)
-  - Thread-safe via torch.no_grad context per call
+  - Forward passes serialized by a per-engine lock (safe for concurrent callers)
 """
 
 import logging
 import os
 import sys
+import threading
 from pathlib import Path
 
 import numpy as np
@@ -69,6 +70,15 @@ class SigLIPEngine:
         self.dtype = dtype
         self._model = None
         self._processor = None
+        # Serialize GPU forward passes. The engine is documented as standalone-
+        # usable and is exercised concurrently by the test suite; a future
+        # threaded / HTTP MCP transport would call it in parallel. The lock is
+        # effectively free — inference is GPU-bound and serial on one device.
+        self._forward_lock = threading.Lock()
+        # Optional eager load: surface a broken model/cache at construction
+        # (server start) instead of on the first tool call.
+        if os.environ.get("AI_EYES_EAGER_LOAD", "").strip().lower() in ("1", "true", "yes", "on"):
+            self._ensure_loaded()
 
     @property
     def loaded(self) -> bool:
@@ -162,6 +172,41 @@ class SigLIPEngine:
                 f"Query too long ({len(query)} chars, max {MAX_QUERY_LENGTH})"
             )
 
+    def _warn_if_truncated(self, query: str) -> None:
+        """Log a warning when a query tokenizes past the text encoder's limit.
+
+        SigLIP's tokenizer silently truncates long prompts, so the score would
+        reflect only the first N tokens without the caller knowing. Observability
+        only — it must never raise (a truncation *check* breaking a scoring call
+        would be worse than the truncation it reports).
+        """
+        try:
+            tok = getattr(self._processor, "tokenizer", None)
+            if tok is None:
+                return
+            # The real limit is the text encoder's positional capacity
+            # (max_position_embeddings, e.g. 64 for SigLIP) — NOT the tokenizer's
+            # model_max_length, which SigLIP leaves as a huge sentinel.
+            cfg = getattr(self._model, "config", None)
+            max_len = None
+            for obj in (getattr(cfg, "text_config", None), cfg):
+                if obj is not None:
+                    max_len = getattr(obj, "max_position_embeddings", None)
+                    if max_len:
+                        break
+            if not max_len:
+                return
+            n = len(tok(query, truncation=False, add_special_tokens=True)["input_ids"])
+            if n > max_len:
+                logger.warning(
+                    "Query tokenizes to %d tokens but the text encoder holds %d — "
+                    "the query was truncated; the score reflects only the first %d "
+                    "tokens. Shorten the query.",
+                    n, max_len, max_len,
+                )
+        except Exception:  # noqa: BLE001 — observability must never break scoring
+            pass
+
     def score(self, image_path: str, query: str) -> float:
         """Score a single image against a single text query.
 
@@ -170,16 +215,18 @@ class SigLIPEngine:
         """
         self._validate_query(query)
         self._ensure_loaded()
+        self._warn_if_truncated(query)
 
         image = self._load_image(image_path)
         inputs = self._processor(
             text=[query],
             images=image,
             padding="max_length",
+            truncation=True,  # >64-token queries would otherwise crash the forward pass
             return_tensors="pt",
         ).to(self.device)
 
-        with torch.no_grad():
+        with self._forward_lock, torch.no_grad():
             outputs = self._model(**inputs)
             prob = torch.sigmoid(outputs.logits_per_image[0, 0]).item()
 
@@ -194,6 +241,8 @@ class SigLIPEngine:
         Duplicate queries are deduplicated before scoring so every unique
         query appears exactly once in the result dict.
         """
+        if not queries:
+            raise ValueError("At least one query is required")
         for q in queries:
             self._validate_query(q)
         self._ensure_loaded()
@@ -206,15 +255,19 @@ class SigLIPEngine:
                 seen.add(q)
                 unique_queries.append(q)
 
+        for q in unique_queries:
+            self._warn_if_truncated(q)
+
         image = self._load_image(image_path)
         inputs = self._processor(
             text=unique_queries,
             images=image,
             padding="max_length",
+            truncation=True,  # >64-token queries would otherwise crash the forward pass
             return_tensors="pt",
         ).to(self.device)
 
-        with torch.no_grad():
+        with self._forward_lock, torch.no_grad():
             outputs = self._model(**inputs)
             probs = torch.sigmoid(outputs.logits_per_image[0]).cpu().numpy()
 
@@ -231,9 +284,11 @@ class SigLIPEngine:
         # as every other text-scoring path.
         self._validate_query(query)
         self._ensure_loaded()
+        self._warn_if_truncated(query)
         text_inputs = self._processor(
             text=[query],
             padding="max_length",
+            truncation=True,  # >64-token queries would otherwise crash the forward pass
             return_tensors="pt",
         ).to(self.device)
         return text_inputs
@@ -254,7 +309,7 @@ class SigLIPEngine:
         # Merge text and image tensors for the forward pass
         combined = {**text_inputs, **image_inputs}
 
-        with torch.no_grad():
+        with self._forward_lock, torch.no_grad():
             outputs = self._model(**combined)
             prob = torch.sigmoid(outputs.logits_per_image[0, 0]).item()
 
@@ -267,6 +322,8 @@ class SigLIPEngine:
         Returns list of sigmoid scores in same order as input paths.
         Logs progress to stderr every 25 images for large batches.
         """
+        if not image_paths:
+            raise ValueError("At least one image path is required")
         self._validate_query(query)
         self._ensure_loaded()
 
@@ -293,7 +350,7 @@ class SigLIPEngine:
         image = self._load_image(image_path)
         inputs = self._processor(images=image, return_tensors="pt").to(self.device)
 
-        with torch.no_grad():
+        with self._forward_lock, torch.no_grad():
             emb = self._model.get_image_features(**inputs)
             # transformers 4.x returns a bare tensor; 5.x returns an output
             # object (BaseModelOutputWithPooling) whose .pooler_output is the

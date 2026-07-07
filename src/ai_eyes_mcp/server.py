@@ -14,6 +14,7 @@ Tools:
 
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 from typing import Annotated
@@ -25,6 +26,17 @@ from pydantic import Field
 from ai_eyes_mcp.engine import SigLIPEngine, DEFAULT_MODEL_ID, DEFAULT_MODEL_REVISION, DEFAULT_CACHE_DIR, DEFAULT_DEVICE, DEFAULT_DTYPE, DEFAULT_THRESHOLD
 
 logger = logging.getLogger("ai_eyes_mcp")
+
+# Configurable verbosity — AI_EYES_LOG_LEVEL=DEBUG|INFO|WARNING|ERROR|CRITICAL
+# (default WARNING). Logs go to STDERR only: STDOUT is the MCP STDIO protocol
+# channel and must never be polluted.
+_log_level = os.environ.get("AI_EYES_LOG_LEVEL", "WARNING").strip().upper()
+logger.setLevel(getattr(logging, _log_level, logging.WARNING))
+if not logger.handlers:
+    _handler = logging.StreamHandler(sys.stderr)
+    _handler.setFormatter(logging.Formatter("%(asctime)s %(name)s [%(levelname)s] %(message)s"))
+    logger.addHandler(_handler)
+    logger.propagate = False
 
 # ---------------------------------------------------------------------------
 # Server + engine setup
@@ -54,7 +66,7 @@ engine = SigLIPEngine(
 def image_contains(
     image_path: Annotated[str, Field(description="Absolute path to the image file")],
     query: Annotated[str, Field(description="What to look for (e.g. 'a person holding a sword', 'a login button', 'a red car')")],
-    threshold: Annotated[float, Field(description="Score threshold for 'present' verdict (default 0.02, tuned for pixel art)")] = DEFAULT_THRESHOLD,
+    threshold: Annotated[float, Field(description="Score threshold for 'present' verdict (default 0.02; scores are query-phrasing sensitive — see docstring)")] = DEFAULT_THRESHOLD,
 ) -> dict:
     """Check if an image contains something described by the query.
 
@@ -64,6 +76,12 @@ def image_contains(
     Uses SigLIP2 discriminative vision — measures visual similarity, does not
     generate text or hallucinate. If the image doesn't clearly match, the score
     will be low.
+
+    NOTE — sigmoid scores are query-phrasing sensitive: absolute scores swing
+    widely with wording, so a fixed ``threshold`` needs query engineering per
+    use case. For robust yes/no decisions across varied inputs, prefer
+    ``image_classify`` (relative ranking of candidate labels), which is
+    insensitive to absolute score magnitude.
     """
     t0 = time.perf_counter()
     if not (0.0 <= threshold <= 1.0):  # NaN-safe: a NaN threshold fails the chained compare
@@ -229,8 +247,15 @@ def image_score_batch(
             })
         except FileNotFoundError:
             errors.append({"path": path, "error": "not found"})
+        except ValueError as e:
+            # Sanitized: never leak raw PIL/exception text (may include absolute
+            # paths / internals) into the response. "invalid image" covers
+            # corrupt, unsupported-format, and decompression-bomb cases.
+            logger.debug("batch item failed (invalid image): %s", e)
+            errors.append({"path": path, "error": "invalid image"})
         except Exception as e:
-            errors.append({"path": path, "error": str(e)})
+            logger.debug("batch item failed: %s", e)
+            errors.append({"path": path, "error": "scoring failed"})
 
     present_count = sum(1 for r in results if r["present"])
 
@@ -264,6 +289,11 @@ def eyes_status() -> dict:
     """
     t0 = time.perf_counter()
     result = engine.status()
+    result["scoring_guidance"] = (
+        "Sigmoid scores are query-phrasing sensitive — absolute thresholds need "
+        "per-use-case tuning. For robust decisions, prefer image_classify "
+        "(relative ranking), which is insensitive to absolute score magnitude."
+    )
     elapsed = round((time.perf_counter() - t0) * 1000)
     logger.debug("eyes_status completed in %.3fs", elapsed / 1000)
     result["elapsed_ms"] = elapsed

@@ -56,8 +56,11 @@ Or run as a module: `python -m ai_eyes_mcp`
 | `AI_EYES_MODEL_DIR` | HF default cache | Model cache directory |
 | `AI_EYES_DEVICE` | `auto` (cuda if available, else cpu) | torch device |
 | `AI_EYES_DEFAULT_THRESHOLD` | `0.02` | Default threshold for `image_contains` |
+| `AI_EYES_LOG_LEVEL` | `WARNING` | Log verbosity: `DEBUG` / `INFO` / `WARNING` / `ERROR` |
+| `AI_EYES_EAGER_LOAD` | unset | If truthy, load the model at startup so a broken model/cache fails fast (not on the first tool call) |
+| `AI_EYES_DTYPE` | full precision | `float16` / `bfloat16` to halve VRAM |
 
-**Logging:** The server uses Python's standard `logging` module under the logger name `ai_eyes_mcp`. To configure log level or output, use `logging.basicConfig()` or set handlers on `logging.getLogger("ai_eyes_mcp")` before starting the server.
+**Logging:** The server logs under the `ai_eyes_mcp` logger to **stderr** (stdout is the MCP protocol channel). Set the level with `AI_EYES_LOG_LEVEL` (above), or attach your own handlers to `logging.getLogger("ai_eyes_mcp")`.
 
 ## How Scores Work
 
@@ -69,7 +72,13 @@ SigLIP2 uses **sigmoid** scoring, not softmax. Each image-text pair gets an inde
 
 Scores are NOT relative. Multiple queries can score high on the same image (e.g., an image with both a sword and a shield).
 
-The default threshold (0.02) was calibrated on pixel art sprites. For photographic images, a higher threshold (0.1-0.3) may work better. The caller can override per-call.
+### ⚠ Query phrasing matters — prefer `image_classify` for robust decisions
+
+SigLIP2 sigmoid scores are **query-phrasing sensitive**: the absolute score for the *same* image swings widely with wording (a style-matched phrase can score 10–100× higher than a generic one). A fixed `threshold` therefore needs query engineering per use case, and thresholds do **not** transfer across image styles.
+
+For robust yes/no decisions across varied inputs, prefer **`image_classify`** — it *ranks* candidate labels against each other and is insensitive to absolute score magnitude. Reach for `image_contains` with a tuned threshold only when you control both the query wording and the image style. `eyes_status` echoes this in its `scoring_guidance` field.
+
+The default threshold (`0.02`) is a permissive floor, not a universal cutoff — tune it for your queries and image style, or use `image_classify`.
 
 ## Architecture
 
