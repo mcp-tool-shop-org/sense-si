@@ -1,8 +1,12 @@
+<p align="center">
+  <img src="docs/logo.svg" alt="ai-eyes" width="300">
+</p>
+
 # ai-eyes-mcp
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 
-Grounded visual evaluator MCP server. Gives Claude honest image judgment via SigLIP2.
+Grounded visual evaluator MCP server. Gives Claude honest image judgment via SigLIP2 — it *measures*, it doesn't narrate, so it doesn't hallucinate.
 
 ## The Problem
 

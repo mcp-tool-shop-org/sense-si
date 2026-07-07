@@ -30,8 +30,21 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Cache the SigLIP2 weights so CI stops re-downloading ~1.6 GB every run.
+      - name: Cache SigLIP2 model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-google-siglip2-so400m-patch14-384
+
       - name: Install dependencies
         run: pip install -e ".[dev]"
+
+      - name: Dependency scan (advisory)
+        continue-on-error: true
+        run: |
+          pip install pip-audit
+          pip-audit
 
       - name: Verify imports and tool registration
         run: |
@@ -57,8 +70,9 @@ jobs:
           print(f'  engine OK: model={s[\"model_id\"]}, device={s[\"device\"]}')
           "
 
-      # Only test_edge_cases.py runs in CI — the dogfood and integration
-      # tests require the SigLIP2 model (~1.6 GB download) and a CUDA GPU,
-      # which are not available on GitHub Actions runners.
+      # CI runs test_edge_cases.py — it downloads SigLIP2 (~1.6 GB, cached above)
+      # and runs REAL inference on CPU. The fuller dogfood suites
+      # (test_engine_dogfood, test_tools_dogfood) run locally on GPU and are left
+      # out of CI to keep it fast — NOT because the model is unavailable here.
       - name: Run edge-case tests
         run: pytest tests/test_edge_cases.py -v

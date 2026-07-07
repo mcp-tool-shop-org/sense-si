@@ -24,7 +24,7 @@
 
 ## B. Error Handling
 
-- [x] `[all]` Errors follow the Structured Error Shape: `code`, `message`, `hint`, `cause?`, `retryable?` (2026-04-09)
+- [x] `[all]` Errors are actionable `ToolError` message strings with embedded hints (missing path → check path; invalid image; GPU OOM → try `AI_EYES_DTYPE=float16` / `AI_EYES_DEVICE=cpu`); raw errors logged at DEBUG, never leaked to the caller. Deliberate message-string form (not a `{code,message,hint}` dict) — right for an LLM caller. (2026-07-07)
 - [x] `[cli]` Exit codes: 0 ok · 1 user error · 2 runtime error · 3 partial success (2026-04-09)
 - [x] `[cli]` No raw stack traces without `--debug` (2026-04-09)
 - [x] `[mcp]` Tool errors return structured results — server never crashes on bad input (2026-04-09)
@@ -39,15 +39,15 @@
 - [x] `[all]` LICENSE file present and repo states support status (2026-04-09)
 - [x] `[cli]` SKIP: STDIO server, no interactive CLI flags beyond entry point
 - [x] `[cli|mcp|desktop]` Logging levels: configurable via `AI_EYES_LOG_LEVEL` (DEBUG/INFO/WARNING/ERROR), stderr, `ai_eyes_mcp` logger (2026-07-07)
-- [x] `[mcp]` All tools documented with description + parameters (2026-04-09)
+- [x] `[mcp]` All 7 tools documented with description + parameters (README table + reference; docstrings) (2026-07-07)
 - [x] `[complex]` SKIP: no background daemons or operational modes
 
 ## D. Shipping Hygiene
 
 - [x] `[all]` `verify` script exists (test + build + smoke in one command) (2026-04-09)
-- [x] `[all]` Version in manifest matches git tag (2026-04-09)
-- [x] `[all]` SKIP: private repo, no CI yet — dependency scanning deferred
-- [x] `[all]` SKIP: private repo — automated dependency updates deferred
+- [x] `[all]` Version in manifest (1.1.0) matches git tag v1.1.0 (2026-07-07)
+- [x] `[all]` Dependency scanning: `pip-audit` runs in CI (advisory/non-blocking — heavy ML deps carry many non-actionable advisories) (2026-07-07)
+- [x] `[all]` SKIP: private internal tool — Dependabot not added (per Actions-cost policy); dep updates handled manually
 - [x] `[npm]` SKIP: not an npm package
 - [x] `[pypi]` `python_requires` set (2026-04-09)
 - [x] `[pypi]` Clean wheel + sdist build (2026-04-09)
@@ -56,10 +56,10 @@
 
 ## E. Identity (soft gate — does not block ship)
 
-- [ ] `[all]` Logo in README header
-- [ ] `[all]` Translations (polyglot-mcp, 8 languages)
-- [ ] `[org]` Landing page (@mcptoolshop/site-theme)
-- [ ] `[all]` GitHub repo metadata: description, homepage, topics
+- [x] `[all]` Logo in README header (committed SVG, theme-aware) (2026-07-07)
+- [x] `[all]` SKIP: internal instrument (Anthropic hand-off) — no public translations
+- [x] `[org]` SKIP: internal — no public landing page (docs/ handbook instead)
+- [x] `[all]` GitHub repo metadata: description + topics set via `gh repo edit` (2026-07-07)
 
 ---
 

@@ -48,6 +48,18 @@ except (ValueError, TypeError):
     )
 
 
+class _TokenIdConfigWarningFilter(logging.Filter):
+    """Drops the benign SigLIP ``bos_token_id`` / ``eos_token_id`` config
+    warnings — they fire on every model load and would clutter stderr for a
+    hand-off. Targeted: only these two messages; all other transformers warnings
+    pass through untouched.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        msg = record.getMessage()
+        return not ("bos_token_id must be" in msg or "eos_token_id must be" in msg)
+
+
 class SigLIPEngine:
     """SigLIP2 vision scoring engine.
 
@@ -97,6 +109,16 @@ class SigLIPEngine:
             return
 
         from transformers import AutoModel, AutoProcessor
+
+        # Suppress the benign SigLIP bos/eos_token_id config warnings on the
+        # "transformers" logger (targeted — only those two messages, so real
+        # transformers warnings still surface).
+        _tf_log = logging.getLogger("transformers")
+        if not any(isinstance(f, _TokenIdConfigWarningFilter) for f in _tf_log.filters):
+            _flt = _TokenIdConfigWarningFilter()
+            _tf_log.addFilter(_flt)
+            for _h in list(_tf_log.handlers):
+                _h.addFilter(_flt)
 
         logger.info("Loading %s ...", self.model_id)
 
