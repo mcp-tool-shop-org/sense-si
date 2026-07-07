@@ -349,3 +349,38 @@ class TestProactiveHardening:
         assert r.returncode != 0, (
             "eager load of a nonexistent model should fail at construction, not silently succeed"
         )
+
+
+# ===========================================================================
+# Stage C — LLM-caller error-hint actionability
+# ===========================================================================
+
+class TestErrorHints:
+    """Errors an LLM caller can hit must carry an ACTIONABLE hint (what to DO),
+    consistently, and must not leak raw internals."""
+
+    def test_oom_error_gives_actionable_hint(self):
+        from ai_eyes_mcp.server import _tool_error
+        err = _tool_error(RuntimeError("CUDA out of memory. Tried to allocate 2.00 GiB"))
+        m = str(err).lower()
+        assert "out of memory" in m
+        assert "float16" in m or "cpu" in m, "OOM error must tell the caller what to try"
+
+    def test_generic_error_is_sanitized_and_points_to_logs(self):
+        from ai_eyes_mcp.server import _tool_error
+        err = _tool_error(RuntimeError("internal detail C:/secret/path/module.py:42 boom"))
+        m = str(err)
+        assert "C:/secret/path" not in m, "raw internals must not leak to the caller"
+        assert "AI_EYES_LOG_LEVEL" in m, "an unexpected error should point to how to debug it"
+
+    def test_not_found_error_stays_actionable(self):
+        from ai_eyes_mcp.server import _tool_error
+        err = _tool_error(FileNotFoundError("Image not found: /x/y.png"))
+        m = str(err).lower()
+        assert "not found" in m
+        assert "path" in m  # hint: check the path
+
+    def test_invalid_input_error_passthrough(self):
+        from ai_eyes_mcp.server import _tool_error
+        err = _tool_error(ValueError("Query must not be empty"))
+        assert "empty" in str(err).lower()

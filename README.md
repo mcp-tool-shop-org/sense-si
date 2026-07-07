@@ -62,6 +62,8 @@ Or run as a module: `python -m ai_eyes_mcp`
 
 **Logging:** The server logs under the `ai_eyes_mcp` logger to **stderr** (stdout is the MCP protocol channel). Set the level with `AI_EYES_LOG_LEVEL` (above), or attach your own handlers to `logging.getLogger("ai_eyes_mcp")`.
 
+**First call:** the model loads lazily — the **first** image tool call downloads/loads SigLIP2 (~10–20s on GPU; longer on the first-ever download), and subsequent calls are ~100ms. Set `AI_EYES_EAGER_LOAD=1` to load at server start instead, or call `eyes_status` (which reports `loaded` without triggering a load).
+
 ## How Scores Work
 
 SigLIP2 uses **sigmoid** scoring, not softmax. Each image-text pair gets an independent probability (0-1):

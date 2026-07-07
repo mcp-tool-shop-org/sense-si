@@ -59,6 +59,36 @@ engine = SigLIPEngine(
 
 
 # ---------------------------------------------------------------------------
+# Error mapping — one place so every tool returns the same actionable shape
+# ---------------------------------------------------------------------------
+
+def _tool_error(exc: Exception) -> ToolError:
+    """Map an engine exception to a consistent, actionable ToolError.
+
+    The message tells an LLM caller what to DO, not just what broke. Raw
+    exception text is forwarded only where it is already actionable (missing
+    path, bad input); the catch-all is sanitized (unactionable internals can
+    leak paths / stack detail) and the real error is logged at DEBUG.
+    """
+    if isinstance(exc, FileNotFoundError):
+        return ToolError(f"{exc} — check the path exists and points to a readable image file.")
+    if isinstance(exc, ValueError):
+        # Engine ValueErrors are already actionable (empty / too-long query,
+        # corrupt or unsupported image).
+        return ToolError(f"Invalid input: {exc}")
+    if "out of memory" in str(exc).lower() or exc.__class__.__name__ == "OutOfMemoryError":
+        return ToolError(
+            "GPU out of memory. Try AI_EYES_DTYPE=float16 (halves VRAM), a smaller "
+            "batch, or AI_EYES_DEVICE=cpu."
+        )
+    logger.debug("unexpected engine error", exc_info=exc)
+    return ToolError(
+        "Scoring failed (unexpected internal error). Set AI_EYES_LOG_LEVEL=DEBUG "
+        "on the server for the full traceback."
+    )
+
+
+# ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
 
@@ -94,12 +124,8 @@ def image_contains(
             raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
     try:
         score = engine.score(image_path, query)
-    except FileNotFoundError:
-        raise ToolError(f"Image not found: {image_path}")
-    except ValueError as e:
-        raise ToolError(f"Invalid input: {e}")
     except Exception as e:
-        raise ToolError(f"Scoring failed: {e}")
+        raise _tool_error(e) from None
 
     elapsed = round((time.perf_counter() - t0) * 1000)
     logger.debug("image_contains completed in %.3fs", elapsed / 1000)
@@ -140,12 +166,8 @@ def image_classify(
             raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
     try:
         scores = engine.score_multi(image_path, labels)
-    except FileNotFoundError:
-        raise ToolError(f"Image not found: {image_path}")
-    except ValueError as e:
-        raise ToolError(f"Invalid input: {e}")
     except Exception as e:
-        raise ToolError(f"Classification failed: {e}")
+        raise _tool_error(e) from None
 
     rounded = {k: round(v, 4) for k, v in scores.items()}
     sorted_scores = dict(sorted(rounded.items(), key=lambda kv: kv[1], reverse=True))
@@ -184,12 +206,8 @@ def image_compare(
             raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
     try:
         similarity = engine.compare(image_a, image_b)
-    except FileNotFoundError as e:
-        raise ToolError(str(e))
-    except ValueError as e:
-        raise ToolError(f"Invalid input: {e}")
     except Exception as e:
-        raise ToolError(f"Comparison failed: {e}")
+        raise _tool_error(e) from None
 
     elapsed = round((time.perf_counter() - t0) * 1000)
     logger.debug("image_compare completed in %.3fs", elapsed / 1000)
@@ -232,10 +250,8 @@ def image_score_batch(
     # Encode text ONCE via the engine, then score each image with pre-encoded text
     try:
         text_inputs = engine._encode_text(query)
-    except ValueError as e:
-        raise ToolError(f"Invalid input: {e}")
     except Exception as e:
-        raise ToolError(f"Text encoding failed: {e}")
+        raise _tool_error(e) from None
 
     for path in image_paths:
         try:
@@ -289,6 +305,12 @@ def eyes_status() -> dict:
     """
     t0 = time.perf_counter()
     result = engine.status()
+    if not result.get("loaded"):
+        result["note"] = (
+            "Model not loaded yet — the first image tool call loads SigLIP2 "
+            "(~10-20s on GPU); subsequent calls are ~100ms. Set AI_EYES_EAGER_LOAD=1 "
+            "to load at server start instead."
+        )
     result["scoring_guidance"] = (
         "Sigmoid scores are query-phrasing sensitive — absolute thresholds need "
         "per-use-case tuning. For robust decisions, prefer image_classify "
