@@ -301,6 +301,73 @@ class TestEyesSelftest:
 
 
 # ===========================================================================
+# MCP protocol end-to-end (in-memory client -> transport -> tool -> engine)
+# ===========================================================================
+
+class TestMCPProtocolE2E:
+    """Exercise tools over the REAL MCP protocol via the FastMCP in-memory
+    client — validates registration -> transport -> tool -> engine, not just the
+    direct-function-call path the other tests use."""
+
+    def _list(self):
+        from fastmcp import Client
+
+        async def go():
+            async with Client(mcp) as c:
+                return await c.list_tools()
+        return asyncio.run(go())
+
+    def _call(self, name, args):
+        from fastmcp import Client
+
+        async def go():
+            async with Client(mcp) as c:
+                return await c.call_tool(name, args)
+        return asyncio.run(go())
+
+    def test_list_tools_over_protocol(self):
+        assert len({t.name for t in self._list()}) == 7
+
+    def test_image_contains_over_protocol(self, photo_cheetah):
+        r = self._call("image_contains", {"image_path": photo_cheetah, "query": "a cheetah"})
+        assert "present" in r.data and isinstance(r.data["score"], float)
+
+    def test_image_verify_over_protocol(self, knight_sword_front):
+        r = self._call("image_verify", {
+            "image_path": knight_sword_front,
+            "target": "a knight with a sword and shield",
+            "alternatives": ["a goblin cook"],
+        })
+        assert r.data["present"] is True and "confidence" in r.data
+
+    def test_eyes_selftest_over_protocol(self):
+        r = self._call("eyes_selftest", {})
+        assert r.data["passed"] is True
+
+    def test_bad_input_over_protocol_raises_not_crashes(self):
+        # A missing image path must surface as a ToolError over the protocol, not
+        # crash the server. (Client.call_tool raises ToolError by default.)
+        with pytest.raises(ToolError):
+            self._call("image_contains", {"image_path": "F:/nonexistent/x.png", "query": "a cat"})
+
+
+# ===========================================================================
+# Determinism — it's an instrument; scores must be reproducible (bit-identical)
+# ===========================================================================
+
+class TestDeterminismInstrument:
+
+    def test_score_bit_identical_across_3_calls(self, engine, photo_cheetah):
+        q = "a cheetah running across the savanna"
+        vals = [engine.score(photo_cheetah, q) for _ in range(3)]
+        assert vals[0] == vals[1] == vals[2], f"nondeterministic score: {vals}"
+
+    def test_verify_bit_identical_across_3_calls(self, engine, knight_sword_front):
+        outs = [engine.verify(knight_sword_front, "a knight", ["a cook"]) for _ in range(3)]
+        assert outs[0] == outs[1] == outs[2], f"nondeterministic verify: {outs}"
+
+
+# ===========================================================================
 # MCP tool registration
 # ===========================================================================
 
