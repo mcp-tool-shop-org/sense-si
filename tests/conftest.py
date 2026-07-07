@@ -48,33 +48,30 @@ def _photo(name: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Sprite fixtures — QUARANTINED (Wave 0)
+# Sprite fixtures — own-IP fantasy character sprites (Stage A)
 #
-# The original sprite sources (sprite-foundry pipeline/gold/crops and
-# the-fractured-road ch1-enemies) are April-2026 generation artifacts that no
-# longer exist on the rig, and — being unreleased game art — must NOT be
-# vendored into this (potentially public) repo. Until a public-safe sprite
-# fixture set is decided (candidate: vendor from the SHIPPED public
-# @sprite-foundry packs — heroes / villains / goblin / townsfolk-hd), these
-# fixtures skip with an explicit, visible reason.
-#
-# This is a DELIBERATE, LOUD quarantine — the opposite of the silent F:/-path
-# skip it replaces. Every quarantined test names this decision in its skip
-# reason so the gap is impossible to miss. Image-AGNOSTIC tests that merely
-# needed "a valid image" have been re-pointed to the vendored photos and run
-# for real; only tests that assert game-sprite SEMANTICS land here.
+# Generated on Comfy Cloud (Flux, non-anime) and vendored under
+# tests/assets/sprites/. Three load-bearing axes: character IDENTITY (the two
+# knight views share one armor design), WEAPON-VISIBLE (knight / battleaxe /
+# armed orc = yes; cook / bard / desperate orc = no), and THEME legibility (the
+# cook reads as a cook, the bard as a bard). The absolute-threshold assertions
+# in test_engine_dogfood.py were RE-MEASURED on these exact images — the old
+# magic numbers were calibrated on the gone April-2026 pixel-art sprites and
+# were not reused.
 # ---------------------------------------------------------------------------
 
-_SPRITE_FIXTURES_PENDING = (
-    "QUARANTINED (Wave 0): game-sprite fixture unavailable — original sprite "
-    "assets are absent on this rig and unreleased game art must not be vendored "
-    "into this repo. Pending sprite-fixture decision (see Wave 0 report). "
-    "Deliberate visible quarantine, not a silent skip."
-)
+SPRITE_DIR = ASSETS_DIR / "sprites"
 
 
-def _sprite_pending():
-    pytest.skip(_SPRITE_FIXTURES_PENDING)
+def _sprite(name: str) -> str:
+    """Resolve a vendored sprite (hard error if missing — committed asset)."""
+    p = SPRITE_DIR / name
+    if not p.is_file():
+        raise FileNotFoundError(
+            f"Vendored sprite missing: {p}. Expected under tests/assets/sprites/ "
+            f"(committed to the repo)."
+        )
+    return str(p)
 
 
 # --- Natural photos (vendored: gradio demo images, redistributable) ---
@@ -100,58 +97,52 @@ def photo_tower():
     return _photo("tower.jpg")
 
 
-# --- Sprites with known content (quarantined — pending Wave 0 decision) ---
+# --- Sprites with known content (own-IP, tests/assets/sprites/) ---
 
 
 @pytest.fixture(scope="session")
 def knight_sword_front():
     """Knight holding a sword and shield — front view."""
-    _sprite_pending()
+    return _sprite("knight_sword_front.png")
 
 
 @pytest.fixture(scope="session")
 def knight_sword_left():
-    """Knight holding a sword and shield — left view (same character)."""
-    _sprite_pending()
+    """Knight holding a sword and shield — same character, side view."""
+    return _sprite("knight_sword_left.png")
 
 
 @pytest.fixture(scope="session")
 def knight_battleaxe_front():
     """Knight holding a battleaxe — front view."""
-    _sprite_pending()
+    return _sprite("knight_battleaxe_front.png")
 
 
 @pytest.fixture(scope="session")
 def goblin_cook_front():
     """Goblin cook — no weapon, cooking theme."""
-    _sprite_pending()
-
-
-@pytest.fixture(scope="session")
-def goblin_merchant_front():
-    """Goblin merchant — no weapon, commerce theme."""
-    _sprite_pending()
+    return _sprite("goblin_cook_front.png")
 
 
 @pytest.fixture(scope="session")
 def hero_bard_front():
     """Bard hero — front view, musical/performance theme."""
-    _sprite_pending()
+    return _sprite("hero_bard_front.png")
 
 
-# --- Enemy sprites (quarantined — pending Wave 0 decision) ---
+# --- Enemy sprites (own-IP, tests/assets/sprites/) ---
 
 
 @pytest.fixture(scope="session")
 def avar_armed_front():
-    """Armed avar enemy — has visible weapon."""
-    _sprite_pending()
+    """Armed orc enemy — visible weapon (war-axe)."""
+    return _sprite("avar_armed_front.png")
 
 
 @pytest.fixture(scope="session")
 def avar_desperate_front():
-    """Desperate avar — unarmed variant."""
-    _sprite_pending()
+    """Desperate orc — unarmed variant, empty hands."""
+    return _sprite("avar_desperate_front.png")
 
 
 # --- Engine (loaded once per session) ---

@@ -37,17 +37,17 @@ class TestImageContains:
 
     def test_present_when_armed(self, knight_sword_front):
         """Style-matched query triggers detection."""
-        result = image_contains(knight_sword_front, "pixel art knight with sword and shield")
+        result = image_contains(knight_sword_front, "a knight with a sword and shield")
         assert result["present"] is True, f"Knight w/ sword not detected: {result}"
 
     def test_absent_when_unarmed(self, goblin_cook_front):
-        result = image_contains(goblin_cook_front, "pixel art knight with sword", threshold=0.01)
+        result = image_contains(goblin_cook_front, "a knight with a sword and shield", threshold=0.01)
         assert result["present"] is False, f"Goblin cook false-positive for sword: {result}"
 
     def test_custom_threshold(self, knight_sword_front):
         """Same query, different threshold — score stays constant."""
-        low = image_contains(knight_sword_front, "pixel art knight with sword and shield", threshold=0.001)
-        high = image_contains(knight_sword_front, "pixel art knight with sword and shield", threshold=0.99)
+        low = image_contains(knight_sword_front, "a knight with a sword and shield", threshold=0.001)
+        high = image_contains(knight_sword_front, "a knight with a sword and shield", threshold=0.99)
         assert low["present"] is True
         assert high["present"] is False
         # Exact equality is safe here: both calls evaluate the same image+query
@@ -174,7 +174,7 @@ class TestImageScoreBatch:
     def test_present_count(self, knight_sword_front, goblin_cook_front, photo_bus):
         result = image_score_batch(
             [knight_sword_front, goblin_cook_front, photo_bus],
-            "pixel art knight with sword and shield",
+            "a knight with a sword and shield",
             threshold=0.02,
         )
         # Knight should be present with style-matched query, others not
@@ -201,7 +201,7 @@ class TestImageScoreBatch:
     def test_threshold_flips_verdicts(self, knight_sword_front, goblin_cook_front, hero_bard_front):
         """Low threshold → all present; high threshold → none present."""
         paths = [knight_sword_front, goblin_cook_front, hero_bard_front]
-        query = "pixel art character"
+        query = "a fantasy character"
 
         low = image_score_batch(paths, query, threshold=0.0001)
         high = image_score_batch(paths, query, threshold=0.9999)

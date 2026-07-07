@@ -36,9 +36,9 @@ from ai_eyes_mcp.engine import SigLIPEngine
 # Calibration constants — siglip2-so400m-patch14-384, 2026-04-09
 # Update these if the model checkpoint or revision changes.
 # ---------------------------------------------------------------------------
-ARMED_DESCRIPTIVE_MIN = 0.05    # armed sprite + style-matched query
+ARMED_DESCRIPTIVE_MIN = 0.4     # armed sprite + descriptive query (re-measured on own-IP knight: 0.885)
 UNARMED_WEAPON_MAX = 0.01       # unarmed sprite + weapon query
-BARD_WEAPON_MAX = 0.15          # bard + weapon query (lax — no visible weapon)
+BARD_WEAPON_MAX = 0.05          # bard + weapon query (re-measured on own-IP bard: 0.0003)
 PHOTO_SPECIFIC_MIN = 0.1        # natural photo + specific label ("a cheetah")
 PHOTO_WRONG_CLASS_MAX = 0.1     # natural photo + wrong class ("cheetah" on bus)
 PHOTO_GENERIC_MAX = 0.01        # natural photo + generic label ("an animal")
@@ -66,7 +66,7 @@ class TestHonesty:
 
     def test_knight_sword_with_descriptive_query(self, engine, knight_sword_front):
         """Knight with sword scores high when query matches image style."""
-        score = engine.score(knight_sword_front, "pixel art knight with sword and shield")
+        score = engine.score(knight_sword_front, "a knight with a sword and shield")
         assert score > ARMED_DESCRIPTIVE_MIN, f"Knight w/ sword scored {score} for descriptive query — should be high"
 
     def test_knight_classified_as_knight(self, engine, knight_sword_front):
@@ -80,7 +80,7 @@ class TestHonesty:
 
     def test_goblin_cook_scores_low_for_sword(self, engine, goblin_cook_front):
         """A goblin cook should score LOW for weapon queries."""
-        score = engine.score(goblin_cook_front, "pixel art character with sword")
+        score = engine.score(goblin_cook_front, "a character holding a sword")
         assert score < UNARMED_WEAPON_MAX, f"Goblin cook scored {score} for 'sword' — should be low"
 
     def test_armed_vs_unarmed_via_classify(self, engine, knight_sword_front, goblin_cook_front):
@@ -106,8 +106,8 @@ class TestHonesty:
 
     def test_knight_battleaxe_detected(self, engine, knight_battleaxe_front):
         """Knight with battleaxe scores high for style-matched query."""
-        score = engine.score(knight_battleaxe_front, "pixel art knight")
-        assert score > 0.5, f"Knight w/ battleaxe scored {score} for 'pixel art knight' — should be high"
+        score = engine.score(knight_battleaxe_front, "a knight with a battleaxe")
+        assert score > 0.5, f"Knight w/ battleaxe scored {score} for 'a knight with a battleaxe' — should be high"
 
     def test_bard_scores_low_for_weapon(self, engine, hero_bard_front):
         """A bard hero should score low for weapons."""
@@ -330,7 +330,7 @@ class TestBatch:
     ):
         """Knight should score highest for style-matched query."""
         paths = [knight_sword_front, goblin_cook_front, photo_bus]
-        scores = engine.score_batch(paths, "pixel art knight with sword")
+        scores = engine.score_batch(paths, "a knight with a sword")
         assert scores[0] > scores[1], f"Knight ({scores[0]:.6f}) should outscore goblin ({scores[1]:.6f})"
         assert scores[0] > scores[2], f"Knight ({scores[0]:.6f}) should outscore bus ({scores[2]:.6f})"
 
@@ -349,8 +349,8 @@ class TestQuerySensitivity:
     """
 
     def test_specific_beats_generic_on_sprites(self, engine, knight_sword_front):
-        """'pixel art knight' >> 'character' on sprite images."""
-        specific = engine.score(knight_sword_front, "pixel art knight")
+        """'a knight in plate armor' >> 'character' on the knight sprite."""
+        specific = engine.score(knight_sword_front, "a knight in plate armor")
         generic = engine.score(knight_sword_front, "character")
         assert specific > generic * 10, (
             f"Specific ({specific:.6f}) should vastly outscore generic ({generic:.6f})"
