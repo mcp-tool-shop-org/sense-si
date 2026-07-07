@@ -226,6 +226,10 @@ class SigLIPEngine:
         The returned dict contains the text-side input tensors on the
         correct device, ready to be merged with per-image inputs.
         """
+        # Validate here so image_score_batch (which calls this directly rather
+        # than going through score/score_multi) enforces the same query contract
+        # as every other text-scoring path.
+        self._validate_query(query)
         self._ensure_loaded()
         text_inputs = self._processor(
             text=[query],
@@ -291,7 +295,13 @@ class SigLIPEngine:
 
         with torch.no_grad():
             emb = self._model.get_image_features(**inputs)
-            emb = emb / emb.norm(dim=-1, keepdim=True)
+            # transformers 4.x returns a bare tensor; 5.x returns an output
+            # object (BaseModelOutputWithPooling) whose .pooler_output is the
+            # pooled image embedding. Handle both, version-agnostically.
+            if not torch.is_tensor(emb):
+                emb = emb.pooler_output
+            # clamp_min avoids 0/0 -> NaN for a degenerate (zero-norm) embedding.
+            emb = emb / emb.norm(dim=-1, keepdim=True).clamp_min(1e-12)
 
         return emb.cpu().numpy().squeeze()
 

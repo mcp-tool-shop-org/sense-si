@@ -66,7 +66,7 @@ def image_contains(
     will be low.
     """
     t0 = time.perf_counter()
-    if threshold < 0.0 or threshold > 1.0:
+    if not (0.0 <= threshold <= 1.0):  # NaN-safe: a NaN threshold fails the chained compare
         raise ToolError("threshold must be between 0.0 and 1.0 (sigmoid score range)")
     image_path = str(Path(image_path).resolve())
     if not engine.loaded:
@@ -198,7 +198,7 @@ def image_score_batch(
         raise ToolError("At least one image path is required")
     if len(image_paths) > 100:
         raise ToolError("Maximum 100 images per batch")
-    if threshold < 0.0 or threshold > 1.0:
+    if not (0.0 <= threshold <= 1.0):  # NaN-safe: a NaN threshold fails the chained compare
         raise ToolError("threshold must be between 0.0 and 1.0 (sigmoid score range)")
 
     t0 = time.perf_counter()

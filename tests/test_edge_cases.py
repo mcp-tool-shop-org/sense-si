@@ -55,13 +55,14 @@ class TestEngineErrors:
             engine.compare(photo_cheetah, FAKE_PATH)
 
     def test_score_invalid_image_type(self, engine):
-        """Passing a non-image file (e.g. pyproject.toml) should raise.
+        """Passing a non-image file (pyproject.toml) must raise ValueError.
 
-        PIL raises UnidentifiedImageError (subclass of OSError) for files
-        that aren't valid images. The engine also raises ValueError for
-        decompression bombs. Accept either.
+        The engine's _load_image catches PIL's UnidentifiedImageError and
+        re-raises ValueError ("Cannot open image ..."). Asserting ValueError
+        specifically — not the broad OSError, which FileNotFoundError also
+        satisfies — ensures this exercises non-image handling, not file-not-found.
         """
-        with pytest.raises((ValueError, OSError)):
+        with pytest.raises(ValueError, match="Cannot open image"):
             engine.score(NON_IMAGE_PATH, "anything")
 
     def test_score_batch_missing_file(self, engine):
@@ -116,6 +117,15 @@ class TestToolErrors:
         paths = [f"F:/fake_{i}.png" for i in range(101)]
         with pytest.raises(ToolError, match="Maximum 100"):
             image_score_batch(paths, "anything")
+
+    def test_batch_empty_query(self, photo_cheetah):
+        """image_score_batch must reject an empty query like its sibling tools.
+
+        Regression guard: it previously bypassed _validate_query by calling
+        engine._encode_text() directly instead of score/score_multi.
+        """
+        with pytest.raises(ToolError, match="empty"):
+            image_score_batch([photo_cheetah], "")
 
     def test_contains_invalid_image_type(self):
         """Passing a non-image file should raise ToolError."""

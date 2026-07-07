@@ -268,6 +268,41 @@ class TestCompare:
 
 
 # ===========================================================================
+# 4b. EMBEDDING CONTRACT — F0-2 regression (transformers 4.x / 5.x compat)
+# ===========================================================================
+
+class TestEmbeddingContract:
+    """F0-2 regression. ``get_image_features`` returns a bare tensor on
+    transformers 4.x but a ``BaseModelOutputWithPooling`` on 5.x. ``embed_image``
+    must return a 1-D unit-normalized vector on BOTH — and, critically, that
+    vector must be the pooled IMAGE embedding (``pooler_output``), not an
+    arbitrary normalized field. The semantic-ordering assertion is what pins the
+    correct field: a wrong-but-unit-normalized field (e.g. a raw patch-sequence
+    mean) would still pass the shape/norm checks but break the ordering.
+    """
+
+    def test_f02_embed_is_1d_unit_vector(self, engine, photo_cheetah):
+        emb = engine.embed_image(photo_cheetah)
+        assert emb.ndim == 1, f"expected 1-D embedding, got ndim={emb.ndim}"
+        assert emb.shape[0] > 0, "embedding must be non-empty"
+        norm = float(np.linalg.norm(emb))
+        assert abs(norm - 1.0) < EMBEDDING_NORM_TOLERANCE, f"embedding norm {norm} — must be unit"
+
+    def test_f02_embedding_field_preserves_semantic_ordering(
+        self, engine, photo_cheetah, photo_lion, photo_bus
+    ):
+        """Two big cats must be more similar than a cat and a vehicle. Guards
+        against get_image_features returning a wrong-but-normalized field on a
+        future transformers version."""
+        cat_cat = engine.compare(photo_lion, photo_cheetah)
+        cat_vehicle = engine.compare(photo_lion, photo_bus)
+        assert cat_cat > cat_vehicle, (
+            f"lion~cheetah ({cat_cat:.4f}) must exceed lion~bus ({cat_vehicle:.4f}) — "
+            f"get_image_features field is not the pooled image embedding"
+        )
+
+
+# ===========================================================================
 # 5. BATCH — consistency
 # ===========================================================================
 
