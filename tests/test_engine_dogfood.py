@@ -577,10 +577,11 @@ class TestPerformance:
     runaway preprocessing, or model reload on every call.
     """
 
-    def test_single_score_under_10_seconds(self, engine, knight_sword_front):
-        """A single score() call must complete in <10 seconds."""
+    def test_single_score_under_10_seconds(self, engine, photo_cheetah):
+        """A single score() call must complete in <10 seconds.
+        (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
         start = time.perf_counter()
-        score = engine.score(knight_sword_front, "pixel art knight with sword")
+        score = engine.score(photo_cheetah, "pixel art knight with sword")
         elapsed = time.perf_counter() - start
 
         assert isinstance(score, float), f"Expected float, got {type(score)}"
