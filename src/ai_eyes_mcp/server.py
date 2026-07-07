@@ -322,6 +322,59 @@ def eyes_status() -> dict:
     return result
 
 
+@mcp.tool
+def image_verify(
+    image_path: Annotated[str, Field(description="Absolute path to the image file")],
+    target: Annotated[str, Field(description="The hypothesis to verify (e.g. 'a knight with a sword')")],
+    alternatives: Annotated[list[str], Field(description="Contrast alternatives to rank the target against — REQUIRED (this is a relative verdict), e.g. ['a goblin cook', 'a bard']")],
+) -> dict:
+    """Honest RELATIVE verdict: is `target` a better description of the image than
+    the caller-supplied `alternatives`?
+
+    Unlike image_contains (which returns a raw sigmoid you must threshold),
+    image_verify returns a DECISION + margin + confidence by RANKING the target
+    against alternatives — robust to SigLIP's query-phrasing sensitivity because
+    it is relative, not absolute. `alternatives` is required (>=1); for a raw
+    score use image_contains, for full ranking use image_classify.
+
+    Returns `{present, target, target_score, best_alternative,
+    best_alternative_score, margin, confidence}`. `confidence` describes the
+    measured gap ("high" / "moderate" / "low — inconclusive"), not invented
+    certainty.
+    """
+    t0 = time.perf_counter()
+    image_path = str(Path(image_path).resolve())
+    if not engine.loaded:
+        try:
+            engine._ensure_loaded()
+        except Exception as e:
+            raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
+    try:
+        result = engine.verify(image_path, target, alternatives)
+    except Exception as e:
+        raise _tool_error(e) from None
+    result["elapsed_ms"] = round((time.perf_counter() - t0) * 1000)
+    return result
+
+
+@mcp.tool
+def eyes_selftest() -> dict:
+    """Self-test the instrument: run the model on a few bundled reference images
+    and confirm the expected orderings hold — proves the install loaded correctly
+    and SigLIP2 is calibrated. Loads the model if it isn't already.
+
+    Returns `{passed, checks: [{name, expected, measured_a, measured_b, ok}],
+    model_id, device, torch_version, transformers_version}`.
+    """
+    t0 = time.perf_counter()
+    try:
+        result = engine.selftest()
+    except Exception as e:
+        raise _tool_error(e) from None
+    result["elapsed_ms"] = round((time.perf_counter() - t0) * 1000)
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------

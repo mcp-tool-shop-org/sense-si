@@ -9,12 +9,16 @@ import asyncio
 
 import pytest
 
+from fastmcp.exceptions import ToolError
+
 from ai_eyes_mcp.server import (
     mcp,
     image_contains,
     image_classify,
     image_compare,
     image_score_batch,
+    image_verify,
+    eyes_selftest,
     eyes_status,
 )
 
@@ -231,6 +235,72 @@ class TestEyesStatus:
 
 
 # ===========================================================================
+# image_verify — contrastive honest verdict
+# ===========================================================================
+
+class TestImageVerify:
+    """Relative verdict: target vs caller-supplied alternatives -> decision +
+    margin + confidence that DESCRIBES the measured gap (not invented precision)."""
+
+    def test_present_high_confidence(self, knight_sword_front):
+        r = image_verify(knight_sword_front, "a knight with a sword and shield",
+                         ["a goblin cook", "a bard"])
+        assert r["present"] is True
+        assert r["margin"] > 0.3
+        assert r["confidence"] == "high"
+        assert r["target"] == "a knight with a sword and shield"
+
+    def test_absent_when_target_loses(self, goblin_cook_front):
+        r = image_verify(goblin_cook_front, "a knight with a sword", ["a goblin cook"])
+        assert r["present"] is False  # the cook wins its own label
+        assert r["margin"] < 0
+        assert r["best_alternative"] == "a goblin cook"
+
+    def test_low_confidence_on_near_tie(self, photo_lion):
+        # "a lion" (~0.017) barely beats "a big cat" (~0.010) — present, but the
+        # gap is tiny, so the verdict must read as low / inconclusive.
+        r = image_verify(photo_lion, "a lion", ["a big cat"])
+        assert abs(r["margin"]) < 0.1
+        assert "low" in r["confidence"] or "inconclusive" in r["confidence"]
+
+    def test_requires_alternatives(self, knight_sword_front):
+        with pytest.raises(ToolError, match="RELATIVE"):
+            image_verify(knight_sword_front, "a knight", [])
+
+    def test_target_not_allowed_to_beat_itself(self, knight_sword_front):
+        # Duplicating the target in alternatives must not let it "beat" itself.
+        r = image_verify(knight_sword_front, "a knight with a sword and shield",
+                         ["a knight with a sword and shield", "a goblin cook"])
+        assert r["best_alternative"] != "a knight with a sword and shield"
+        assert r["present"] is True
+
+    def test_return_shape(self, knight_sword_front):
+        r = image_verify(knight_sword_front, "a knight", ["a cook"])
+        for k in ("present", "target", "target_score", "best_alternative",
+                  "best_alternative_score", "margin", "confidence"):
+            assert k in r
+
+
+# ===========================================================================
+# eyes_selftest — self-proving calibration check
+# ===========================================================================
+
+class TestEyesSelftest:
+    """The instrument verifies itself on bundled reference images."""
+
+    def test_selftest_passes_on_real_model(self):
+        r = eyes_selftest()
+        assert r["passed"] is True, f"selftest failed: {r}"
+        assert len(r["checks"]) >= 3
+        assert all(c["ok"] for c in r["checks"]), r["checks"]
+
+    def test_selftest_reports_model_info(self):
+        r = eyes_selftest()
+        assert "siglip2" in r["model_id"].lower()
+        assert r["device"]
+
+
+# ===========================================================================
 # MCP tool registration
 # ===========================================================================
 
@@ -246,6 +316,8 @@ class TestMCPToolRegistration:
         "image_classify",
         "image_compare",
         "image_score_batch",
+        "image_verify",
+        "eyes_selftest",
         "eyes_status",
     }
 
@@ -253,10 +325,10 @@ class TestMCPToolRegistration:
         return asyncio.run(mcp._list_tools())
 
     def test_tool_count(self):
-        """Exactly 5 tools should be registered."""
+        """Exactly 7 tools should be registered."""
         tools = self._get_tools()
-        assert len(tools) == 5, (
-            f"Expected 5 registered tools, got {len(tools)}: "
+        assert len(tools) == 7, (
+            f"Expected 7 registered tools, got {len(tools)}: "
             f"{[t.name for t in tools]}"
         )
 

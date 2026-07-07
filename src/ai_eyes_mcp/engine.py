@@ -371,6 +371,51 @@ class SigLIPEngine:
         emb_b = self.embed_image(image_b)
         return float(np.dot(emb_a, emb_b))
 
+    def verify(self, image_path: str, target: str, contrasts: list[str]) -> dict:
+        """Relative honest verdict: is ``target`` a better description of the
+        image than any caller-supplied ``contrast``?
+
+        Composes ``score_multi`` (so it inherits query validation, truncation,
+        and the forward-pass lock — no new inference code). Returns a DECISION +
+        margin + a confidence band that DESCRIBES the measured gap, rather than
+        an absolute threshold dressed up as certainty. ``contrasts`` is REQUIRED:
+        this verb is relative, not absolute.
+        """
+        if not contrasts:
+            raise ValueError(
+                "image_verify needs at least one contrast alternative; it is "
+                "RELATIVE, not absolute. For a raw score use image_contains."
+            )
+        scores = self.score_multi(image_path, [target] + list(contrasts))
+        target_score = scores[target]
+        # Best alternative = max over the contrasts, EXCLUDING the target itself
+        # (score_multi dedupes, so a target repeated in contrasts must not be
+        # allowed to beat itself).
+        alt_scores = {c: scores[c] for c in contrasts if c != target}
+        if not alt_scores:
+            raise ValueError(
+                "image_verify needs at least one contrast that differs from the target."
+            )
+        best_alt = max(alt_scores, key=alt_scores.get)
+        best_alt_score = alt_scores[best_alt]
+        margin = target_score - best_alt_score
+        magnitude = abs(margin)  # confidence = how decisive the gap is, either way
+        if magnitude >= 0.3:
+            confidence = "high"
+        elif magnitude >= 0.1:
+            confidence = "moderate"
+        else:
+            confidence = "low — target and best alternative are close; treat as inconclusive"
+        return {
+            "present": target_score > best_alt_score,
+            "target": target,
+            "target_score": round(target_score, 4),
+            "best_alternative": best_alt,
+            "best_alternative_score": round(best_alt_score, 4),
+            "margin": round(margin, 4),
+            "confidence": confidence,
+        }
+
     def status(self) -> dict:
         """Return engine status info."""
         import transformers
@@ -393,3 +438,57 @@ class SigLIPEngine:
                 vram_mb = torch.cuda.memory_allocated() / 1024 / 1024
                 info["vram_mb"] = round(vram_mb)
         return info
+
+    def selftest(self) -> dict:
+        """Run a few DECISIVE, known orderings on bundled reference images to
+        prove the model loaded and is calibrated. Returns a pass/fail report.
+
+        Reference images ship as package data (``assets/selftest/``) so the
+        check works from an installed wheel, not just the source tree. Loads the
+        model on first use (via ``score``).
+        """
+        refs = Path(__file__).resolve().parent / "assets" / "selftest"
+        knight = str(refs / "knight.png")
+        cook = str(refs / "cook.png")
+        cheetah = str(refs / "cheetah.jpg")
+        checks: list[dict] = []
+
+        def _order(name: str, a: float, b: float, note: str) -> None:
+            checks.append({
+                "name": name,
+                "expected": note,
+                "measured_a": round(a, 5),
+                "measured_b": round(b, 5),
+                "ok": a > b,
+            })
+
+        # Each pair has large measured headroom (Stage-A calibration) so the
+        # self-test itself is not flaky.
+        _order(
+            "armed_vs_unarmed",
+            self.score(knight, "a knight with a sword and shield"),
+            self.score(cook, "a knight with a sword and shield"),
+            "armed knight > unarmed cook for a knight-with-weapon query",
+        )
+        _order(
+            "photo_true_vs_wrong_label",
+            self.score(cheetah, "a cheetah"),
+            self.score(cheetah, "a bus"),
+            "cheetah photo scores 'a cheetah' > 'a bus'",
+        )
+        _order(
+            "self_vs_cross_similarity",
+            self.compare(knight, knight),
+            self.compare(knight, cook),
+            "compare(knight, knight) > compare(knight, cook)",
+        )
+
+        info = self.status()
+        return {
+            "passed": all(c["ok"] for c in checks),
+            "checks": checks,
+            "model_id": info["model_id"],
+            "device": info["device"],
+            "torch_version": info["torch_version"],
+            "transformers_version": info["transformers_version"],
+        }

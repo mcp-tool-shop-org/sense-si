@@ -42,7 +42,7 @@ jobs:
           from ai_eyes_mcp.server import mcp
           import asyncio
           tools = asyncio.run(mcp._list_tools())
-          expected = {'image_contains', 'image_classify', 'image_compare', 'image_score_batch', 'eyes_status'}
+          expected = {'image_contains', 'image_classify', 'image_compare', 'image_score_batch', 'image_verify', 'eyes_selftest', 'eyes_status'}
           names = {t.name for t in tools}
           assert names == expected, f'Expected {expected}, got {names}'
           print(f'  {len(tools)} tools registered OK')

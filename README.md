@@ -22,6 +22,8 @@ This MCP server wraps SigLIP2 as tools that any Claude workflow can call.
 | `image_classify` | Score image against N candidate labels |
 | `image_compare` | Cosine similarity between two images |
 | `image_score_batch` | Score N images against one query |
+| `image_verify` | Honest RELATIVE verdict: target vs alternatives → decision + margin + confidence |
+| `eyes_selftest` | Self-test on bundled reference images (proves install + calibration) |
 | `eyes_status` | Health check: model, device, loaded state |
 
 ## Quick Start
@@ -168,6 +170,22 @@ Score multiple images against a single query. Max 100 images per call.
 
 Returns: `{query, threshold, total, scored, present, absent, errors, error_details?, results: [{path, score, present}]}`
 
+### `image_verify`
+
+```
+image_verify(image_path, target, alternatives)
+```
+
+Honest **relative** verdict — ranks `target` against caller-supplied `alternatives` (required, ≥1) and returns a decision + margin + confidence. Robust to SigLIP's query-phrasing sensitivity because it's relative, not an absolute threshold. For a raw score use `image_contains`; for full ranking use `image_classify`.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `image_path` | string | yes | Absolute path to the image |
+| `target` | string | yes | The hypothesis to verify |
+| `alternatives` | string[] | yes | Contrast alternatives to rank against (≥1) |
+
+Returns: `{present, target, target_score, best_alternative, best_alternative_score, margin, confidence}` — `confidence` is `high` / `moderate` / `low — inconclusive`, describing the measured gap.
+
 ### `eyes_status`
 
 ```
@@ -176,7 +194,17 @@ eyes_status()
 
 Check server status. Does not trigger model loading.
 
-Returns: `{model_id, device, loaded, cache_dir, parameters?, vram_mb?}`
+Returns: `{model_id, device, loaded, cache_dir, parameters?, vram_mb?, scoring_guidance, note?}`
+
+### `eyes_selftest`
+
+```
+eyes_selftest()
+```
+
+Runs the model on a few bundled reference images and confirms the expected orderings hold — proves the install loaded correctly and SigLIP2 is calibrated. Loads the model if not already loaded.
+
+Returns: `{passed, checks: [{name, expected, measured_a, measured_b, ok}], model_id, device, torch_version, transformers_version}`
 
 When `loaded` is true, also returns `parameters` (e.g., '400M') and `vram_mb` (CUDA only).
 
