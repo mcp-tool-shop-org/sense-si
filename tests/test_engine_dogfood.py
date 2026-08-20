@@ -327,7 +327,14 @@ class TestBatch:
         self, engine, photo_lion, photo_bus, photo_cheetah
     ):
         """Batch scores should match individual score() calls. (Image-agnostic —
-        re-pointed to vendored photos in Wave 0.)"""
+        re-pointed to vendored photos in Wave 0.)
+
+        NOT a stacking gate: ``abs < 0.001`` is three orders of magnitude
+        looser than the 5.364e-07 delta a stacked forward introduces, so this
+        stays green through it. ``test_stacked_matches_loop_exactly`` is the
+        gate. Left as-is deliberately — it checks a different, coarser
+        promise (batch and single agree to display tolerance).
+        """
         paths = [photo_lion, photo_bus, photo_cheetah]
         query = "a character holding a sword"
 
@@ -353,9 +360,33 @@ class TestBatch:
     ):
         """F-W5-TESTS-001: stacked forward == per-image loop, bit-identical.
 
-        Until ENGINE-001, stacked IS the loop (compares the loop to itself).
-        After ENGINE-001 this is the red-green gate that stacking did not
-        move a number. Fixture set: 8 images, mixed sizes/modes, RGBA + non-square.
+        !!! THIS TEST IS A TAUTOLOGY TODAY, ON PURPOSE. READ THIS BEFORE
+        !!! TRUSTING ITS GREEN.
+
+        ``_score_batch_stacked`` currently delegates to ``_score_batch_loop``
+        (F-W5-ENGINE-001 is held open — see that method's docstring). So this
+        compares the loop to ITSELF. A green here means "the delegation is
+        still in place". It does NOT mean stacking is proven safe, because
+        there is no stacking. Wave 8 implemented real stacking and watched
+        this fire immediately:
+
+            index 1: loop=5.835853501834354e-12 stacked=5.836043454054973e-12
+
+        It has teeth the moment a real stacked path lands, which is exactly
+        why it must not be deleted or loosened to make one pass. If you are
+        here because you just implemented stacking and this went red: that is
+        the gate working, not a flaky test.
+
+        Do NOT count ``test_batch_matches_individual`` as a second opinion
+        either — its tolerance is ``abs < 0.001`` against a real stacking
+        delta of 5.364e-07, so it stays green through the change this gate
+        exists to catch.
+
+        What the wave-9 measurement actually established lives in
+        ``test_stacking_divergence_is_payload_visible`` and
+        ``test_fixed_batch_size_is_reproducible``.
+
+        Fixture set: 8 images, mixed sizes/modes, RGBA + non-square.
         """
         from tests.conftest import assert_identical_scores
 
