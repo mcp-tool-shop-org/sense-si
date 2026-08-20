@@ -329,7 +329,9 @@ class TestMCPProtocolE2E:
         return asyncio.run(go())
 
     def test_list_tools_over_protocol(self):
-        assert len({t.name for t in self._list()}) == len(EXPECTED_TOOL_NAMES)
+        from tests.test_ci_gates import SHIPPED_TOOL_COUNT
+
+        assert len({t.name for t in self._list()}) == SHIPPED_TOOL_COUNT
 
     def test_image_contains_over_protocol(self, photo_cheetah):
         r = self._call("image_contains", {"image_path": photo_cheetah, "query": "a cheetah"})
@@ -387,10 +389,19 @@ class TestMCPToolRegistration:
         return asyncio.run(mcp._list_tools())
 
     def test_tool_count(self):
-        """Registered tools must match EXPECTED_TOOL_NAMES."""
+        """Registered tools must match the INDEPENDENT count anchor.
+
+        Was ``len(tools) == len(EXPECTED_TOOL_NAMES)``. That does catch an
+        undeclared tool, but both the expectation and the count came from one
+        source, so nothing here could catch the count itself going stale — and
+        it had (eight tools registered while three test names said "seven").
+        SHIPPED_TOOL_COUNT is a literal a human maintains in test_ci_gates.py.
+        """
+        from tests.test_ci_gates import SHIPPED_TOOL_COUNT
+
         tools = self._get_tools()
-        assert len(tools) == len(EXPECTED_TOOL_NAMES), (
-            f"Expected {len(EXPECTED_TOOL_NAMES)} registered tools, got {len(tools)}: "
+        assert len(tools) == SHIPPED_TOOL_COUNT, (
+            f"Expected {SHIPPED_TOOL_COUNT} registered tools, got {len(tools)}: "
             f"{[t.name for t in tools]}"
         )
 

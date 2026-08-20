@@ -16,6 +16,22 @@ import pytest
 
 REPO = Path(__file__).resolve().parent.parent
 
+# ---------------------------------------------------------------------------
+# THE INDEPENDENT ANCHOR.
+#
+# EXPECTED_TOOL_NAMES (in __init__.py) is the canonical constant that the
+# server, verify.sh, CI and the dogfood suite all import. It cannot check
+# itself. SHIPPED_TOOLS and SHIPPED_TOOL_COUNT are hand-maintained HERE, on
+# purpose, so that changing the shipped tool surface has to touch two sources
+# deliberately instead of being added, declared and self-approved in one edit.
+#
+# SHIPPED_TOOL_COUNT is spelled as a literal rather than derived from
+# SHIPPED_TOOLS: the count is the part that goes stale silently. It did —
+# image_rank landed in v1.2.0 and three test names went on saying "seven"
+# while eight tools registered, so a reader auditing whether the anchor still
+# guarded the right number was told the wrong one by the anchor itself.
+# ---------------------------------------------------------------------------
+
 SHIPPED_TOOLS = {
     "image_contains",
     "image_classify",
@@ -26,26 +42,44 @@ SHIPPED_TOOLS = {
     "eyes_selftest",
     "eyes_status",
 }
+SHIPPED_TOOL_COUNT = 8
 
 
-def test_canonical_constant_matches_shipped_seven():
+def test_shipped_tool_count_matches_the_shipped_set():
+    """The hand-maintained count must not drift from the hand-maintained set."""
+    assert len(SHIPPED_TOOLS) == SHIPPED_TOOL_COUNT, (
+        f"SHIPPED_TOOL_COUNT says {SHIPPED_TOOL_COUNT} but SHIPPED_TOOLS lists "
+        f"{len(SHIPPED_TOOLS)}: {sorted(SHIPPED_TOOLS)}"
+    )
+
+
+def test_canonical_constant_matches_the_independent_anchor():
+    """EXPECTED_TOOL_NAMES is checked against a set it does not derive from."""
     from ai_eyes_mcp import EXPECTED_TOOL_NAMES
 
     assert set(EXPECTED_TOOL_NAMES) == SHIPPED_TOOLS
 
 
-def test_live_registration_matches_shipped_seven():
-    """The server must register exactly the v1.1.0 seven-tool set."""
-    from ai_eyes_mcp import EXPECTED_TOOL_NAMES
+def test_live_registration_matches_the_independent_anchor():
+    """The server must register exactly the hand-declared tool set.
+
+    Asserted against SHIPPED_TOOLS, not EXPECTED_TOOL_NAMES: a tool added to
+    server.py and waved through by also editing the canonical constant must
+    still land on a literal a human wrote in a different file.
+    """
     from ai_eyes_mcp.server import mcp
 
     names = {t.name for t in asyncio.run(mcp._list_tools())}
-    assert names == EXPECTED_TOOL_NAMES, (
-        f"registered {sorted(names)} != shipped {sorted(EXPECTED_TOOL_NAMES)}"
+    assert names == SHIPPED_TOOLS, (
+        f"registered {sorted(names)} != declared {sorted(SHIPPED_TOOLS)}"
+    )
+    assert len(names) == SHIPPED_TOOL_COUNT, (
+        f"{len(names)} tools register but SHIPPED_TOOL_COUNT says "
+        f"{SHIPPED_TOOL_COUNT}"
     )
 
 
-def test_verify_sh_asserts_the_shipped_seven():
+def test_verify_sh_asserts_the_shipped_tool_set():
     """verify.sh must not carry a stale inline tool set (W1-CITOOL-001).
 
     One source of truth: both the script and CI import EXPECTED_TOOL_NAMES
