@@ -8,6 +8,7 @@ EXPECTED_TOOL_NAMES = frozenset({
     "image_contains",
     "image_classify",
     "image_compare",
+    "image_rank",
     "image_score_batch",
     "image_verify",
     "eyes_selftest",

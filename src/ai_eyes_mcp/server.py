@@ -32,6 +32,8 @@ from ai_eyes_mcp.engine import (
     round_preserving_gt,
     display_round,
     configure_logging,
+    confidence_from_magnitude,
+    round_margin,
 )
 
 logger = logging.getLogger("ai_eyes_mcp")
@@ -72,6 +74,31 @@ def _construct_engine() -> SigLIPEngine:
 
 
 engine = _construct_engine()
+
+
+def _parse_baseline_pairs(baselines) -> list[tuple[str, str]] | None:
+    """Caller-supplied 'these are not a match' pairs. None/empty → no floor."""
+    if not baselines:
+        return None
+    pairs: list[tuple[str, str]] = []
+    for item in baselines:
+        if item is None or len(item) != 2:
+            raise ToolError(
+                "each baseline must be a pair of image paths [path_a, path_b] "
+                "that are NOT a match in this style"
+            )
+        pairs.append((str(Path(item[0]).resolve()), str(Path(item[1]).resolve())))
+    return pairs
+
+
+def _separation(similarity: float, floor: float) -> dict:
+    margin = similarity - floor
+    return {
+        "separated": similarity > floor,
+        "margin": round_margin(margin),
+        "baseline_max": float(floor),
+        "confidence": confidence_from_magnitude(abs(margin)),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -231,30 +258,136 @@ def image_classify(
 def image_compare(
     image_a: Annotated[str, Field(description="Absolute path to the first image")],
     image_b: Annotated[str, Field(description="Absolute path to the second image")],
+    baselines: Annotated[
+        list[list[str]] | None,
+        Field(
+            description=(
+                "Pairs of images that are NOT a match in this style. A-B is "
+                "separated only if its similarity exceeds this caller-supplied "
+                "floor. Omit for a raw measurement (incomplete — not a verdict)."
+            )
+        ),
+    ] = None,
 ) -> dict:
     """Compute visual similarity between two images.
 
     Returns cosine similarity (-1 to 1) of their SigLIP2 embeddings.
-    Higher values mean the images look more alike to the vision model.
-
-    Use cases: comparing sprite poses, checking if two renders match,
-    detecting visual duplicates.
+    Without ``baselines`` the number is a measurement, not a match verdict
+    (``incomplete: true``) — similarity floors do not transfer across styles.
+    With baselines, ``separated`` reports whether A-B exceeds the caller-supplied
+    'these are different' floor.
     """
     t0 = time.perf_counter()
     image_a = str(Path(image_a).resolve())
     image_b = str(Path(image_b).resolve())
+    pairs = _parse_baseline_pairs(baselines)
     _ensure_engine_ready()
     try:
         similarity = engine.compare(image_a, image_b)
+        floor = None
+        if pairs:
+            floor = max(engine.compare(x, y) for x, y in pairs)
     except Exception as e:
         raise _tool_error(e) from None
 
     elapsed = round((time.perf_counter() - t0) * 1000)
     logger.debug("image_compare completed in %.3fs", elapsed / 1000)
-    return {
+    payload = {
         "similarity": round(similarity, 4),
         "image_a": image_a,
         "image_b": image_b,
+        "revision": engine._resolved_revision,
+        "incomplete": floor is None,
+        "elapsed_ms": elapsed,
+    }
+    if floor is None:
+        payload["separated"] = None
+        payload["margin"] = None
+        payload["baseline_max"] = None
+        payload["confidence"] = None
+    else:
+        payload.update(_separation(float(similarity), float(floor)))
+    return payload
+
+
+@mcp.tool
+def image_rank(
+    reference: Annotated[str, Field(description="Absolute path to the reference image")],
+    candidates: Annotated[list[str], Field(description="Candidate image paths to rank against the reference")],
+    k: Annotated[int, Field(description="Maximum matches to return")] = 5,
+    baselines: Annotated[
+        list[list[str]] | None,
+        Field(
+            description=(
+                "Pairs of images that are NOT a match in this style. Candidates "
+                "at or below this floor are not close. Omit for a raw top-k "
+                "measurement (incomplete — not a verdict)."
+            )
+        ),
+    ] = None,
+) -> dict:
+    """Rank candidates by cosine similarity to one reference.
+
+    Encodes the reference once. Returns top-k with margins. Without baselines
+    the ranking is a measurement (``incomplete: true``), not 'these match'.
+    With baselines, only candidates whose similarity exceeds the caller-supplied
+    'different' floor are matches; if none do, ``matches`` is empty and
+    ``nothing_close`` is true.
+    """
+    if not candidates:
+        raise ToolError("At least one candidate is required")
+    if len(candidates) > 100:
+        raise ToolError("Maximum 100 candidates per call")
+    if k < 1:
+        raise ToolError("k must be >= 1")
+    t0 = time.perf_counter()
+    reference = str(Path(reference).resolve())
+    candidates = [str(Path(p).resolve()) for p in candidates]
+    pairs = _parse_baseline_pairs(baselines)
+    _ensure_engine_ready()
+    try:
+        sims = engine.similarities_to_reference(reference, candidates)
+        floor = None
+        if pairs:
+            floor = max(engine.compare(x, y) for x, y in pairs)
+    except Exception as e:
+        raise _tool_error(e) from None
+
+    ranked = sorted(zip(candidates, sims), key=lambda kv: kv[1], reverse=True)
+    matches = []
+    if floor is None:
+        take = ranked[:k]
+        for i, (path, sim) in enumerate(take):
+            nxt = take[i + 1][1] if i + 1 < len(take) else None
+            matches.append({
+                "path": path,
+                "similarity": round(float(sim), 4),
+                "margin_to_next": None if nxt is None else round(float(sim) - float(nxt), 4),
+                "separated": None,
+            })
+        nothing_close = False
+    else:
+        above = [(p, s) for p, s in ranked if float(s) > float(floor)]
+        take = above[:k]
+        for i, (path, sim) in enumerate(take):
+            nxt = take[i + 1][1] if i + 1 < len(take) else None
+            matches.append({
+                "path": path,
+                "similarity": round(float(sim), 4),
+                "margin_to_next": None if nxt is None else round(float(sim) - float(nxt), 4),
+                "separated": True,
+                "margin_to_baseline": round_margin(float(sim) - float(floor)),
+            })
+        nothing_close = len(above) == 0
+
+    elapsed = round((time.perf_counter() - t0) * 1000)
+    return {
+        "reference": reference,
+        "k": k,
+        "matches": matches,
+        "incomplete": floor is None,
+        "nothing_close": nothing_close,
+        "baseline_max": None if floor is None else float(floor),
         "revision": engine._resolved_revision,
         "elapsed_ms": elapsed,
     }

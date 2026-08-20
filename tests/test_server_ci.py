@@ -18,6 +18,7 @@ from ai_eyes_mcp.server import (
     image_classify,
     image_compare,
     image_contains,
+    image_rank,
     image_score_batch,
     image_verify,
     eyes_selftest,
@@ -220,6 +221,9 @@ def test_every_model_backed_payload_names_the_resolved_revision(monkeypatch):
     monkeypatch.setattr(server.engine, "_score_with_text_inputs", lambda path, text: 0.1)
     monkeypatch.setattr(server.engine, "compare", lambda a, b: 0.8)
     monkeypatch.setattr(
+        server.engine, "similarities_to_reference", lambda ref, cands: [0.5] * len(cands)
+    )
+    monkeypatch.setattr(
         server.engine,
         "selftest",
         lambda: {
@@ -251,6 +255,7 @@ def test_every_model_backed_payload_names_the_resolved_revision(monkeypatch):
         "image_verify": lambda: image_verify("unused.png", "a", ["b"]),
         "eyes_selftest": eyes_selftest,
         "eyes_status": eyes_status,
+        "image_rank": lambda: image_rank("ref.png", ["a.png", "b.png"], k=1),
     }
     uncovered = EXPECTED_TOOL_NAMES - set(callers)
     extra = set(callers) - EXPECTED_TOOL_NAMES
@@ -275,3 +280,76 @@ def test_classify_docstring_does_not_equate_low_score_with_absence():
     assert "NOT confidently present" not in doc
     assert "not confidently present" not in doc.lower()
     assert "phrasing" in doc.lower() or "relative" in doc.lower()
+
+
+def test_image_rank_incomplete_without_baselines(monkeypatch):
+    """F-W5-SERVER-003: without baselines, top-k is a measurement not a verdict."""
+    from ai_eyes_mcp import server
+
+    _stub_loaded(monkeypatch, server)
+    monkeypatch.setattr(
+        server.engine,
+        "similarities_to_reference",
+        lambda ref, cands: [0.9, 0.4],
+    )
+    r = image_rank("ref.png", ["hit.png", "miss.png"], k=2)
+    assert r["incomplete"] is True
+    assert r["revision"] == _PIN
+    assert len(r["matches"]) == 2
+    assert r["matches"][0]["path"].endswith("hit.png")
+    assert r["matches"][0]["similarity"] >= r["matches"][1]["similarity"]
+
+
+def test_image_rank_nothing_close_returns_empty_matches(monkeypatch):
+    """A verb that always returns top-k is confident output with no signal."""
+    from ai_eyes_mcp import server
+
+    _stub_loaded(monkeypatch, server)
+    monkeypatch.setattr(
+        server.engine,
+        "similarities_to_reference",
+        lambda ref, cands: [0.70, 0.65],
+    )
+    monkeypatch.setattr(server.engine, "compare", lambda a, b: 0.80)
+    r = image_rank(
+        "ref.png",
+        ["a.png", "b.png"],
+        k=5,
+        baselines=[["x.png", "y.png"]],
+    )
+    assert r["incomplete"] is False
+    assert r["matches"] == []
+    assert r["nothing_close"] is True
+    assert r["revision"] == _PIN
+
+
+def test_compare_incomplete_without_baselines(monkeypatch):
+    """F-W5-SERVER-002: no caller baseline → no verdict, only the measurement."""
+    from ai_eyes_mcp import server
+
+    _stub_loaded(monkeypatch, server)
+    monkeypatch.setattr(server.engine, "compare", lambda a, b: 0.82)
+    r = image_compare("a.png", "b.png")
+    assert r["incomplete"] is True
+    assert r["separated"] is None
+    assert "similarity" in r
+    assert r["revision"] == _PIN
+
+
+def test_compare_separated_uses_caller_baseline_not_a_fixed_band(monkeypatch):
+    from ai_eyes_mcp import server
+
+    _stub_loaded(monkeypatch, server)
+    calls = []
+
+    def fake_compare(a, b):
+        calls.append(1)
+        # First call is A-B, later calls are baseline pairs.
+        return 0.95 if len(calls) == 1 else 0.80
+
+    monkeypatch.setattr(server.engine, "compare", fake_compare)
+    r = image_compare("a.png", "b.png", baselines=[["x.png", "y.png"]])
+    assert r["incomplete"] is False
+    assert r["separated"] is True
+    assert r["baseline_max"] == 0.80
+    assert r["margin"] > 0

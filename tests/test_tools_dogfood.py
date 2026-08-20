@@ -329,7 +329,7 @@ class TestMCPProtocolE2E:
         return asyncio.run(go())
 
     def test_list_tools_over_protocol(self):
-        assert len({t.name for t in self._list()}) == 7
+        assert len({t.name for t in self._list()}) == len(EXPECTED_TOOL_NAMES)
 
     def test_image_contains_over_protocol(self, photo_cheetah):
         r = self._call("image_contains", {"image_path": photo_cheetah, "query": "a cheetah"})
@@ -387,10 +387,10 @@ class TestMCPToolRegistration:
         return asyncio.run(mcp._list_tools())
 
     def test_tool_count(self):
-        """Exactly 7 tools should be registered."""
+        """Registered tools must match EXPECTED_TOOL_NAMES."""
         tools = self._get_tools()
-        assert len(tools) == 7, (
-            f"Expected 7 registered tools, got {len(tools)}: "
+        assert len(tools) == len(EXPECTED_TOOL_NAMES), (
+            f"Expected {len(EXPECTED_TOOL_NAMES)} registered tools, got {len(tools)}: "
             f"{[t.name for t in tools]}"
         )
 
