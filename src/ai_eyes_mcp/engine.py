@@ -88,6 +88,28 @@ else:
         DEFAULT_THRESHOLD = _THRESHOLD_FALLBACK
 
 
+def assert_cold_status(s: dict) -> None:
+    """CI/verify gate for a freshly constructed, unloaded engine.
+
+    Must be able to fail: loaded lying, a missing/wrong revision, or a
+    missing model_id. Truthy-only checks on model_id/device cannot (W1-CITOOL-002).
+    """
+    if s.get("loaded") is not False:
+        raise AssertionError(
+            f"cold engine must report loaded=False (status does not load the "
+            f"model); got loaded={s.get('loaded')!r}"
+        )
+    if s.get("revision") != PINNED_MODEL_REVISION:
+        raise AssertionError(
+            f"status revision {s.get('revision')!r} does not match the pin "
+            f"{PINNED_MODEL_REVISION}"
+        )
+    if s.get("model_id") != DEFAULT_MODEL_ID:
+        raise AssertionError(
+            f"status model_id {s.get('model_id')!r} != {DEFAULT_MODEL_ID!r}"
+        )
+
+
 def validate_model_revision(revision: str | None) -> str:
     """Return a 40-character hex SHA, or raise.
 

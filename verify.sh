@@ -20,12 +20,10 @@ print(f'  {len(tools)} tools registered OK')
 
 echo "[3/5] Engine status check..."
 python -c "
-from ai_eyes_mcp.engine import SigLIPEngine
-e = SigLIPEngine()
-s = e.status()
-assert s['model_id'], 'model_id missing'
-assert s['device'], 'device missing'
-print(f'  engine OK: model={s[\"model_id\"]}, device={s[\"device\"]}')
+from ai_eyes_mcp.engine import SigLIPEngine, assert_cold_status
+s = SigLIPEngine().status()
+assert_cold_status(s)
+print(f'  engine OK: model={s[\"model_id\"]}, revision={s[\"revision\"]}, loaded={s[\"loaded\"]}')
 "
 
 echo "[4/5] Build check..."

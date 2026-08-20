@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "build"]
+dev = ["pytest>=8.0", "build", "hatchling"]
 
 [project.scripts]
 ai-eyes-mcp = "ai_eyes_mcp.server:main"

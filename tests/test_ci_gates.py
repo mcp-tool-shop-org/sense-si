@@ -12,6 +12,8 @@ import asyncio
 import re
 from pathlib import Path
 
+import pytest
+
 REPO = Path(__file__).resolve().parent.parent
 
 SHIPPED_TOOLS = {
@@ -68,6 +70,53 @@ def test_ci_yml_uses_canonical_tool_names():
     assert "EXPECTED_TOOL_NAMES" in text, (
         "ci.yml must import EXPECTED_TOOL_NAMES rather than a second hand-maintained set"
     )
+
+
+def test_dev_extra_includes_hatchling():
+    """W1-COORD-010: verify.sh runs `python -m build --no-isolation`, which
+    needs hatchling on the import path. The documented `pip install -e ".[dev]"`
+    path must provision it."""
+    try:
+        import tomllib
+    except ImportError:  # pragma: no cover — 3.10
+        import tomli as tomllib
+    data = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
+    dev = data["project"]["optional-dependencies"]["dev"]
+    assert any(d.split(">=")[0].split("==")[0] == "hatchling" for d in dev), (
+        f"dev extra must include hatchling so verify.sh --no-isolation can build; got {dev}"
+    )
+
+
+def test_cold_status_gate_passes_fresh_engine():
+    from ai_eyes_mcp.engine import SigLIPEngine, assert_cold_status
+
+    assert_cold_status(SigLIPEngine().status())
+
+
+def test_cold_status_gate_rejects_loaded_lie():
+    """W1-CITOOL-002: the gate must be able to go red if loaded lies."""
+    from ai_eyes_mcp.engine import SigLIPEngine, assert_cold_status
+
+    s = SigLIPEngine().status()
+    s["loaded"] = True
+    with pytest.raises(AssertionError, match="loaded"):
+        assert_cold_status(s)
+
+
+def test_cold_status_gate_rejects_wrong_revision():
+    from ai_eyes_mcp.engine import SigLIPEngine, assert_cold_status
+
+    s = SigLIPEngine().status()
+    s["revision"] = "main"
+    with pytest.raises(AssertionError, match="revision"):
+        assert_cold_status(s)
+
+
+def test_verify_and_ci_use_cold_status_gate():
+    verify = (REPO / "verify.sh").read_text(encoding="utf-8")
+    ci = (REPO / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "assert_cold_status" in verify
+    assert "assert_cold_status" in ci
 
 
 def test_ci_and_verify_select_not_dogfood():
