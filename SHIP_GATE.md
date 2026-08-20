@@ -58,7 +58,7 @@
 
 - [x] `[all]` Logo in README header — `docs/logo.png`, dark-card wordmark, replaced the line-art SVG (2026-08-20)
 - [ ] `[all]` Translations — **SKIP justification is STALE.** The reason on file was "internal instrument (Anthropic hand-off)"; the repo is **PUBLIC** with a public description and 7 topics. Whether a public org tool gets the standard 8-language treatment is a Director call, not a default. Flagged 2026-08-20, not silently honoured and not silently overridden.
-- [ ] `[org]` Landing page + handbook — **SKIP justification is STALE**, same reason as above: filed as "internal", repo is PUBLIC. Director call. Flagged 2026-08-20.
+- [x] `[org]` Landing page + 5-page Starlight handbook at `site/` (blue accent, Pagefind search, local logo). The prior SKIP was justified as "internal"; the repo is PUBLIC, so the justification was stale rather than the decision being wrong. Build verified: 6 pages, search index, all handbook routes present. (2026-08-20)
 - [x] `[all]` GitHub repo metadata: description + 7 topics set via `gh repo edit`; description refreshed for v1.2.0 (2026-08-20)
 
 ---

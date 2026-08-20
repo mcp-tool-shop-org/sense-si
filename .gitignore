@@ -31,3 +31,4 @@ models/
 .idea/
 .vscode/
 *.swp
+site/.astro/
