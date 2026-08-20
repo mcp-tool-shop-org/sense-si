@@ -396,6 +396,17 @@ def test_standalone_engine_honours_model_id_env():
     assert r.stdout == "TEST/should-appear", r.stdout
 
 
+def test_missing_weights_helper_does_not_treat_oom_as_absent():
+    """W1-TESTS-001: CUDA OOM / ImportError must fail the suite, not skip-green."""
+    from tests.conftest import is_missing_weights_error
+
+    assert is_missing_weights_error(OSError("We couldn't find google/siglip2 in the cache"))
+    assert is_missing_weights_error(OSError("Offline mode: file not found"))
+    assert not is_missing_weights_error(RuntimeError("CUDA out of memory. Tried to allocate 2 GiB"))
+    assert not is_missing_weights_error(ImportError("No module named transformers"))
+    assert not is_missing_weights_error(RuntimeError("cuDNN error: CUDNN_STATUS_NOT_INITIALIZED"))
+
+
 def test_out_of_range_threshold_falls_back_with_warning():
     """W1-ENGINE-005: 1.5 must not become the default; banana already falls back."""
     r = _engine_subprocess(

@@ -21,6 +21,38 @@ import pytest
 
 from ai_eyes_mcp.engine import SigLIPEngine
 
+
+def is_missing_weights_error(exc: BaseException) -> bool:
+    """True only when the weights are genuinely not on disk / not downloadable.
+
+    CUDA OOM, driver errors, and ImportError are broken-load failures and
+    must fail the suite, not skip-green (W1-TESTS-001).
+    """
+    if isinstance(exc, (RuntimeError, ImportError)):
+        return False
+    name = type(exc).__name__
+    if name in {
+        "LocalEntryNotFoundError",
+        "EntryNotFoundError",
+        "RepositoryNotFoundError",
+        "RevisionNotFoundError",
+    }:
+        return True
+    if isinstance(exc, OSError):
+        msg = str(exc).lower()
+        needles = (
+            "not found",
+            "no such file",
+            "couldn't find",
+            "could not find",
+            "cannot find",
+            "offline",
+            "local_files_only",
+            "is not a local folder",
+        )
+        return any(n in msg for n in needles)
+    return False
+
 # ---------------------------------------------------------------------------
 # Vendored image assets — portable, committed under tests/assets/
 # ---------------------------------------------------------------------------
@@ -163,6 +195,8 @@ def engine():
     # Force load now so we see any load failures immediately
     try:
         e._ensure_loaded()
-    except (OSError, RuntimeError, ImportError) as exc:
-        pytest.skip(f"SigLIP2 model not available: {exc}")
+    except Exception as exc:
+        if is_missing_weights_error(exc):
+            pytest.skip(f"SigLIP2 model not available: {exc}")
+        raise
     return e

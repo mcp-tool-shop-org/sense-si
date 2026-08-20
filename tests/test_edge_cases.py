@@ -135,7 +135,7 @@ class TestToolErrors:
 
     def test_contains_invalid_image_type(self):
         """Passing a non-image file should raise ToolError."""
-        with pytest.raises(ToolError):
+        with pytest.raises(ToolError, match="Cannot open image"):
             image_contains(NON_IMAGE_PATH, "anything")
 
     def test_contains_empty_query(self, photo_cheetah):
@@ -163,13 +163,13 @@ class TestToolErrors:
     def test_compare_non_image_as_image_a(self, photo_cheetah):
         """Passing a non-image file as image_a should raise ToolError.
         (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
-        with pytest.raises(ToolError):
+        with pytest.raises(ToolError, match="Cannot open image"):
             image_compare(NON_IMAGE_PATH, photo_cheetah)
 
     def test_compare_non_image_as_image_b(self, photo_cheetah):
         """Passing a non-image file as image_b should raise ToolError.
         (Image-agnostic — re-pointed to a vendored photo in Wave 0.)"""
-        with pytest.raises(ToolError):
+        with pytest.raises(ToolError, match="Cannot open image"):
             image_compare(photo_cheetah, NON_IMAGE_PATH)
 
     def test_batch_non_image_captured_in_errors(self, photo_cheetah):
