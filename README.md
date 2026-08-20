@@ -30,6 +30,19 @@ This MCP server wraps SigLIP2 as tools that any Claude workflow can call.
 | `eyes_selftest` | Self-test on bundled reference images (proves install + calibration) |
 | `eyes_status` | Health check: model, device, loaded state |
 
+### When to reach for something else
+
+ai-eyes answers **"is this claim about the pixels true?"** It scores a hypothesis
+you supply — it cannot tell you what is in an image you have not already described.
+
+For a **caption, a description, or text read off the image**, that is generative
+work and a different instrument: **[plain-sight](https://github.com/mcp-tool-shop-org/plain-sight)**
+(Florence-2). Its output can hallucinate detail by construction — bring anything
+load-bearing back here and measure it with `image_verify`.
+
+A deliberate pair, and each one's guidance points at the other: **plain-sight
+describes, ai-eyes measures.**
+
 ## Quick Start
 
 ```bash
@@ -59,12 +72,25 @@ Or run as a module: `python -m ai_eyes_mcp`
 | Env Var | Default | Purpose |
 |---------|---------|---------|
 | `AI_EYES_MODEL_ID` | `google/siglip2-so400m-patch14-384` | HuggingFace model |
+| `AI_EYES_MODEL_REVISION` | pinned commit SHA | Model revision. **Must be a 40-character hex commit SHA.** `main`, a tag, or an empty value is a hard load failure, not a fallback — see *Reproducibility* below. |
 | `AI_EYES_MODEL_DIR` | HF default cache | Model cache directory |
 | `AI_EYES_DEVICE` | `cuda` if available, else `cpu` | torch device. Set a literal device (`cuda`, `cpu`, `cuda:1`) — there is no `auto` value; `AI_EYES_DEVICE=auto` raises. |
 | `AI_EYES_DEFAULT_THRESHOLD` | `0.02` | Default threshold for `image_contains` |
 | `AI_EYES_LOG_LEVEL` | `WARNING` | Log verbosity: `DEBUG` / `INFO` / `WARNING` / `ERROR` |
 | `AI_EYES_EAGER_LOAD` | unset | If truthy, load the model at startup so a broken model/cache fails fast (not on the first tool call) |
 | `AI_EYES_DTYPE` | full precision | `float16` / `bfloat16` to halve VRAM |
+
+### Reproducibility — the weights are pinned
+
+A score is only meaningful if you know which weights produced it. The model
+revision is **pinned to a specific commit SHA**, passed to every load, and
+**reported in every payload that contains a number**. Two installs made months
+apart return the same score for the same input.
+
+Leaving a revision unset resolves to the pin — never to a floating branch. An
+override is honoured only as a *different* 40-character SHA (operator intent);
+`main`, a tag, or an empty string fails the load with an actionable message
+rather than silently drifting.
 
 **Logging:** The server logs under the `ai_eyes_mcp` logger to **stderr** (stdout is the MCP protocol channel). Set the level with `AI_EYES_LOG_LEVEL` (above), or attach your own handlers to `logging.getLogger("ai_eyes_mcp")`.
 
@@ -128,7 +154,9 @@ Check if an image contains something described by the query. Returns an independ
 | `query` | string | yes | What to look for (e.g., "a person holding a sword") |
 | `threshold` | float | no | Score threshold for present verdict (default 0.02) |
 
-Returns: `{present: bool, score: float, threshold: float, query: string}`
+Returns: `{present, score, threshold, query, truncated, revision, elapsed_ms}`
+
+`truncated: true` means your query ran past the text encoder's 64-token capacity and **the score reflects only the first 64 tokens** — treat it as incomplete, not as a number.
 
 ### `image_classify`
 
@@ -143,7 +171,9 @@ Score an image against multiple candidate labels. Returns independent sigmoid sc
 | `image_path` | string | yes | Absolute path to image file |
 | `labels` | string[] | yes | Candidate labels to score (max 20) |
 
-Returns: `{scores: {label: float}, best: string, best_score: float}`
+Returns: `{scores, best, best_score, truncated, revision, elapsed_ms}`
+
+`best` is selected from full-precision scores; displayed values are rounded only as far as keeps them consistent with that choice.
 
 ### `image_compare`
 
@@ -158,7 +188,9 @@ Compute visual similarity between two images using cosine similarity of SigLIP2 
 | `image_a` | string | yes | Absolute path to first image |
 | `image_b` | string | yes | Absolute path to second image |
 
-Returns: `{similarity: float, image_a: string, image_b: string}`
+Returns: `{similarity, image_a, image_b, revision, elapsed_ms}`
+
+**Cosine similarity does not discriminate finely within a style.** Measured across six pairs of *different* characters in one sprite style: 0.698–0.836, against 1.0 for an image against itself. Use it to detect near-duplicates, not to decide whether two distinct subjects match.
 
 ### `image_score_batch`
 
@@ -174,7 +206,7 @@ Score multiple images against a single query. Max 100 images per call.
 | `query` | string | yes | What to look for |
 | `threshold` | float | no | Score threshold (default 0.02) |
 
-Returns: `{query, threshold, total, scored, present, absent, errors, error_details?, results: [{path, score, present}]}`
+Returns: `{query, threshold, total, scored, present, absent, errors, error_details?, results: [{path, score, present}], truncated, revision, elapsed_ms}`
 
 ### `image_verify`
 
@@ -190,7 +222,7 @@ Honest **relative** verdict — ranks `target` against caller-supplied `alternat
 | `target` | string | yes | The hypothesis to verify |
 | `alternatives` | string[] | yes | Contrast alternatives to rank against (≥1) |
 
-Returns: `{present, target, target_score, best_alternative, best_alternative_score, margin, confidence}` — `confidence` is `high` / `moderate` / `low — inconclusive`, describing the measured gap.
+Returns: `{present, target, target_score, best_alternative, best_alternative_score, margin, confidence, truncated, revision, elapsed_ms}` — `confidence` is `high` / `moderate` / `low — inconclusive`, describing the measured gap.
 
 ### `eyes_status`
 
@@ -200,7 +232,7 @@ eyes_status()
 
 Check server status. Does not trigger model loading.
 
-Returns: `{model_id, device, loaded, cache_dir, parameters?, vram_mb?, scoring_guidance, note?}`
+Returns: `{model_id, revision, device, dtype, loaded, cache_dir, parameters?, vram_mb?, scoring_guidance, note?}`
 
 When `loaded` is true it also returns `parameters` (`1136M`) and `vram_mb` (CUDA only).
 
@@ -242,15 +274,19 @@ This tool operates **locally only**.
 # Install in editable mode with dev dependencies
 pip install -e ".[dev]"
 
-# Run CI-safe tests (no model required)
-pytest tests/test_edge_cases.py -v
+# Run CI-safe tests (no model required) — this is what CI runs
+pytest -m "not dogfood"
 
-# Run all tests (requires SigLIP2 model + GPU)
-pytest tests/ -v
+# Run everything, including GPU tests that need the model
+pytest
 
-# Full verify: imports, tools, build, edge-case tests
+# Full verify: imports, 7-tool registration, cold-status gate, wheel build, CI-safe tests
 bash verify.sh
 ```
+
+Use the **console script** `pytest`, not `python -m pytest`. The latter puts the
+working directory on `sys.path` and can hide an import failure that CI will
+catch.
 
 ## License
 
