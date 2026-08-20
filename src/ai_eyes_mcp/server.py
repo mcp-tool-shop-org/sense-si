@@ -167,6 +167,7 @@ def image_contains(
         "threshold": threshold,
         "query": query,
         "truncated": truncated,
+        "revision": engine._resolved_revision,
         "elapsed_ms": elapsed,
     }
 
@@ -221,6 +222,7 @@ def image_classify(
         "best": best_label,
         "best_score": displayed[best_label],
         "truncated": truncated,
+        "revision": engine._resolved_revision,
         "elapsed_ms": elapsed,
     }
 
@@ -324,6 +326,7 @@ def image_score_batch(
         "results": results,
         "error_details": errors if errors else None,
         "truncated": truncated,
+        "revision": engine._resolved_revision,
         "elapsed_ms": elapsed,
     }
     if results:
@@ -398,6 +401,7 @@ def image_verify(
         result["truncated"] = engine.query_truncated(target) or any(
             engine.query_truncated(a) for a in alternatives
         )
+        result["revision"] = engine._resolved_revision
     except Exception as e:
         raise _tool_error(e) from None
     result["elapsed_ms"] = round((time.perf_counter() - t0) * 1000)

@@ -12,6 +12,7 @@ import sys
 import pytest
 from fastmcp.exceptions import ToolError
 
+from ai_eyes_mcp.engine import PINNED_MODEL_REVISION
 from ai_eyes_mcp.server import (
     image_classify,
     image_contains,
@@ -19,6 +20,13 @@ from ai_eyes_mcp.server import (
     image_verify,
     _tool_error,
 )
+
+_PIN = PINNED_MODEL_REVISION
+
+
+def _stub_loaded(monkeypatch, server):
+    monkeypatch.setattr(type(server.engine), "loaded", property(lambda self: True))
+    monkeypatch.setattr(server.engine, "_resolved_revision", _PIN, raising=False)
 
 
 def test_classify_best_uses_raw_scores_not_rounded(monkeypatch):
@@ -172,6 +180,58 @@ def test_eyes_status_includes_revision():
     assert "revision" in r
     assert r["revision"] == "e8e487298228002f3d8a82e0cd5c8ea9c567f57f"
     assert len(r["revision"]) == 40
+
+
+def test_scoring_payloads_name_the_resolved_revision(monkeypatch):
+    """W5-SERVER-001 / W5-TESTS-002: every scoring payload names the pin.
+
+    scoring_guidance tells callers to treat a payload with no revision as
+    incomplete. This gate must fail if any scoring tool omits the field or
+    echoes a constant that is not the resolved revision.
+    """
+    from ai_eyes_mcp import server
+
+    _stub_loaded(monkeypatch, server)
+    monkeypatch.setattr(server.engine, "score", lambda path, query: 0.1)
+    monkeypatch.setattr(server.engine, "query_truncated", lambda query: False)
+    monkeypatch.setattr(
+        server.engine,
+        "score_multi",
+        lambda path, labels: {lab: 0.1 for lab in labels},
+    )
+    monkeypatch.setattr(
+        server.engine,
+        "verify",
+        lambda path, target, alts: {
+            "present": True,
+            "target": target,
+            "target_score": 0.9,
+            "best_alternative": alts[0],
+            "best_alternative_score": 0.1,
+            "margin": 0.8,
+            "confidence": "high",
+        },
+    )
+    monkeypatch.setattr(server.engine, "_encode_text", lambda query: {})
+    monkeypatch.setattr(server.engine, "_score_with_text_inputs", lambda path, text: 0.1)
+
+    payloads = {
+        "image_contains": image_contains("unused.png", "a query"),
+        "image_classify": image_classify("unused.png", ["a", "b"]),
+        "image_verify": image_verify("unused.png", "a", ["b"]),
+        "image_score_batch": image_score_batch(["unused.png"], "a query"),
+    }
+    missing = [name for name, p in payloads.items() if "revision" not in p]
+    assert not missing, f"scoring payloads missing revision: {missing}"
+    wrong = [
+        name
+        for name, p in payloads.items()
+        if p.get("revision") != _PIN
+    ]
+    assert not wrong, (
+        f"revision is not the resolved SHA on {wrong}: "
+        + ", ".join(f"{n}={payloads[n].get('revision')!r}" for n in wrong)
+    )
 
 
 def test_classify_docstring_does_not_equate_low_score_with_absence():
