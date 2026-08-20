@@ -60,6 +60,27 @@ DEFAULT_MODEL_ID = os.environ.get(
 PINNED_MODEL_REVISION = "e8e487298228002f3d8a82e0cd5c8ea9c567f57f"
 DEFAULT_MODEL_REVISION = PINNED_MODEL_REVISION
 _SHA40 = re.compile(r"^[0-9a-fA-F]{40}$")
+
+
+class Score(float):
+    """A sigmoid that still behaves as a float, plus honesty fields.
+
+    Wave 6 design (W5-ENGINE-003): ``score()`` cannot stay a bare float —
+    that withholds truncated and revision, which the thesis forbids. A
+    parallel ``score_detailed()`` would leave the advertised ``score()``
+    dishonest. A dict return is a break we are not version-bumping this
+    wave (W5-CITOOL-001 is held). Subclassing float keeps
+    ``isinstance(x, float)``, comparisons, and ``round(x, n)`` working
+    for existing standalone callers while exposing ``.truncated`` and
+    ``.revision``.
+    """
+
+    def __new__(cls, value, truncated=False, revision=""):
+        return float.__new__(cls, value)
+
+    def __init__(self, value, truncated=False, revision=""):
+        self.truncated = bool(truncated)
+        self.revision = str(revision)
 DEFAULT_CACHE_DIR = os.environ.get("AI_EYES_MODEL_DIR", None)
 DEFAULT_DEVICE = os.environ.get("AI_EYES_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 DEFAULT_DTYPE = os.environ.get("AI_EYES_DTYPE", None)  # "float16" | "bfloat16" | None (full precision)
@@ -398,12 +419,14 @@ class SigLIPEngine:
     def score(self, image_path: str, query: str) -> float:
         """Score a single image against a single text query.
 
-        Returns a sigmoid probability (0-1). Independent per query —
+        Returns a ``Score`` (float subclass) in 0-1. Independent per query —
         not relative to other queries. Higher = stronger match.
+        ``.truncated`` and ``.revision`` name whether the query was cut
+        and which weights produced the number.
         """
         self._validate_query(query)
         self._ensure_loaded()
-        self._warn_if_truncated(query)
+        truncated = self._warn_if_truncated(query)
 
         image = self._load_image(image_path)
         inputs = self._processor(
@@ -418,7 +441,7 @@ class SigLIPEngine:
             outputs = self._model(**inputs)
             prob = torch.sigmoid(outputs.logits_per_image[0, 0]).item()
 
-        return prob
+        return Score(prob, truncated=truncated, revision=self._resolved_revision)
 
     def score_multi(self, image_path: str, queries: list[str]) -> dict[str, float]:
         """Score one image against multiple text queries.
@@ -443,8 +466,7 @@ class SigLIPEngine:
                 seen.add(q)
                 unique_queries.append(q)
 
-        for q in unique_queries:
-            self._warn_if_truncated(q)
+        truncated_map = {q: self._warn_if_truncated(q) for q in unique_queries}
 
         image = self._load_image(image_path)
         inputs = self._processor(
@@ -459,7 +481,11 @@ class SigLIPEngine:
             outputs = self._model(**inputs)
             probs = torch.sigmoid(outputs.logits_per_image[0]).cpu().numpy()
 
-        return {q: float(p) for q, p in zip(unique_queries, probs)}
+        rev = self._resolved_revision
+        return {
+            q: Score(float(p), truncated=truncated_map[q], revision=rev)
+            for q, p in zip(unique_queries, probs)
+        }
 
     def _encode_text(self, query: str) -> dict:
         """Encode a text query once and return the tokenized tensors.
@@ -481,7 +507,9 @@ class SigLIPEngine:
         ).to(self.device)
         return text_inputs
 
-    def _score_with_text_inputs(self, image_path: str, text_inputs: dict) -> float:
+    def _score_with_text_inputs(
+        self, image_path: str, text_inputs: dict, truncated: bool = False
+    ) -> Score:
         """Score a single image using pre-encoded text tensors.
 
         Skips text encoding — only processes the image and runs the
@@ -501,7 +529,7 @@ class SigLIPEngine:
             outputs = self._model(**combined)
             prob = torch.sigmoid(outputs.logits_per_image[0, 0]).item()
 
-        return prob
+        return Score(prob, truncated=truncated, revision=self._resolved_revision)
 
     def score_batch(self, image_paths: list[str], query: str) -> list[float]:
         """Score multiple images against a single text query.
@@ -517,11 +545,14 @@ class SigLIPEngine:
 
         # Encode text ONCE, reuse for every image
         text_inputs = self._encode_text(query)
+        truncated = self.query_truncated(query)
 
         total = len(image_paths)
         scores = []
         for i, path in enumerate(image_paths):
-            scores.append(self._score_with_text_inputs(path, text_inputs))
+            scores.append(
+                self._score_with_text_inputs(path, text_inputs, truncated=truncated)
+            )
             # Progress reporting every 25 images (skip the very last — caller sees the result)
             if total > 1 and (i + 1) % 25 == 0 and (i + 1) < total:
                 logger.info("Batch progress: %d/%d", i + 1, total)
@@ -590,6 +621,9 @@ class SigLIPEngine:
         present = target_score > best_alt_score
         confidence = confidence_from_magnitude(abs(margin))
         disp_target, disp_alt = round_pair_preserving_order(target_score, best_alt_score)
+        truncated = self.query_truncated(target) or any(
+            self.query_truncated(c) for c in contrasts
+        )
         return {
             "present": present,
             "target": target,
@@ -598,6 +632,8 @@ class SigLIPEngine:
             "best_alternative_score": disp_alt,
             "margin": round_margin(margin),
             "confidence": confidence,
+            "truncated": truncated,
+            "revision": self._resolved_revision,
         }
 
     def status(self) -> dict:

@@ -396,6 +396,54 @@ def test_standalone_engine_honours_model_id_env():
     assert r.stdout == "TEST/should-appear", r.stdout
 
 
+def test_score_object_behaves_as_float_and_carries_qualifiers():
+    """W5-ENGINE-003: standalone score is a float that still names its weights."""
+    from ai_eyes_mcp.engine import Score
+
+    s = Score(0.02004, truncated=True, revision=_BLESSED_SHA)
+    assert isinstance(s, float)
+    assert s > 0.02
+    assert float(s) == 0.02004
+    assert s.truncated is True
+    assert s.revision == _BLESSED_SHA
+
+
+def test_engine_score_returns_score_with_qualifiers(monkeypatch):
+    """score() itself, not a helper, must attach truncated + resolved revision."""
+    from ai_eyes_mcp.engine import Score, SigLIPEngine
+
+    e = SigLIPEngine()
+    e._resolved_revision = _BLESSED_SHA
+    monkeypatch.setattr(e, "_validate_query", lambda q: None)
+    monkeypatch.setattr(e, "_load_image", lambda p: object())
+    monkeypatch.setattr(e, "_warn_if_truncated", lambda q: True)
+
+    class _Tensors(dict):
+        def to(self, device):
+            return self
+
+    class _Proc:
+        def __call__(self, **_k):
+            return _Tensors()
+
+    class _Out:
+        logits_per_image = __import__("torch").tensor([[0.0]])  # sigmoid -> 0.5
+
+    class _Model:
+        def __call__(self, **_k):
+            return _Out()
+
+    e._processor = _Proc()
+    e._model = _Model()
+
+    s = e.score("unused.png", "a query")
+    assert isinstance(s, Score)
+    assert isinstance(s, float)
+    assert s.truncated is True
+    assert s.revision == _BLESSED_SHA
+    assert abs(float(s) - 0.5) < 1e-6
+
+
 def test_missing_weights_helper_does_not_treat_oom_as_absent():
     """W1-TESTS-001: CUDA OOM / ImportError must fail the suite, not skip-green."""
     from tests.conftest import is_missing_weights_error
