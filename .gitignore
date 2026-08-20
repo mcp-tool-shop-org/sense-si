@@ -36,3 +36,6 @@ site/.astro/
 # Node deps for the Astro site (never tracked)
 node_modules/
 site/dist/
+
+# polyglot translation cache (local, regenerated)
+.polyglot-cache.json
