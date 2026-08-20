@@ -348,10 +348,21 @@ def eyes_status() -> dict:
             "(~10-20s on GPU); subsequent calls are ~100ms. Set AI_EYES_EAGER_LOAD=1 "
             "to load at server start instead."
         )
+    # The honesty contract. Reciprocal of plain-sight's _HONESTY_GUIDANCE, which
+    # sends callers here when a claim needs measuring rather than narrating. The
+    # two strings are a matched pair across repos — neither side rewords alone.
     result["scoring_guidance"] = (
-        "Sigmoid scores are query-phrasing sensitive — absolute thresholds need "
-        "per-use-case tuning. For robust decisions, prefer image_classify "
-        "(relative ranking), which is insensitive to absolute score magnitude."
+        "ai-eyes measures one image-text pair. It does not describe the image and "
+        "it does not complete a narrative. A score is a sigmoid for the query AS "
+        "TOKENIZED, on the pinned SigLIP2 revision named in this payload. It is "
+        "not a probability that 'X is in the photo' independent of wording.\n"
+        "Treat these as incomplete, not as a number: truncated=true (the score is "
+        "of a prefix, not your full query); a confidence containing 'inconclusive'; "
+        "any payload with no revision.\n"
+        "Do not threshold a raw image_contains score across image styles. Prefer "
+        "image_verify (relative, against contrasts you supply) or image_classify "
+        "(ranking).\n"
+        "For a caption, use plain-sight. For a claim about pixels, use ai-eyes."
     )
     elapsed = round((time.perf_counter() - t0) * 1000)
     logger.debug("eyes_status completed in %.3fs", elapsed / 1000)

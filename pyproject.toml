@@ -41,6 +41,11 @@ packages = ["src/ai_eyes_mcp"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Repo root on sys.path so `from tests.conftest import ...` resolves under the
+# CONSOLE SCRIPT invocation (`pytest`), which CI and verify.sh both use.
+# `python -m pytest` injects CWD implicitly and hid this; the console script
+# does not. Without it, CI goes red and a local `python -m pytest` stays green.
+pythonpath = ["."]
 markers = [
     "dogfood: requires SigLIP2 model and GPU (not CI-safe)",
 ]

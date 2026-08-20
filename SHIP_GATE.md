@@ -44,7 +44,7 @@
 
 ## D. Shipping Hygiene
 
-- [x] `[all]` `verify` script exists (test + build + smoke in one command) (2026-04-09)
+- [x] `[all]` `verify` script exists and PASSES end-to-end: imports, 7-tool registration from the single `EXPECTED_TOOL_NAMES` source, cold-status gate, wheel build, `pytest -m "not dogfood"` (51 passed). Re-dated only after a green run — it had been failing since v1.1.0 added two tools. (2026-08-20)
 - [x] `[all]` Version in manifest (1.1.0) matches git tag v1.1.0 (2026-07-07)
 - [x] `[all]` Dependency scanning: `pip-audit` runs in CI (advisory/non-blocking — heavy ML deps carry many non-actionable advisories) (2026-07-07)
 - [x] `[all]` SKIP: private internal tool — Dependabot not added (per Actions-cost policy); dep updates handled manually
