@@ -531,6 +531,28 @@ class SigLIPEngine:
 
         return Score(prob, truncated=truncated, revision=self._resolved_revision)
 
+    def _score_batch_loop(
+        self, image_paths: list[str], text_inputs: dict, truncated: bool
+    ) -> list[Score]:
+        """Per-image forward. The reference implementation for the equality gate."""
+        scores: list[Score] = []
+        total = len(image_paths)
+        for i, path in enumerate(image_paths):
+            scores.append(
+                self._score_with_text_inputs(path, text_inputs, truncated=truncated)
+            )
+            if total > 1 and (i + 1) % 25 == 0 and (i + 1) < total:
+                logger.info("Batch progress: %d/%d", i + 1, total)
+        return scores
+
+    def _score_batch_stacked(
+        self, image_paths: list[str], text_inputs: dict, truncated: bool
+    ) -> list[Score]:
+        """Many images, one (or chunked) forward. Until ENGINE-001 this IS the loop
+        so the equality gate compares the loop to itself; ENGINE-001 replaces the body.
+        """
+        return self._score_batch_loop(image_paths, text_inputs, truncated)
+
     def score_batch(self, image_paths: list[str], query: str) -> list[float]:
         """Score multiple images against a single text query.
 
@@ -546,17 +568,7 @@ class SigLIPEngine:
         # Encode text ONCE, reuse for every image
         text_inputs = self._encode_text(query)
         truncated = self.query_truncated(query)
-
-        total = len(image_paths)
-        scores = []
-        for i, path in enumerate(image_paths):
-            scores.append(
-                self._score_with_text_inputs(path, text_inputs, truncated=truncated)
-            )
-            # Progress reporting every 25 images (skip the very last — caller sees the result)
-            if total > 1 and (i + 1) % 25 == 0 and (i + 1) < total:
-                logger.info("Batch progress: %d/%d", i + 1, total)
-        return scores
+        return self._score_batch_stacked(image_paths, text_inputs, truncated)
 
     def embed_image(self, image_path: str) -> np.ndarray:
         """Extract the image embedding vector.

@@ -327,6 +327,46 @@ class TestBatch:
                 f"Image {i}: batch={b:.4f} vs individual={s:.4f} — should match"
             )
 
+    def test_stacked_matches_loop_exactly(
+        self,
+        engine,
+        photo_cheetah,
+        photo_lion,
+        photo_bus,
+        photo_tower,
+        knight_sword_front,
+        goblin_cook_front,
+        hero_bard_front,
+        tmp_path,
+    ):
+        """F-W5-TESTS-001: stacked forward == per-image loop, bit-identical.
+
+        Until ENGINE-001, stacked IS the loop (compares the loop to itself).
+        After ENGINE-001 this is the red-green gate that stacking did not
+        move a number. Fixture set: 8 images, mixed sizes/modes, RGBA + non-square.
+        """
+        from tests.conftest import assert_identical_scores
+
+        rgba = tmp_path / "rgba_rect.png"
+        Image.new("RGBA", (64, 96), (10, 200, 30, 80)).save(rgba)
+
+        paths = [
+            photo_cheetah,       # non-square JPEG
+            photo_tower,         # tall JPEG
+            photo_lion,          # square JPEG
+            photo_bus,           # palette GIF named .png
+            knight_sword_front,  # opaque PNG sprite
+            goblin_cook_front,
+            hero_bard_front,
+            str(rgba),           # RGBA, non-square
+        ]
+        query = "a knight with a sword and shield"
+        text = engine._encode_text(query)
+        truncated = engine.query_truncated(query)
+        loop = engine._score_batch_loop(paths, text, truncated)
+        stacked = engine._score_batch_stacked(paths, text, truncated)
+        assert_identical_scores(loop, stacked)
+
     def test_batch_ordering(
         self, engine, knight_sword_front, goblin_cook_front, photo_bus
     ):

@@ -22,6 +22,16 @@ import pytest
 from ai_eyes_mcp.engine import SigLIPEngine
 
 
+def assert_identical_scores(loop, stacked):
+    """F-W5-TESTS-001: stacked must match the per-image loop exactly, not closely."""
+    assert len(loop) == len(stacked), f"len loop={len(loop)} stacked={len(stacked)}"
+    for i, (a, b) in enumerate(zip(loop, stacked)):
+        fa, fb = float(a), float(b)
+        assert fa == fb, (
+            f"index {i}: loop={fa!r} stacked={fb!r} (identical required, not close)"
+        )
+
+
 def is_missing_weights_error(exc: BaseException) -> bool:
     """True only when the weights are genuinely not on disk / not downloadable.
 

@@ -444,6 +444,14 @@ def test_engine_score_returns_score_with_qualifiers(monkeypatch):
     assert abs(float(s) - 0.5) < 1e-6
 
 
+def test_identical_scores_gate_fires_on_any_difference():
+    """Prove the equality gate can go red (mutate a score)."""
+    from tests.conftest import assert_identical_scores
+
+    with pytest.raises(AssertionError, match="index 1"):
+        assert_identical_scores([0.1, 0.2], [0.1, 0.3])
+
+
 def test_missing_weights_helper_does_not_treat_oom_as_absent():
     """W1-TESTS-001: CUDA OOM / ImportError must fail the suite, not skip-green."""
     from tests.conftest import is_missing_weights_error
