@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.svg" alt="ai-eyes" width="280">
+  <img src="logo.png" alt="ai-eyes" width="320">
 </p>
 
 # ai-eyes handbook

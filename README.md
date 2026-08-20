@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.svg" alt="ai-eyes" width="300">
+  <img src="docs/logo.png" alt="ai-eyes" width="360">
 </p>
 
 # ai-eyes-mcp
