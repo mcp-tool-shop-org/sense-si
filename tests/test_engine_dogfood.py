@@ -250,6 +250,18 @@ class TestCompare:
         sim = engine.compare(photo_cheetah, photo_bus)
         assert sim < 0.7, f"Cheetah/bus similarity {sim} — should be low"
 
+    def test_similarities_to_reference_matches_pairwise_compare(
+        self, engine, knight_sword_front, goblin_cook_front, hero_bard_front, avar_armed_front
+    ):
+        """F-W5-ENGINE-002: embed the reference once; dots equal pairwise compare."""
+        ref = knight_sword_front
+        cands = [goblin_cook_front, hero_bard_front, avar_armed_front]
+        pairwise = [engine.compare(ref, c) for c in cands]
+        once = engine.similarities_to_reference(ref, cands)
+        assert len(once) == len(pairwise)
+        for i, (a, b) in enumerate(zip(pairwise, once)):
+            assert float(a) == float(b), f"index {i}: compare={float(a)!r} embed-once={float(b)!r}"
+
     def test_self_similarity(self, engine, photo_cheetah):
         """Image compared to itself should be ~1.0. (Image-agnostic — re-pointed
         to a vendored photo in Wave 0; original used a sprite fixture.)"""

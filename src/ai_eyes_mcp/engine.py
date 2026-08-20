@@ -548,8 +548,13 @@ class SigLIPEngine:
     def _score_batch_stacked(
         self, image_paths: list[str], text_inputs: dict, truncated: bool
     ) -> list[Score]:
-        """Many images, one (or chunked) forward. Until ENGINE-001 this IS the loop
-        so the equality gate compares the loop to itself; ENGINE-001 replaces the body.
+        """Many images, one (or chunked) forward.
+
+        ANDON F-W5-ENGINE-001: a stacked forward on this pin is NOT bit-
+        identical to the per-image loop (index 1: 5.835853501834354e-12 vs
+        5.836043454054973e-12). The batching win is not worth a silently
+        different number. This stays the loop until a stacked path matches
+        ``assert_identical_scores``.
         """
         return self._score_batch_loop(image_paths, text_inputs, truncated)
 
@@ -592,6 +597,18 @@ class SigLIPEngine:
             emb = emb / emb.norm(dim=-1, keepdim=True).clamp_min(1e-12)
 
         return emb.cpu().numpy().squeeze()
+
+    def similarities_to_reference(
+        self, reference: str, candidates: list[str]
+    ) -> list[float]:
+        """Cosine similarity of each candidate to one reference embedding.
+
+        Encodes the reference once. In-memory only — no disk index.
+        """
+        if not candidates:
+            raise ValueError("At least one candidate is required")
+        ref = self.embed_image(reference)
+        return [float(np.dot(ref, self.embed_image(c))) for c in candidates]
 
     def compare(self, image_a: str, image_b: str) -> float:
         """Compute cosine similarity between two images.
