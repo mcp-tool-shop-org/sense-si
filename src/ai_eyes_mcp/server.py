@@ -82,10 +82,22 @@ def _parse_baseline_pairs(baselines) -> list[tuple[str, str]] | None:
         return None
     pairs: list[tuple[str, str]] = []
     for item in baselines:
-        if item is None or len(item) != 2:
+        # Validate the TYPE, not only the length. `len(item) != 2` is False for
+        # the string "ab", which was then indexed by CHARACTER and produced two
+        # garbage paths resolved against the server's cwd — silently, from a
+        # plausible typo. A dict or set of two leaked a raw KeyError/TypeError,
+        # and this runs BEFORE the try/except in image_compare / image_rank, so
+        # that escaped without passing through _tool_error.
+        if (
+            not isinstance(item, (list, tuple))
+            or len(item) != 2
+            or not all(isinstance(p, str) and p.strip() for p in item)
+        ):
             raise ToolError(
-                "each baseline must be a pair of image paths [path_a, path_b] "
-                "that are NOT a match in this style"
+                "each baseline must be a pair of image paths "
+                "[path_a, path_b] that are NOT a match in this style; got "
+                f"{type(item).__name__} — pass a two-element list of "
+                "non-empty path strings, e.g. [[\"/a.png\", \"/b.png\"]]"
             )
         pairs.append((str(Path(item[0]).resolve()), str(Path(item[1]).resolve())))
     return pairs

@@ -353,3 +353,64 @@ def test_compare_separated_uses_caller_baseline_not_a_fixed_band(monkeypatch):
     assert r["separated"] is True
     assert r["baseline_max"] == 0.80
     assert r["margin"] > 0
+
+
+# ---------------------------------------------------------------------------
+# Baseline pair parsing — the guard validates the TYPE, not just the length
+# ---------------------------------------------------------------------------
+
+
+def test_baseline_pair_rejects_two_character_string():
+    """A plausible typo must not become two silent garbage paths.
+
+    ``len(item) != 2`` is False for the string ``"ab"``, which then gets
+    indexed by CHARACTER — ``_parse_baseline_pairs(["ab"])`` returned
+    ``[('<cwd>/a', '<cwd>/b')]``: two paths the caller never wrote, resolved
+    against the server's working directory, fed straight into a comparison
+    that decides ``separated``.
+    """
+    from ai_eyes_mcp.server import _parse_baseline_pairs
+
+    with pytest.raises(ToolError, match="pair of image paths"):
+        _parse_baseline_pairs(["ab"])
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        pytest.param([b"xy"], id="bytes"),
+        pytest.param([[1, 2]], id="non-string-elements"),
+        pytest.param([{"a": 1, "b": 2}], id="dict-of-two"),
+        pytest.param([{1, 2}], id="set-of-two"),
+        pytest.param([["only-one"]], id="one-element"),
+        pytest.param([["a", "b", "c"]], id="three-elements"),
+        pytest.param([None], id="none"),
+        pytest.param([["a", ""]], id="empty-path"),
+    ],
+)
+def test_baseline_pair_rejects_wrong_shapes_with_actionable_error(bad):
+    """Everything that is not a pair of path strings raises the SAME shape.
+
+    Sweeping from the claim ("each baseline must be a pair of image paths")
+    rather than from the one reported case: bytes, ints, dicts and sets all
+    satisfied ``len(item) == 2`` or failed the length check late, and leaked a
+    raw ``TypeError``/``KeyError`` instead. ``_parse_baseline_pairs`` runs
+    BEFORE the try/except in both ``image_compare`` and ``image_rank``, so
+    those escaped without ever passing through ``_tool_error``.
+    """
+    from ai_eyes_mcp.server import _parse_baseline_pairs
+
+    with pytest.raises(ToolError):
+        _parse_baseline_pairs(bad)
+
+
+def test_baseline_pair_accepts_lists_and_tuples_of_two_paths():
+    """The guard must not have been tightened into rejecting valid input."""
+    from ai_eyes_mcp.server import _parse_baseline_pairs
+
+    for good in ([["a.png", "b.png"]], [("a.png", "b.png")]):
+        pairs = _parse_baseline_pairs(good)
+        assert len(pairs) == 1
+        assert pairs[0][0].endswith("a.png") and pairs[0][1].endswith("b.png")
+    assert _parse_baseline_pairs(None) is None
+    assert _parse_baseline_pairs([]) is None
