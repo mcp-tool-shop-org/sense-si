@@ -25,27 +25,17 @@ from pydantic import Field
 
 from ai_eyes_mcp.engine import (
     SigLIPEngine,
-    DEFAULT_MODEL_ID,
     DEFAULT_CACHE_DIR,
     DEFAULT_DEVICE,
     DEFAULT_DTYPE,
     DEFAULT_THRESHOLD,
     round_preserving_gt,
     display_round,
+    configure_logging,
 )
 
 logger = logging.getLogger("ai_eyes_mcp")
-
-# Configurable verbosity — AI_EYES_LOG_LEVEL=DEBUG|INFO|WARNING|ERROR|CRITICAL
-# (default WARNING). Logs go to STDERR only: STDOUT is the MCP STDIO protocol
-# channel and must never be polluted.
-_log_level = os.environ.get("AI_EYES_LOG_LEVEL", "WARNING").strip().upper()
-logger.setLevel(getattr(logging, _log_level, logging.WARNING))
-if not logger.handlers:
-    _handler = logging.StreamHandler(sys.stderr)
-    _handler.setFormatter(logging.Formatter("%(asctime)s %(name)s [%(levelname)s] %(message)s"))
-    logger.addHandler(_handler)
-    logger.propagate = False
+configure_logging()
 
 # ---------------------------------------------------------------------------
 # Server + engine setup
@@ -64,8 +54,8 @@ def _construct_engine() -> SigLIPEngine:
     (W1-COORD-007 / SHIP_GATE B)."""
     try:
         return SigLIPEngine(
-            model_id=os.environ.get("AI_EYES_MODEL_ID", DEFAULT_MODEL_ID),
-            # None → engine pins; a set env value is validated as a 40-char SHA
+            # model_id / revision / cache / device / dtype all resolve inside
+            # the engine from env-or-default. One source of truth (W1-COORD-005).
             revision=os.environ.get("AI_EYES_MODEL_REVISION"),
             cache_dir=DEFAULT_CACHE_DIR,
             device=DEFAULT_DEVICE,

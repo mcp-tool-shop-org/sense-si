@@ -336,3 +336,73 @@ def test_status_includes_revision_when_unloaded():
     assert e.loaded is False
     s = e.status()
     assert s["revision"] == _BLESSED_SHA
+
+
+# ---------------------------------------------------------------------------
+# W1-COORD-006 / W1-COORD-005 / W1-ENGINE-005 — standalone contract
+# ---------------------------------------------------------------------------
+
+import os
+import subprocess
+import sys
+
+
+def _engine_subprocess(code: str, env_extra: dict, timeout: int = 60) -> subprocess.CompletedProcess:
+    env = os.environ.copy()
+    env.update(env_extra)
+    # Isolate from the parent process's already-imported engine defaults.
+    env.pop("AI_EYES_EAGER_LOAD", None)
+    return subprocess.run(
+        [sys.executable, "-c", code],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+
+
+def test_standalone_engine_honours_log_level():
+    """W1-COORD-006: importing engine.py alone must honour AI_EYES_LOG_LEVEL."""
+    r = _engine_subprocess(
+        "import logging; from ai_eyes_mcp import engine; "
+        "log = logging.getLogger('ai_eyes_mcp'); "
+        "assert log.level == logging.DEBUG, log.level; "
+        "assert log.handlers, 'no handlers on standalone path'; "
+        "print('ok')",
+        {"AI_EYES_LOG_LEVEL": "DEBUG"},
+    )
+    assert r.returncode == 0, r.stderr + r.stdout
+
+
+def test_configure_logging_is_idempotent():
+    from ai_eyes_mcp.engine import configure_logging
+
+    log = __import__("logging").getLogger("ai_eyes_mcp")
+    n = len(log.handlers)
+    configure_logging()
+    configure_logging()
+    assert len(log.handlers) == n
+    assert n >= 1
+
+
+def test_standalone_engine_honours_model_id_env():
+    """W1-COORD-005: SigLIPEngine() must read AI_EYES_MODEL_ID."""
+    r = _engine_subprocess(
+        "from ai_eyes_mcp.engine import SigLIPEngine; "
+        "print(SigLIPEngine().model_id, end='')",
+        {"AI_EYES_MODEL_ID": "TEST/should-appear"},
+    )
+    assert r.returncode == 0, r.stderr
+    assert r.stdout == "TEST/should-appear", r.stdout
+
+
+def test_out_of_range_threshold_falls_back_with_warning():
+    """W1-ENGINE-005: 1.5 must not become the default; banana already falls back."""
+    r = _engine_subprocess(
+        "from ai_eyes_mcp.engine import DEFAULT_THRESHOLD; "
+        "print(DEFAULT_THRESHOLD, end='')",
+        {"AI_EYES_DEFAULT_THRESHOLD": "1.5"},
+    )
+    assert r.returncode == 0, r.stderr
+    assert r.stdout == "0.02", r.stdout
+    assert "AI_EYES_DEFAULT_THRESHOLD" in (r.stderr or "") or "threshold" in (r.stderr or "").lower()

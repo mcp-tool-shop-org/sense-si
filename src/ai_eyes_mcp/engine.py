@@ -28,11 +28,33 @@ from ai_eyes_mcp import __version__ as _package_version
 
 logger = logging.getLogger("ai_eyes_mcp")
 
+
+def configure_logging() -> None:
+    """Idempotent stderr logging for both the MCP server and standalone import.
+
+    Honours AI_EYES_LOG_LEVEL. Must not stack handlers if server.py and the
+    engine are both imported (W1-COORD-006).
+    """
+    level_name = os.environ.get("AI_EYES_LOG_LEVEL", "WARNING").strip().upper()
+    logger.setLevel(getattr(logging, level_name, logging.WARNING))
+    if not logger.handlers:
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(
+            logging.Formatter("%(asctime)s %(name)s [%(levelname)s] %(message)s")
+        )
+        logger.addHandler(handler)
+        logger.propagate = False
+
+
+configure_logging()
+
 # ---------------------------------------------------------------------------
 # Defaults (overridable via env vars)
 # ---------------------------------------------------------------------------
 
-DEFAULT_MODEL_ID = "google/siglip2-so400m-patch14-384"
+DEFAULT_MODEL_ID = os.environ.get(
+    "AI_EYES_MODEL_ID", "google/siglip2-so400m-patch14-384"
+)
 # Blessed snapshot — the SHA every score in this swarm was produced against.
 # Not "main": a branch name floats. See W1-COORD-008.
 PINNED_MODEL_REVISION = "e8e487298228002f3d8a82e0cd5c8ea9c567f57f"
@@ -42,15 +64,28 @@ DEFAULT_CACHE_DIR = os.environ.get("AI_EYES_MODEL_DIR", None)
 DEFAULT_DEVICE = os.environ.get("AI_EYES_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 DEFAULT_DTYPE = os.environ.get("AI_EYES_DTYPE", None)  # "float16" | "bfloat16" | None (full precision)
 MAX_QUERY_LENGTH = 500  # character cap; the text encoder holds 64 tokens (see query_truncated)
+_THRESHOLD_FALLBACK = 0.02
 try:
     DEFAULT_THRESHOLD = float(os.environ.get("AI_EYES_DEFAULT_THRESHOLD", "0.02"))
 except (ValueError, TypeError):
-    DEFAULT_THRESHOLD = 0.02
+    DEFAULT_THRESHOLD = _THRESHOLD_FALLBACK
     logger.warning(
         "Invalid AI_EYES_DEFAULT_THRESHOLD (%r), using %s",
-        os.environ.get('AI_EYES_DEFAULT_THRESHOLD'),
+        os.environ.get("AI_EYES_DEFAULT_THRESHOLD"),
         DEFAULT_THRESHOLD,
     )
+else:
+    # NaN-safe: a NaN fails the chained compare. Out-of-range is a loud
+    # fallback, not a hard refuse — the tools would reject it at call time
+    # anyway, and unlike a floating revision this cannot silently corrupt
+    # a measurement (W1-ENGINE-005).
+    if not (0.0 <= DEFAULT_THRESHOLD <= 1.0):
+        logger.warning(
+            "AI_EYES_DEFAULT_THRESHOLD=%r is outside [0.0, 1.0]; using %s",
+            os.environ.get("AI_EYES_DEFAULT_THRESHOLD"),
+            _THRESHOLD_FALLBACK,
+        )
+        DEFAULT_THRESHOLD = _THRESHOLD_FALLBACK
 
 
 def validate_model_revision(revision: str | None) -> str:
