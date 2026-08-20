@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- In-memory image-embedding memo (`embed_image`, bounded LRU, default 64
+  entries, `AI_EYES_EMBED_CACHE` overrides). A caller's baseline pairs were
+  re-embedded on every `image_compare` / `image_rank` call — 36.5 ms per
+  embedding, so a three-pair floor cost 219 ms per call to recompute a number
+  that cannot have changed. Keyed on path + mtime + size, never path alone, so
+  a rewritten file is re-measured rather than served stale. In-memory only:
+  no disk, no sidecar, no index file. Returns a private copy, so a caller
+  mutating the vector cannot poison the memo. Moves no score — `embed_image`
+  is bit-identical across repeat calls on the pin.
+
+### Fixed
+
+- `image_compare` / `image_rank` baselines validate the TYPE of each pair, not
+  only its length. `len("ab") == 2` is true, so the string `"ab"` was indexed
+  by character and became two garbage paths resolved against the server's
+  working directory — silently, from a plausible typo. Bytes, `[[1, 2]]`, a
+  dict of two and a set of two additionally leaked a raw `TypeError` /
+  `KeyError` from outside the tool's try/except, bypassing the actionable
+  error shape.
+
+### Held
+
+- **Stacked batch forward (F-W5-ENGINE-001) remains held.** `score_batch` still
+  runs a per-image loop. A stacked forward is 1.65x–1.95x faster at good chunk
+  sizes but is not the same number, and — contrary to the assumption this was
+  scoped on — the difference REACHES THE PAYLOAD: 4 of 11 vendored fixtures
+  print a different value at batch size 8, because `display_round` keeps five
+  significant digits for scores too small to survive 4-decimal rounding and
+  SigLIP2 scores non-matching images at 1e-12..1e-5. Shipping it would put two
+  calibrations in one server, since `image_contains` stays at batch size 1.
+  The design is implementable — a fixed batch size is bit-reproducible and
+  padding content provably does not affect the real images' scores — so this is
+  a product decision, not an engineering gap. Evidence is executable:
+  `test_stacking_divergence_is_payload_visible`.
+
+### Internal
+
+- Version is pinned across `pyproject.toml`, `__init__.py` and the README by a
+  CI gate, plus a floor gate so agreement is not satisfiable by a placeholder.
+- The tool-registration anchor is explicit (`SHIPPED_TOOL_COUNT`) and no longer
+  stale: eight tools ship, while three test names still said "seven".
+
 ## [1.2.0] - 2026-08-20
 
 Pin, honesty fields, one new ranking verb, and relative verdicts on
