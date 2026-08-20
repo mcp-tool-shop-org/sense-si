@@ -19,7 +19,7 @@
 
 - [x] `[cli|mcp|desktop]` SKIP: no dangerous actions — all tools are read-only image analysis
 - [x] `[cli|mcp|desktop]` File operations constrained to known directories (2026-04-09)
-- [x] `[mcp]` Network egress off by default (2026-04-09)
+- [x] `[mcp]` Network egress: zero at inference. One exception — the **first run** downloads ~1.6 GB of weights from HuggingFace; pre-populate the cache and set `AI_EYES_MODEL_DIR` for a zero-egress deployment. The earlier unqualified "off by default" line was inaccurate. (2026-08-20)
 - [x] `[mcp]` Stack traces never exposed — structured error results only (2026-04-09)
 
 ## B. Error Handling

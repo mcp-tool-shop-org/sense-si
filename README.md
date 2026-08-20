@@ -60,7 +60,7 @@ Or run as a module: `python -m ai_eyes_mcp`
 |---------|---------|---------|
 | `AI_EYES_MODEL_ID` | `google/siglip2-so400m-patch14-384` | HuggingFace model |
 | `AI_EYES_MODEL_DIR` | HF default cache | Model cache directory |
-| `AI_EYES_DEVICE` | `auto` (cuda if available, else cpu) | torch device |
+| `AI_EYES_DEVICE` | `cuda` if available, else `cpu` | torch device. Set a literal device (`cuda`, `cpu`, `cuda:1`) — there is no `auto` value; `AI_EYES_DEVICE=auto` raises. |
 | `AI_EYES_DEFAULT_THRESHOLD` | `0.02` | Default threshold for `image_contains` |
 | `AI_EYES_LOG_LEVEL` | `WARNING` | Log verbosity: `DEBUG` / `INFO` / `WARNING` / `ERROR` |
 | `AI_EYES_EAGER_LOAD` | unset | If truthy, load the model at startup so a broken model/cache fails fast (not on the first tool call) |
@@ -68,15 +68,17 @@ Or run as a module: `python -m ai_eyes_mcp`
 
 **Logging:** The server logs under the `ai_eyes_mcp` logger to **stderr** (stdout is the MCP protocol channel). Set the level with `AI_EYES_LOG_LEVEL` (above), or attach your own handlers to `logging.getLogger("ai_eyes_mcp")`.
 
-**First call:** the model loads lazily — the **first** image tool call downloads/loads SigLIP2 (~10–20s on GPU; longer on the first-ever download), and subsequent calls are ~100ms. Set `AI_EYES_EAGER_LOAD=1` to load at server start instead, or call `eyes_status` (which reports `loaded` without triggering a load).
+**First call:** the model loads lazily — the **first** image tool call downloads/loads SigLIP2 (~10–20s on GPU; longer on the first-ever download), and subsequent calls are ~100ms. Set `AI_EYES_EAGER_LOAD=1` to load at server start instead, or call `eyes_status`, which reports `loaded` without triggering a load. **It is not free on a cold server** — the first call pays a one-off library import (measured ~10s; ~2ms once warm).
 
 ## How Scores Work
 
 SigLIP2 uses **sigmoid** scoring, not softmax. Each image-text pair gets an independent probability (0-1):
 
-- **High score** (>0.1): Strong visual match — the described object is likely present
-- **Low score** (<0.01): No match — the object is not visible
-- **Mid score** (0.01-0.1): Ambiguous — may need human review
+Rough illustration only — **these bands do not transfer between queries or image styles**, and the next section explains why you should not build on them:
+
+- **High** (>0.1): strong visual match
+- **Low** (<0.01): weak or no match
+- **Mid** (0.01-0.1): ambiguous
 
 Scores are NOT relative. Multiple queries can score high on the same image (e.g., an image with both a sword and a shield).
 
@@ -200,6 +202,8 @@ Check server status. Does not trigger model loading.
 
 Returns: `{model_id, device, loaded, cache_dir, parameters?, vram_mb?, scoring_guidance, note?}`
 
+When `loaded` is true it also returns `parameters` (`1136M`) and `vram_mb` (CUDA only).
+
 ### `eyes_selftest`
 
 ```
@@ -210,14 +214,15 @@ Runs the model on a few bundled reference images and confirms the expected order
 
 Returns: `{passed, checks: [{name, expected, measured_a, measured_b, ok}], model_id, device, torch_version, transformers_version}`
 
-When `loaded` is true, also returns `parameters` (e.g., '400M') and `vram_mb` (CUDA only).
+`measured_a` / `measured_b` are reported at full resolution — a tiny non-zero score renders in scientific notation (e.g. `4.3813e-08`) rather than collapsing to `0`.
 
 ## Security and Trust
 
 This tool operates **locally only**.
 
 - **Data touched:** Local image files (read-only), HuggingFace model cache (downloaded once)
-- **No network egress** at runtime — model downloads happen once on first use, then all inference is local
+- **Network:** all *inference* is local — no egress, ever. The one exception is the **first run**, which downloads ~1.6 GB of model weights from HuggingFace. After that the tool never reaches the network again.
+  - **For an air-gapped or egress-audited deployment:** pre-populate the cache and point `AI_EYES_MODEL_DIR` at it. The tool then makes zero network calls at any point.
 - **No secrets handling** — does not read, store, or transmit credentials or API keys
 - **No telemetry** — nothing is collected or sent
 - **No file mutation** — image files are opened read-only, never modified
@@ -227,7 +232,7 @@ This tool operates **locally only**.
 ## Requirements
 
 - Python >= 3.10
-- CUDA GPU recommended (~800MB VRAM at FP16)
+- CUDA GPU recommended. **Measured VRAM: ~4.3 GB at the default `float32`**, ~2.2 GB with `AI_EYES_DTYPE=float16`. The model is 1136M parameters — "SO400M" names the vision tower, not the assembled model.
 - CPU fallback available (slower, ~10x)
 - Model downloads ~1.6GB on first use
 
