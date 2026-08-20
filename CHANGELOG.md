@@ -5,86 +5,96 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
-
-### Added
-
-- In-memory image-embedding memo (`embed_image`, bounded LRU, default 64
-  entries, `AI_EYES_EMBED_CACHE` overrides). A caller's baseline pairs were
-  re-embedded on every `image_compare` / `image_rank` call — 36.5 ms per
-  embedding, so a three-pair floor cost 219 ms per call to recompute a number
-  that cannot have changed. Keyed on path + mtime + size, never path alone, so
-  a rewritten file is re-measured rather than served stale. In-memory only:
-  no disk, no sidecar, no index file. Returns a private copy, so a caller
-  mutating the vector cannot poison the memo. Moves no score — `embed_image`
-  is bit-identical across repeat calls on the pin.
-
-### Fixed
-
-- `image_compare` / `image_rank` baselines validate the TYPE of each pair, not
-  only its length. `len("ab") == 2` is true, so the string `"ab"` was indexed
-  by character and became two garbage paths resolved against the server's
-  working directory — silently, from a plausible typo. Bytes, `[[1, 2]]`, a
-  dict of two and a set of two additionally leaked a raw `TypeError` /
-  `KeyError` from outside the tool's try/except, bypassing the actionable
-  error shape.
-
-### Held
-
-- **Stacked batch forward (F-W5-ENGINE-001) remains held.** `score_batch` still
-  runs a per-image loop. A stacked forward is 1.65x–1.95x faster at good chunk
-  sizes but is not the same number, and — contrary to the assumption this was
-  scoped on — the difference REACHES THE PAYLOAD: 4 of 11 vendored fixtures
-  print a different value at batch size 8, because `display_round` keeps five
-  significant digits for scores too small to survive 4-decimal rounding and
-  SigLIP2 scores non-matching images at 1e-12..1e-5. Shipping it would put two
-  calibrations in one server, since `image_contains` stays at batch size 1.
-  The design is implementable — a fixed batch size is bit-reproducible and
-  padding content provably does not affect the real images' scores — so this is
-  a product decision, not an engineering gap. Evidence is executable:
-  `test_stacking_divergence_is_payload_visible`.
-
-### Internal
-
-- Version is pinned across `pyproject.toml`, `__init__.py` and the README by a
-  CI gate, plus a floor gate so agreement is not satisfiable by a placeholder.
-- The tool-registration anchor is explicit (`SHIPPED_TOOL_COUNT`) and no longer
-  stale: eight tools ship, while three test names still said "seven".
-
 ## [1.2.0] - 2026-08-20
 
 Pin, honesty fields, one new ranking verb, and relative verdicts on
 image-image comparison. Additive: no documented behaviour was removed.
-Not 2.0.0. Not a patch.
 
 ### Added
 
-- Model revision is pinned (`e8e487298228002f3d8a82e0cd5c8ea9c567f57f`) and
-  hard-refuses branch names. Every tool payload that returns a model number
-  includes `revision`.
-- `truncated` on text-scoring tools and on standalone `Score` (a float
-  subclass carrying `.truncated` and `.revision`).
-- `image_rank` — one reference, many candidates, top-k with margins.
-  Without caller baselines the ranking is a measurement (`incomplete`);
-  with baselines, candidates at or below the 'these are different' floor
-  are not matches (`nothing_close` when the list is empty).
-- `image_compare` accepts optional `baselines` (pairs that are not a match
-  in this style). Without them `incomplete: true`; with them, `separated`
-  is relative to that floor. No hardcoded 0.70–0.84 band.
+- **The model revision is pinned** (`e8e487298228002f3d8a82e0cd5c8ea9c567f57f`)
+  and hard-refuses branch names, tags, and empty values — an override is
+  honoured only as a different 40-character SHA. Previously the model resolved
+  to whatever the hub default branch pointed at *at download time*, so two
+  installs weeks apart could return different scores for identical input with
+  no signal. **Every payload that returns a model number now carries
+  `revision`**, so a score can name the weights that produced it.
+- `truncated` on every text-scoring tool, and on standalone `Score` (a float
+  subclass carrying `.truncated` and `.revision`). A query past the encoder's
+  64-token capacity is scored on its prefix; the caller can now see that
+  without reading stderr.
+- **`image_rank`** — one reference, many candidates, top-k with margins,
+  encoding the reference once. Without caller baselines the ranking is a
+  measurement (`incomplete`); with them, candidates at or below the
+  "these are different" floor are not matches, and `matches` is empty when
+  nothing clears it.
+- `image_compare` accepts optional `baselines` — pairs that are *not* a match
+  in your style. Without them, `incomplete: true`; with them, `separated` is
+  relative to that floor. **No hardcoded band**: measured similarity between
+  six pairs of different characters in one sprite style was 0.698–0.836, and a
+  cutoff drawn from that would not transfer to photos or screenshots.
 - `similarities_to_reference` engine primitive (embed the canon once).
-- Caller-facing honesty contract on `eyes_status.scoring_guidance`.
+- In-memory image-embedding memo (bounded LRU, default 64, `AI_EYES_EMBED_CACHE`).
+  Baselines were re-embedded on every call — 36.5 ms each, 219 ms per call for a
+  three-pair floor — to recompute a number that cannot have changed. Keyed on
+  path + mtime + size, never path alone, so a rewritten file is re-measured
+  rather than served stale. Returns a private copy so a caller mutating the
+  vector cannot poison the memo. In-memory only: no disk, no sidecar, no index.
+  Moves no score.
+- Caller-facing honesty contract on `eyes_status.scoring_guidance`, reciprocal
+  with plain-sight's — that tool describes, this one measures.
 
 ### Changed
 
-- `image_classify` ranks on raw scores, not 4-dp rounded values.
-- `AI_EYES_MODEL_ID` is honoured by standalone `SigLIPEngine()`.
+- `image_classify` ranks on raw scores, not 4-dp rounded values. Two labels
+  within 1e-4 previously collapsed to a tie that `max()` resolved by *caller
+  argument order*, so the same call with labels swapped could report a
+  different `best`.
+- `AI_EYES_MODEL_ID` is honoured by a standalone `SigLIPEngine()`. It was the
+  only configuration constant not read at module scope, so the MCP surface
+  respected it and the documented library path silently ignored it.
 - Out-of-range `AI_EYES_DEFAULT_THRESHOLD` falls back to 0.02 with a warning.
-- Logging is configured on the standalone import path (`AI_EYES_LOG_LEVEL`).
+  A numeric-but-invalid value such as `1.5` was previously kept, which made
+  both thresholded tools reject their own default on every call.
+- Logging is configured on the standalone import path, so `AI_EYES_LOG_LEVEL`
+  works there — including the truncation warning it exists to surface.
 
 ### Fixed
 
-- First-load and eager-import errors no longer leak hub/CUDA internals.
-- `verify.sh` / CI use one tool-set source and `pytest -m "not dogfood"`.
+- First-load and eager-import failures no longer leak hub or CUDA internals;
+  an unresolvable model id exits cleanly instead of dumping a traceback.
+- `image_compare` / `image_rank` baselines validate the **type** of each pair,
+  not only its length. `len("ab") == 2` is true, so `"ab"` was indexed by
+  character into two garbage paths — silently, from a plausible typo. Bytes,
+  `[[1, 2]]`, a dict of two and a set of two additionally leaked a raw
+  `TypeError` / `KeyError` from outside the tool's try/except.
+- Display rounding can no longer contradict the verdict printed beside it —
+  `margin: 0.0` with `present: true`, or `{present: true, score: 0.02,
+  threshold: 0.02}`, are both gone. A measured non-zero never prints as `0`.
+- `verify.sh` and CI share one tool-set source and select by marker; the
+  script had asserted a five-tool set since v1.1.0 shipped seven.
+
+### Held
+
+- **Stacked batch forward is held, on evidence.** `score_batch` still runs a
+  per-image loop. A stacked forward is 1.65×–1.95× faster at good chunk sizes
+  (and *slower* at 100), but it is not the same number — and the difference
+  **reaches the payload**: 4 of 11 fixtures print a different value at batch
+  size 8, because `display_round` keeps five significant digits for scores too
+  small for 4-dp rounding and SigLIP2 scores non-matching images at 1e-12–1e-5.
+  Shipping it would put two calibrations in one server, since `image_contains`
+  stays at batch size 1 — the same image, query and revision would print
+  different numbers depending on which verb you called. The design is
+  implementable; declining it is a product decision, and the evidence is
+  executable: `test_stacking_divergence_is_payload_visible`.
+
+### Internal
+
+- The version is pinned across `pyproject.toml`, `__init__.py` and the README
+  by a CI gate, with a floor check so agreement cannot be satisfied by a
+  placeholder.
+- The tool-registration anchor is explicit (`SHIPPED_TOOL_COUNT`) and no longer
+  stale — eight tools ship, while three test names still said "seven".
 
 ## [1.1.0] - 2026-07-07
 

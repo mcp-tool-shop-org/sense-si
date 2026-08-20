@@ -2,6 +2,12 @@
   <img src="docs/logo.png" alt="ai-eyes" width="360">
 </p>
 
+<p align="center">
+  <a href="https://github.com/mcp-tool-shop-org/ai-eyes-mcp/actions/workflows/ci.yml"><img src="https://github.com/mcp-tool-shop-org/ai-eyes-mcp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python 3.10+">
+</p>
+
 # ai-eyes-mcp
 
 **Version:** 1.2.0
@@ -24,9 +30,10 @@ This MCP server wraps SigLIP2 as tools that any Claude workflow can call.
 |------|-------------|
 | `image_contains` | "Does this image contain X?" → sigmoid score |
 | `image_classify` | Score image against N candidate labels |
-| `image_compare` | Cosine similarity between two images |
+| `image_compare` | Cosine similarity between two images, against a caller-supplied "different" floor |
 | `image_score_batch` | Score N images against one query |
 | `image_verify` | Honest RELATIVE verdict: target vs alternatives → decision + margin + confidence |
+| `image_rank` | Rank N candidates against one reference → top-k with margins |
 | `eyes_selftest` | Self-test on bundled reference images (proves install + calibration) |
 | `eyes_status` | Health check: model, device, loaded state |
 
@@ -79,6 +86,7 @@ Or run as a module: `python -m ai_eyes_mcp`
 | `AI_EYES_LOG_LEVEL` | `WARNING` | Log verbosity: `DEBUG` / `INFO` / `WARNING` / `ERROR` |
 | `AI_EYES_EAGER_LOAD` | unset | If truthy, load the model at startup so a broken model/cache fails fast (not on the first tool call) |
 | `AI_EYES_DTYPE` | full precision | `float16` / `bfloat16` to halve VRAM |
+| `AI_EYES_EMBED_CACHE` | `64` | In-memory image-embedding memo size. Keyed on path + mtime + size, so a rewritten file is re-measured, never served stale. No disk, no sidecar. |
 
 ### Reproducibility — the weights are pinned
 
@@ -134,9 +142,9 @@ inference logic. `server.py` never touches torch directly; it delegates
 everything to the engine. This means you can `from ai_eyes_mcp.engine import
 SigLIPEngine` and use it in any Python script without pulling in FastMCP.
 
-The 5-to-8 direction mapping used by the sprite pipeline is NOT this tool's
-concern. ai-eyes-mcp evaluates images; direction mapping lives in the
-downstream consumer (Sprite Foundry / Game Foundry OS).
+ai-eyes-mcp evaluates images and nothing else. It has no opinion about what
+you do with the number — cataloguing, sprite pipelines, CI gates on generated
+assets — that belongs to the consumer.
 
 ## Tool Reference
 
@@ -178,7 +186,7 @@ Returns: `{scores, best, best_score, truncated, revision, elapsed_ms}`
 ### `image_compare`
 
 ```
-image_compare(image_a, image_b)
+image_compare(image_a, image_b, baselines=None)
 ```
 
 Compute visual similarity between two images using cosine similarity of SigLIP2 embeddings.
@@ -187,10 +195,11 @@ Compute visual similarity between two images using cosine similarity of SigLIP2 
 |-----------|------|----------|-------------|
 | `image_a` | string | yes | Absolute path to first image |
 | `image_b` | string | yes | Absolute path to second image |
+| `baselines` | string[][] | no | Pairs of images that are **not** a match in your style. A-B counts as separated only if it exceeds this floor. |
 
-Returns: `{similarity, image_a, image_b, revision, elapsed_ms}`
+**Without `baselines` the number is a measurement, not a verdict** — the payload carries `incomplete: true`. Similarity floors do not transfer across image styles, so the tool will not invent one. Measured across six pairs of *different* characters in one sprite style: **0.698–0.836**, against 1.0 for an image against itself. A fixed cutoff picked from that would be wrong for photos, screenshots, or renders — so you supply the contrast, exactly as `image_verify` takes alternatives.
 
-**Cosine similarity does not discriminate finely within a style.** Measured across six pairs of *different* characters in one sprite style: 0.698–0.836, against 1.0 for an image against itself. Use it to detect near-duplicates, not to decide whether two distinct subjects match.
+Returns: `{similarity, separated, incomplete, margin, baseline_max, confidence, image_a, image_b, revision, elapsed_ms}`
 
 ### `image_score_batch`
 
@@ -223,6 +232,25 @@ Honest **relative** verdict — ranks `target` against caller-supplied `alternat
 | `alternatives` | string[] | yes | Contrast alternatives to rank against (≥1) |
 
 Returns: `{present, target, target_score, best_alternative, best_alternative_score, margin, confidence, truncated, revision, elapsed_ms}` — `confidence` is `high` / `moderate` / `low — inconclusive`, describing the measured gap.
+
+### `image_rank`
+
+```
+image_rank(reference, candidates, k=5, baselines=None)
+```
+
+Rank candidates by similarity to one reference. Encodes the reference **once** rather than per candidate.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `reference` | string | yes | Absolute path to the reference image |
+| `candidates` | string[] | yes | Candidate image paths to rank |
+| `k` | int | no | Maximum matches to return (default 5) |
+| `baselines` | string[][] | no | Pairs that are **not** a match in your style — the floor below which nothing is "close" |
+
+Returns: `{matches, nothing_close, incomplete, baseline_max, k, reference, revision, elapsed_ms}`
+
+**Without `baselines` the ranking is a measurement, not "these match"** (`incomplete: true`). With baselines, only candidates above the caller-supplied floor are matches — and if none clear it, `matches` is **empty**. A ranking verb that always returns k results is a confident answer in a regime with no signal; this one refuses.
 
 ### `eyes_status`
 
@@ -280,7 +308,7 @@ pytest -m "not dogfood"
 # Run everything, including GPU tests that need the model
 pytest
 
-# Full verify: imports, 7-tool registration, cold-status gate, wheel build, CI-safe tests
+# Full verify: imports, tool registration, cold-status gate, wheel build, CI-safe tests
 bash verify.sh
 ```
 
