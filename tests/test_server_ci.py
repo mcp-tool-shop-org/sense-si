@@ -137,6 +137,16 @@ def test_eager_server_import_does_not_leak_traceback():
     assert "Traceback (most recent call last)" not in leaked, leaked[-800:]
 
 
+def test_eyes_status_includes_revision():
+    """W1-COORD-008: a status payload that cannot name the weights is incomplete."""
+    from ai_eyes_mcp.server import eyes_status
+
+    r = eyes_status()
+    assert "revision" in r
+    assert r["revision"] == "e8e487298228002f3d8a82e0cd5c8ea9c567f57f"
+    assert len(r["revision"]) == 40
+
+
 def test_classify_docstring_does_not_equate_low_score_with_absence():
     """W1-SERVER-002: the MCP API must not claim a low score means 'not present'."""
     doc = image_classify.__doc__ or ""

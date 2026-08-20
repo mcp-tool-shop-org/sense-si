@@ -239,3 +239,100 @@ def test_vram_mb_is_load_delta_not_current_process_allocation(monkeypatch):
         f"vram_mb should be the load delta (400), not process allocated "
         f"({s['vram_mb']})"
     )
+
+
+# ---------------------------------------------------------------------------
+# W1-COORD-008 — revision is a 40-char SHA, passed unconditionally
+# ---------------------------------------------------------------------------
+
+_BLESSED_SHA = "e8e487298228002f3d8a82e0cd5c8ea9c567f57f"
+_OTHER_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+
+def _fake_pretrained_pair(capture: dict):
+    """Stub AutoModel/AutoProcessor.from_pretrained and record kwargs."""
+
+    class FakeModel(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.w = torch.nn.Parameter(torch.zeros(1))
+            self.config = type("C", (), {"_commit_hash": capture.get("resolved")})()
+
+        def eval(self):
+            return self
+
+        def to(self, device):
+            return self
+
+    def fake_model(*_a, **k):
+        capture["model_kwargs"] = k
+        return FakeModel()
+
+    def fake_proc(*_a, **k):
+        capture["proc_kwargs"] = k
+        return object()
+
+    return fake_model, fake_proc
+
+
+def test_default_revision_is_forty_char_hex():
+    from ai_eyes_mcp.engine import DEFAULT_MODEL_REVISION, PINNED_MODEL_REVISION
+
+    assert DEFAULT_MODEL_REVISION == _BLESSED_SHA
+    assert PINNED_MODEL_REVISION == _BLESSED_SHA
+    assert DEFAULT_MODEL_REVISION not in (None, "main", "")
+    assert len(DEFAULT_MODEL_REVISION) == 40
+    assert all(c in "0123456789abcdef" for c in DEFAULT_MODEL_REVISION)
+
+
+def test_from_pretrained_always_receives_revision(monkeypatch):
+    capture: dict = {}
+    fake_model, fake_proc = _fake_pretrained_pair(capture)
+    import transformers
+
+    monkeypatch.setattr(transformers.AutoModel, "from_pretrained", fake_model)
+    monkeypatch.setattr(transformers.AutoProcessor, "from_pretrained", fake_proc)
+
+    e = SigLIPEngine()
+    e._ensure_loaded()
+    assert "revision" in capture["model_kwargs"], (
+        "from_pretrained was called without revision= — that is the float"
+    )
+    assert capture["model_kwargs"]["revision"] == _BLESSED_SHA
+    assert capture["proc_kwargs"]["revision"] == _BLESSED_SHA
+
+
+def test_valid_sha_override_reaches_from_pretrained(monkeypatch):
+    capture: dict = {"resolved": _OTHER_SHA}
+    fake_model, fake_proc = _fake_pretrained_pair(capture)
+    import transformers
+
+    monkeypatch.setattr(transformers.AutoModel, "from_pretrained", fake_model)
+    monkeypatch.setattr(transformers.AutoProcessor, "from_pretrained", fake_proc)
+
+    e = SigLIPEngine(revision=_OTHER_SHA)
+    e._ensure_loaded()
+    assert capture["model_kwargs"]["revision"] == _OTHER_SHA
+    assert e.status()["revision"] == _OTHER_SHA
+
+
+@pytest.mark.parametrize("bad", ["main", "", "v1.0", "e8e4872", "MAIN"])
+def test_non_sha_revision_raises_actionable_error(bad):
+    with pytest.raises(ValueError, match=r"40-character hex|commit SHA") as ei:
+        SigLIPEngine(revision=bad)
+    msg = str(ei.value)
+    assert "main" in msg.lower() or "SHA" in msg or "sha" in msg.lower()
+    assert "AI_EYES_MODEL_REVISION" in msg or "revision" in msg.lower()
+
+
+def test_env_main_raises_at_construction(monkeypatch):
+    monkeypatch.setenv("AI_EYES_MODEL_REVISION", "main")
+    with pytest.raises(ValueError, match=r"40-character hex|commit SHA"):
+        SigLIPEngine()
+
+
+def test_status_includes_revision_when_unloaded():
+    e = SigLIPEngine()
+    assert e.loaded is False
+    s = e.status()
+    assert s["revision"] == _BLESSED_SHA

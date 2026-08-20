@@ -15,6 +15,7 @@ Key design decisions:
 
 import logging
 import os
+import re
 import sys
 import threading
 from pathlib import Path
@@ -32,7 +33,11 @@ logger = logging.getLogger("ai_eyes_mcp")
 # ---------------------------------------------------------------------------
 
 DEFAULT_MODEL_ID = "google/siglip2-so400m-patch14-384"
-DEFAULT_MODEL_REVISION = os.environ.get("AI_EYES_MODEL_REVISION", None)
+# Blessed snapshot — the SHA every score in this swarm was produced against.
+# Not "main": a branch name floats. See W1-COORD-008.
+PINNED_MODEL_REVISION = "e8e487298228002f3d8a82e0cd5c8ea9c567f57f"
+DEFAULT_MODEL_REVISION = PINNED_MODEL_REVISION
+_SHA40 = re.compile(r"^[0-9a-fA-F]{40}$")
 DEFAULT_CACHE_DIR = os.environ.get("AI_EYES_MODEL_DIR", None)
 DEFAULT_DEVICE = os.environ.get("AI_EYES_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 DEFAULT_DTYPE = os.environ.get("AI_EYES_DTYPE", None)  # "float16" | "bfloat16" | None (full precision)
@@ -46,6 +51,27 @@ except (ValueError, TypeError):
         os.environ.get('AI_EYES_DEFAULT_THRESHOLD'),
         DEFAULT_THRESHOLD,
     )
+
+
+def validate_model_revision(revision: str | None) -> str:
+    """Return a 40-character hex SHA, or raise.
+
+    ``None`` means the blessed pin. Empty string, ``main``, a tag, a
+    branch, or any non-SHA is a load failure — not a silent fallback.
+    """
+    if revision is None:
+        return PINNED_MODEL_REVISION
+    if not isinstance(revision, str):
+        revision = str(revision)
+    stripped = revision.strip()
+    if not _SHA40.fullmatch(stripped):
+        raise ValueError(
+            f"AI_EYES_MODEL_REVISION={revision!r} is not a 40-character hex "
+            "commit SHA. Branch names and tags (including 'main') are refused "
+            "because they resolve to different weights over time. Pass a "
+            f"commit SHA. The blessed default is {PINNED_MODEL_REVISION}."
+        )
+    return stripped.lower()
 
 
 def display_round(value: float, ndigits: int = 4) -> float:
@@ -123,13 +149,17 @@ class SigLIPEngine:
         model_id: str = DEFAULT_MODEL_ID,
         cache_dir: str | Path | None = DEFAULT_CACHE_DIR,
         device: str = DEFAULT_DEVICE,
-        revision: str | None = DEFAULT_MODEL_REVISION,
+        revision: str | None = None,
         dtype: str | None = DEFAULT_DTYPE,
     ):
         self.model_id = model_id
         self.cache_dir = cache_dir
         self.device = device
-        self.revision = revision
+        if revision is None:
+            env_rev = os.environ.get("AI_EYES_MODEL_REVISION")
+            revision = PINNED_MODEL_REVISION if env_rev is None else env_rev
+        self.revision = validate_model_revision(revision)
+        self._resolved_revision = self.revision
         self.dtype = dtype
         self._model = None
         self._processor = None
@@ -183,11 +213,11 @@ class SigLIPEngine:
 
         logger.info("Loading %s ...", self.model_id)
 
-        kwargs = {}
+        kwargs = {
+            "revision": self.revision,  # unconditional — omitting this is the float
+        }
         if self.cache_dir:
             kwargs["cache_dir"] = self.cache_dir
-        if self.revision:
-            kwargs["revision"] = self.revision
 
         cuda = self.device == "cuda" and torch.cuda.is_available()
         vram_before = torch.cuda.memory_allocated() if cuda else None
@@ -226,6 +256,9 @@ class SigLIPEngine:
         # Commit only after full success
         self._processor = processor
         self._model = model
+        cfg = getattr(model, "config", None)
+        resolved = getattr(cfg, "_commit_hash", None) if cfg is not None else None
+        self._resolved_revision = resolved or self.revision
         if vram_before is not None:
             delta = torch.cuda.memory_allocated() - vram_before
             self._vram_mb = round(delta / 1024 / 1024)
@@ -517,6 +550,7 @@ class SigLIPEngine:
         info = {
             "ai_eyes_version": _package_version,
             "model_id": self.model_id,
+            "revision": self._resolved_revision if self.loaded else self.revision,
             "device": self.device,
             "loaded": self.loaded,
             "cache_dir": self.cache_dir or "default",
@@ -587,6 +621,7 @@ class SigLIPEngine:
             "passed": all(c["ok"] for c in checks),
             "checks": checks,
             "model_id": info["model_id"],
+            "revision": info["revision"],
             "device": info["device"],
             "torch_version": info["torch_version"],
             "transformers_version": info["transformers_version"],

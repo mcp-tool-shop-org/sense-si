@@ -26,7 +26,6 @@ from pydantic import Field
 from ai_eyes_mcp.engine import (
     SigLIPEngine,
     DEFAULT_MODEL_ID,
-    DEFAULT_MODEL_REVISION,
     DEFAULT_CACHE_DIR,
     DEFAULT_DEVICE,
     DEFAULT_DTYPE,
@@ -65,7 +64,8 @@ def _construct_engine() -> SigLIPEngine:
     try:
         return SigLIPEngine(
             model_id=os.environ.get("AI_EYES_MODEL_ID", DEFAULT_MODEL_ID),
-            revision=os.environ.get("AI_EYES_MODEL_REVISION", DEFAULT_MODEL_REVISION),
+            # None → engine pins; a set env value is validated as a 40-char SHA
+            revision=os.environ.get("AI_EYES_MODEL_REVISION"),
             cache_dir=DEFAULT_CACHE_DIR,
             device=DEFAULT_DEVICE,
             dtype=DEFAULT_DTYPE,
