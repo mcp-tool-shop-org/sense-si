@@ -379,6 +379,139 @@ class TestBatch:
         stacked = engine._score_batch_stacked(paths, text, truncated)
         assert_identical_scores(loop, stacked)
 
+    def test_stacking_divergence_is_payload_visible(
+        self,
+        engine,
+        photo_bus,
+        photo_cheetah,
+        photo_lion,
+        photo_tower,
+        avar_armed_front,
+        avar_desperate_front,
+        goblin_cook_front,
+        hero_bard_front,
+        knight_battleaxe_front,
+        knight_sword_front,
+        knight_sword_left,
+    ):
+        """F-W5-ENGINE-001 HALT EVIDENCE — the batch divergence is NOT invisible.
+
+        Wave 9 halted stacked batching. The design that was proposed rested on
+        the claim that the loop-vs-stacked divergence hides below the precision
+        the tools expose, so naming the batch size in the payload would close
+        the honesty gap. Measured, that claim is false.
+
+        ``display_round`` deliberately keeps FIVE SIGNIFICANT DIGITS for a score
+        too small to survive 4-decimal rounding, so a tiny sigmoid does not print
+        as a calibrated zero. SigLIP2 scores non-matching images at 1e-12..1e-5,
+        so most of a real batch goes through that branch — and a relative
+        divergence of ~1e-5..1e-4 lands squarely inside those five digits.
+
+        A RED here means the divergence stopped reaching the payload on this
+        torch/transformers/GPU combination. That is the condition under which
+        F-W5-ENGINE-001 should be RE-OPENED, not a defect to paper over.
+        """
+        import torch
+
+        from ai_eyes_mcp.engine import display_round
+
+        paths = [
+            photo_bus,
+            photo_cheetah,
+            photo_lion,
+            photo_tower,
+            avar_armed_front,
+            avar_desperate_front,
+            goblin_cook_front,
+            hero_bard_front,
+            knight_battleaxe_front,
+            knight_sword_front,
+            knight_sword_left,
+        ]
+        query = "a knight with a sword and shield"
+        text = engine._encode_text(query)
+        truncated = engine.query_truncated(query)
+        loop = [float(s) for s in engine._score_batch_loop(paths, text, truncated)]
+
+        # A real stacked forward, chunked and padded exactly as the halted
+        # design specified — computed HERE so the halt rests on a measurement
+        # this repo can re-run, not on a number in a report.
+        batch_size = 8
+        stacked: list[float] = []
+        for start in range(0, len(paths), batch_size):
+            chunk = paths[start : start + batch_size]
+            real = len(chunk)
+            padded = chunk + [chunk[-1]] * (batch_size - real)
+            image_inputs = engine._processor(
+                images=[engine._load_image(p) for p in padded],
+                return_tensors="pt",
+            ).to(engine.device)
+            with engine._forward_lock, torch.no_grad():
+                out = engine._model(**{**text, **image_inputs})
+                probs = torch.sigmoid(out.logits_per_image[:, 0]).cpu().tolist()
+            stacked.extend(probs[:real])
+
+        visible = [
+            (p, a, b)
+            for p, a, b in zip(paths, loop, stacked)
+            if display_round(a, 4) != display_round(b, 4)
+        ]
+        assert visible, (
+            f"stacked-vs-loop divergence no longer reaches the payload at "
+            f"batch_size={batch_size} over {len(paths)} images. The wave-9 halt "
+            f"was argued on this being VISIBLE; if it is not, re-open "
+            f"F-W5-ENGINE-001 rather than deleting this test.\n"
+            + "\n".join(
+                f"  loop={a!r} stacked={b!r} disp={display_round(a, 4)!r}"
+                for _, a, b in zip(paths, loop, stacked)
+            )
+        )
+
+    def test_fixed_batch_size_is_reproducible(
+        self, engine, photo_cheetah, photo_lion, photo_bus, photo_tower
+    ):
+        """The property a batch-size stamp COULD have promised, measured.
+
+        The halt in F-W5-ENGINE-001 is about loop-vs-stacked disagreement, not
+        about batching being nondeterministic. At a FIXED batch size with FIXED
+        padding, a stacked forward is bit-identical across repeats, and the
+        padding CONTENT does not touch the real images' scores (a ViT batch has
+        no cross-image interaction). Both hold — so the halted design is
+        implementable whenever the trade is judged worth it. This test keeps
+        that fact true rather than remembered.
+        """
+        import torch
+
+        real = [photo_cheetah, photo_lion, photo_bus]
+        query = "a knight with a sword and shield"
+        text = engine._encode_text(query)
+        batch_size = 8
+
+        def stacked_once(filler: str) -> list[float]:
+            padded = real + [filler] * (batch_size - len(real))
+            image_inputs = engine._processor(
+                images=[engine._load_image(p) for p in padded],
+                return_tensors="pt",
+            ).to(engine.device)
+            with engine._forward_lock, torch.no_grad():
+                out = engine._model(**{**text, **image_inputs})
+                return torch.sigmoid(out.logits_per_image[:, 0]).cpu().tolist()[
+                    : len(real)
+                ]
+
+        runs = [stacked_once(photo_tower) for _ in range(3)]
+        assert runs[0] == runs[1] == runs[2], (
+            f"a fixed batch size must be bit-reproducible; got {runs}"
+        )
+
+        # Different padding content, same batch size -> same numbers.
+        other_filler = stacked_once(photo_cheetah)
+        assert runs[0] == other_filler, (
+            f"padding CONTENT changed the real scores: "
+            f"pad=tower {runs[0]} vs pad=cheetah {other_filler}. Padding is only "
+            f"sound if a ViT batch has no cross-image interaction."
+        )
+
     def test_batch_ordering(
         self, engine, knight_sword_front, goblin_cook_front, photo_bus
     ):

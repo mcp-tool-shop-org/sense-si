@@ -550,11 +550,51 @@ class SigLIPEngine:
     ) -> list[Score]:
         """Many images, one (or chunked) forward.
 
-        ANDON F-W5-ENGINE-001: a stacked forward on this pin is NOT bit-
-        identical to the per-image loop (index 1: 5.835853501834354e-12 vs
-        5.836043454054973e-12). The batching win is not worth a silently
-        different number. This stays the loop until a stacked path matches
-        ``assert_identical_scores``.
+        ANDON F-W5-ENGINE-001 — HELD OPEN, wave 9. This is still the loop.
+
+        A stacked forward is NOT bit-identical to the per-image loop: a batched
+        matmul reduces in a different order, which is arithmetic, not a bug.
+        Padding every chunk to a fixed size does NOT recover the single-image
+        number either — no batch size except 1 reproduces ``score(x)``, and
+        n=1 IS the loop. That much was known before wave 9.
+
+        What wave 9 measured, on this pin (RTX 5090, torch 2.11.0+cu128,
+        fp32), is why naming the batch size in the payload does not close it:
+
+        * The divergence REACHES THE PAYLOAD. Over the 11 vendored fixture
+          images at batch_size=8, 4 of 11 print a different number than the
+          loop — e.g. tower ``5.8359e-12`` vs ``5.836e-12``, goblin_cook
+          ``2.3848e-08`` vs ``2.3851e-08``. ``display_round`` keeps five
+          SIGNIFICANT digits for a score too small to survive 4-decimal
+          rounding (so a tiny sigmoid does not print as a calibrated zero),
+          and SigLIP2 scores non-matching images at 1e-12..1e-5 — so most of a
+          real batch lands in that branch, where a ~1e-5..1e-4 relative
+          divergence is plainly visible. "Invisible at 4 dp" holds only for
+          scores that survive 4-decimal rounding.
+        * It would put TWO CALIBRATIONS in one server. ``image_contains(x)``
+          stays at batch size 1 by design, so it and ``image_score_batch([x])``
+          would print different digits for the same image, same query, same
+          revision. A stamp explains that; it does not reconcile it.
+        * The throughput win is real but hardware-shaped and NON-MONOTONIC:
+          1.65x at bs=8, 1.95x at bs=12, 1.38x at bs=16, and 0.47x at bs=100
+          (median of 7 reps, N=24). Any baked-in chunk size is tuned to one
+          rig while also DETERMINING the score.
+        * There is no number-preserving version of the win. The forward pass is
+          82% of batch cost (35.96 of 43.6 ms/img); batching the image
+          preprocessing instead is bit-identical but buys 0.99x.
+
+        VRAM is not the constraint and never was: ~35 MB marginal per image,
+        8.2 GB peak at bs=100 of 32.6 GB, so a chunk never stops fitting inside
+        the 100-image cap. Throughput is what bounds a chunk, and its optimum
+        is not monotonic.
+
+        The halted design is IMPLEMENTABLE — a fixed batch size is bit-
+        reproducible and padding content provably does not touch the real
+        images' scores (``test_fixed_batch_size_is_reproducible``). What blocks
+        it is a product judgement about shipping a second calibration, not an
+        engineering gap. Evidence lives in
+        ``test_stacking_divergence_is_payload_visible``; a RED there is the
+        signal to re-open this.
         """
         return self._score_batch_loop(image_paths, text_inputs, truncated)
 
