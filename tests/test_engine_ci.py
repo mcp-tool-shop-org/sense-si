@@ -7,8 +7,10 @@ on unmodified engine.py.
 
 from __future__ import annotations
 
+import os
 import threading
 import time
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
@@ -473,3 +475,141 @@ def test_out_of_range_threshold_falls_back_with_warning():
     assert r.returncode == 0, r.stderr
     assert r.stdout == "0.02", r.stdout
     assert "AI_EYES_DEFAULT_THRESHOLD" in (r.stderr or "") or "threshold" in (r.stderr or "").lower()
+
+
+# ---------------------------------------------------------------------------
+# Embedding cache — baselines were re-embedded on every call
+# ---------------------------------------------------------------------------
+
+
+def _counting_embedder(counter, vectors):
+    """Stub the uncached embedder; record every path it is actually asked for."""
+
+    def fake(self, image_path):
+        counter.append(image_path)
+        return vectors[Path(image_path).name]
+
+    return fake
+
+
+def test_baseline_embeddings_are_reused_across_calls(monkeypatch, tmp_path):
+    """F-W5-SERVER-004: a caller's baseline floor is the same images every call.
+
+    ``max(compare(x, y) for x, y in pairs)`` re-embedded every baseline image on
+    every ``image_compare`` / ``image_rank`` call. Measured at 36.5 ms per
+    embedding, a three-pair floor was costing 219 ms of GPU per call to
+    recompute a number that cannot have changed.
+    """
+    import numpy as np
+
+    e = SigLIPEngine()
+    seen: list[str] = []
+    vecs = {
+        "x.png": np.array([1.0, 0.0], dtype=np.float32),
+        "y.png": np.array([0.0, 1.0], dtype=np.float32),
+    }
+    for name in vecs:
+        (tmp_path / name).write_bytes(b"stub")
+    monkeypatch.setattr(
+        SigLIPEngine, "_embed_image_uncached", _counting_embedder(seen, vecs)
+    )
+
+    x, y = str(tmp_path / "x.png"), str(tmp_path / "y.png")
+    first = e.compare(x, y)
+    second = e.compare(x, y)
+    third = e.compare(x, y)
+
+    assert first == second == third, "cache must not move the number"
+    assert len(seen) == 2, (
+        f"expected 2 embeddings for 3 compares of the same pair, got "
+        f"{len(seen)}: {seen}"
+    )
+
+
+def test_embedding_cache_invalidates_when_the_file_changes(monkeypatch, tmp_path):
+    """An instrument must never report a measurement of a file that changed.
+
+    Keying on path alone would return a stale embedding after the bytes on disk
+    are replaced — the tool would state something it did not measure. The key
+    carries mtime and size.
+    """
+    import numpy as np
+
+    e = SigLIPEngine()
+    seen: list[str] = []
+    box = {"v": np.array([1.0, 0.0], dtype=np.float32)}
+
+    def fake(self, image_path):
+        seen.append(image_path)
+        return box["v"]
+
+    monkeypatch.setattr(SigLIPEngine, "_embed_image_uncached", fake)
+
+    p = tmp_path / "shifting.png"
+    p.write_bytes(b"first")
+    e.embed_image(str(p))
+    e.embed_image(str(p))
+    assert len(seen) == 1, "unchanged file must be served from cache"
+
+    # Replace the bytes; a real edit changes size and mtime.
+    os.utime(p, None)
+    p.write_bytes(b"second-and-longer")
+    box["v"] = np.array([0.0, 1.0], dtype=np.float32)
+    got = e.embed_image(str(p))
+    assert len(seen) == 2, (
+        f"a changed file must be re-embedded, not served stale; calls={seen}"
+    )
+    assert got.tolist() == [0.0, 1.0], "stale embedding returned for changed bytes"
+
+
+def test_embedding_cache_is_bounded(monkeypatch, tmp_path):
+    """A long-running server scanning directories must not grow without limit."""
+    import numpy as np
+
+    from ai_eyes_mcp.engine import EMBED_CACHE_MAX
+
+    e = SigLIPEngine()
+    monkeypatch.setattr(
+        SigLIPEngine,
+        "_embed_image_uncached",
+        lambda self, p: np.array([1.0, 0.0], dtype=np.float32),
+    )
+    for i in range(EMBED_CACHE_MAX + 25):
+        p = tmp_path / f"img{i}.png"
+        p.write_bytes(b"x" * (i + 1))
+        e.embed_image(str(p))
+    assert len(e._embed_cache) <= EMBED_CACHE_MAX, (
+        f"cache grew to {len(e._embed_cache)}, cap is {EMBED_CACHE_MAX}"
+    )
+
+
+def test_embedding_cache_hands_back_a_private_copy(monkeypatch, tmp_path):
+    """A caller mutating the returned vector must not poison the cache."""
+    import numpy as np
+
+    e = SigLIPEngine()
+    monkeypatch.setattr(
+        SigLIPEngine,
+        "_embed_image_uncached",
+        lambda self, p: np.array([1.0, 0.0], dtype=np.float32),
+    )
+    p = tmp_path / "a.png"
+    p.write_bytes(b"stub")
+
+    # Both copy sites matter and they fail differently, so both are exercised.
+    # STORE side: the vector handed back on a MISS must not be the object the
+    # cache keeps.
+    miss = e.embed_image(str(p))
+    miss[0] = 99.0
+    assert e.embed_image(str(p))[0] == 1.0, (
+        "mutating the miss-path result poisoned the cache (store must copy)"
+    )
+
+    # READ side: the vector handed back on a HIT must not be the cached object
+    # either. An earlier version of this test only covered the miss path and
+    # stayed green with `return hit` in place of `return hit.copy()`.
+    hit = e.embed_image(str(p))
+    hit[0] = -7.0
+    assert e.embed_image(str(p))[0] == 1.0, (
+        "mutating a cache HIT poisoned the cache (read must copy)"
+    )

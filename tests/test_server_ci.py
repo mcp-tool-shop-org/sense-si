@@ -414,3 +414,58 @@ def test_baseline_pair_accepts_lists_and_tuples_of_two_paths():
         assert pairs[0][0].endswith("a.png") and pairs[0][1].endswith("b.png")
     assert _parse_baseline_pairs(None) is None
     assert _parse_baseline_pairs([]) is None
+
+
+def test_baseline_floor_is_not_re_embedded_on_every_call(monkeypatch, tmp_path):
+    """F-W5-SERVER-004: the caller's baseline pairs are the same images
+    every call, and were re-embedded every time.
+
+    Runs the real ``engine.compare`` (numpy dot) over a stubbed embedder, so
+    this counts actual forward passes without a GPU. Two ``image_compare``
+    calls with one baseline pair touch four distinct images; the second call
+    must add no new embeddings, and must return the identical payload.
+    """
+    import numpy as np
+
+    from ai_eyes_mcp import server
+    from ai_eyes_mcp.engine import SigLIPEngine
+
+    _stub_loaded(monkeypatch, server)
+    seen: list[str] = []
+    vecs = {
+        "a.png": np.array([1.0, 0.0, 0.0], dtype=np.float32),
+        "b.png": np.array([0.9, 0.436, 0.0], dtype=np.float32),
+        "x.png": np.array([0.0, 1.0, 0.0], dtype=np.float32),
+        "y.png": np.array([0.0, 0.0, 1.0], dtype=np.float32),
+    }
+    for name in vecs:
+        (tmp_path / name).write_bytes(b"stub")
+
+    def fake(self, image_path):
+        seen.append(os.path.basename(image_path))
+        return vecs[os.path.basename(image_path)]
+
+    monkeypatch.setattr(SigLIPEngine, "_embed_image_uncached", fake)
+    server.engine._embed_cache.clear()
+
+    def call():
+        return image_compare(
+            str(tmp_path / "a.png"),
+            str(tmp_path / "b.png"),
+            baselines=[[str(tmp_path / "x.png"), str(tmp_path / "y.png")]],
+        )
+
+    first = call()
+    after_first = len(seen)
+    second = call()
+
+    assert after_first == 4, f"first call should embed 4 images, got {seen}"
+    assert len(seen) == 4, (
+        f"second call re-embedded {len(seen) - after_first} images that cannot "
+        f"have changed: {seen[after_first:]}"
+    )
+    for field in ("similarity", "separated", "baseline_max", "margin"):
+        assert first[field] == second[field], (
+            f"{field} moved between identical calls: "
+            f"{first[field]!r} -> {second[field]!r}"
+        )

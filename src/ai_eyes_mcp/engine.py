@@ -18,6 +18,7 @@ import os
 import re
 import sys
 import threading
+from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
@@ -85,6 +86,20 @@ DEFAULT_CACHE_DIR = os.environ.get("AI_EYES_MODEL_DIR", None)
 DEFAULT_DEVICE = os.environ.get("AI_EYES_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 DEFAULT_DTYPE = os.environ.get("AI_EYES_DTYPE", None)  # "float16" | "bfloat16" | None (full precision)
 MAX_QUERY_LENGTH = 500  # character cap; the text encoder holds 64 tokens (see query_truncated)
+# In-memory image-embedding cache. A caller's baseline pairs are the same
+# images on every image_compare / image_rank call, and re-embedding them cost
+# 36.5 ms each. Bounded so a long-running server scanning directories cannot
+# grow without limit; 1152 float32 per entry, so the default cap is ~295 KB.
+# In-memory ONLY — no disk, no sidecar, no index file.
+try:
+    EMBED_CACHE_MAX = max(0, int(os.environ.get("AI_EYES_EMBED_CACHE", "64")))
+except (ValueError, TypeError):
+    EMBED_CACHE_MAX = 64
+    logger.warning(
+        "Invalid AI_EYES_EMBED_CACHE (%r), using %s",
+        os.environ.get("AI_EYES_EMBED_CACHE"),
+        EMBED_CACHE_MAX,
+    )
 _THRESHOLD_FALLBACK = 0.02
 try:
     DEFAULT_THRESHOLD = float(os.environ.get("AI_EYES_DEFAULT_THRESHOLD", "0.02"))
@@ -248,6 +263,10 @@ class SigLIPEngine:
         # load would stall every in-flight caller (W1-ENGINE-001).
         self._forward_lock = threading.Lock()
         self._load_lock = threading.Lock()
+        # Path+mtime+size -> embedding. Guarded by its own lock: a cache hit
+        # must not queue behind an in-flight forward pass.
+        self._embed_cache: "OrderedDict[tuple, np.ndarray]" = OrderedDict()
+        self._embed_cache_lock = threading.Lock()
         # Optional eager load: surface a broken model/cache at construction
         # (server start) instead of on the first tool call.
         if os.environ.get("AI_EYES_EAGER_LOAD", "").strip().lower() in ("1", "true", "yes", "on"):
@@ -615,12 +634,54 @@ class SigLIPEngine:
         truncated = self.query_truncated(query)
         return self._score_batch_stacked(image_paths, text_inputs, truncated)
 
+    @staticmethod
+    def _embed_cache_key(image_path: str):
+        """Identity of the BYTES, not just the path.
+
+        Keying on the path alone would hand back an embedding for a file that
+        has since been overwritten — the instrument would state something it
+        did not measure. mtime + size makes a rewritten file a different key.
+        Returns None when the file cannot be stat'ed, so an unreadable path
+        falls through uncached and raises the normal load error.
+        """
+        try:
+            st = Path(image_path).stat()
+        except OSError:
+            return None
+        return (str(Path(image_path).resolve()), st.st_mtime_ns, st.st_size)
+
     def embed_image(self, image_path: str) -> np.ndarray:
         """Extract the image embedding vector.
 
         Returns a 1D numpy array (normalized). Use for cosine similarity
         comparisons between images.
+
+        Embeddings are memoised in-process (see ``EMBED_CACHE_MAX``). This
+        cannot move a number: ``embed_image`` is bit-identical across repeat
+        calls on a pinned revision, so a hit returns exactly what a recompute
+        would have. Callers get a private copy so a mutation cannot poison it.
         """
+        key = self._embed_cache_key(image_path)
+        if key is not None:
+            with self._embed_cache_lock:
+                hit = self._embed_cache.get(key)
+                if hit is not None:
+                    self._embed_cache.move_to_end(key)
+                    return hit.copy()
+
+        emb = self._embed_image_uncached(image_path)
+
+        if key is not None and EMBED_CACHE_MAX > 0:
+            with self._embed_cache_lock:
+                self._embed_cache[key] = emb.copy()
+                self._embed_cache.move_to_end(key)
+                while len(self._embed_cache) > EMBED_CACHE_MAX:
+                    self._embed_cache.popitem(last=False)
+        return emb
+
+    def _embed_image_uncached(self, image_path: str) -> np.ndarray:
+        """The real forward pass. Split out so the cache is testable and so a
+        subclass/stub can be counted."""
         self._ensure_loaded()
 
         image = self._load_image(image_path)
