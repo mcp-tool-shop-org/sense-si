@@ -9,12 +9,12 @@ python -c "from ai_eyes_mcp.server import mcp; from ai_eyes_mcp.engine import Si
 
 echo "[2/5] Tool registration check..."
 python -c "
+from ai_eyes_mcp import EXPECTED_TOOL_NAMES
 from ai_eyes_mcp.server import mcp
 import asyncio
 tools = asyncio.run(mcp._list_tools())
-expected = {'image_contains', 'image_classify', 'image_compare', 'image_score_batch', 'eyes_status'}
 names = {t.name for t in tools}
-assert names == expected, f'Expected {expected}, got {names}'
+assert names == EXPECTED_TOOL_NAMES, f'Expected {EXPECTED_TOOL_NAMES}, got {names}'
 print(f'  {len(tools)} tools registered OK')
 "
 
@@ -36,8 +36,8 @@ else
   echo "  SKIP: python-build not installed (pip install build)"
 fi
 
-echo "[5/5] Edge-case tests..."
-pytest tests/test_edge_cases.py -v
+echo "[5/5] CI-safe tests (pytest -m 'not dogfood')..."
+pytest -m "not dogfood" -v
 
 echo ""
 echo "=== verify passed ==="

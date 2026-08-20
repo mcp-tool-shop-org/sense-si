@@ -32,6 +32,8 @@ from PIL import Image
 
 from ai_eyes_mcp.engine import SigLIPEngine
 
+pytestmark = pytest.mark.dogfood
+
 # ---------------------------------------------------------------------------
 # Calibration constants — siglip2-so400m-patch14-384, 2026-04-09
 # Update these if the model checkpoint or revision changes.

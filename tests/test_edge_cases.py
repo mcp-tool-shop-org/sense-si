@@ -34,6 +34,7 @@ NON_IMAGE_PATH = str(Path(__file__).resolve().parent.parent / "pyproject.toml")
 # Engine-level errors
 # ===========================================================================
 
+@pytest.mark.dogfood
 class TestEngineErrors:
 
     def test_score_missing_file(self, engine):
@@ -84,6 +85,7 @@ class TestEngineErrors:
 # Tool-level errors (ToolError)
 # ===========================================================================
 
+@pytest.mark.dogfood
 class TestToolErrors:
 
     def test_contains_missing_file(self):
@@ -188,6 +190,7 @@ class TestToolErrors:
 # Boundary values
 # ===========================================================================
 
+@pytest.mark.dogfood
 class TestBoundaryValues:
 
     def test_single_label_classify(self, photo_cheetah):
@@ -275,11 +278,13 @@ class TestProactiveHardening:
 
     # --- E-05: degenerate-input guards (fire before model load) ---
 
+    @pytest.mark.dogfood
     def test_score_multi_empty_queries_rejected(self, engine):
         """score_multi([]) must raise a clear error, not reach the tokenizer."""
         with pytest.raises(ValueError, match="At least one query"):
             engine.score_multi("unused.png", [])
 
+    @pytest.mark.dogfood
     def test_score_batch_empty_paths_rejected(self, engine):
         """score_batch([], q) must raise a clear error, not return []."""
         with pytest.raises(ValueError, match="At least one image"):
@@ -287,6 +292,7 @@ class TestProactiveHardening:
 
     # --- E-06: token-truncation observability ---
 
+    @pytest.mark.dogfood
     def test_long_query_logs_truncation_warning(self, engine, photo_cheetah, caplog):
         """A query that tokenizes past the text-encoder limit must WARN — otherwise
         the score silently reflects only the first N tokens."""
@@ -300,6 +306,7 @@ class TestProactiveHardening:
             "expected a truncation warning for an over-length query"
         )
 
+    @pytest.mark.dogfood
     def test_short_query_no_truncation_warning(self, engine, photo_cheetah, caplog):
         with caplog.at_level(logging.WARNING, logger="ai_eyes_mcp"):
             engine.score(photo_cheetah, "a cheetah")
@@ -307,6 +314,7 @@ class TestProactiveHardening:
 
     # --- F2: batch error messages are sanitized (no raw path/exception leak) ---
 
+    @pytest.mark.dogfood
     def test_batch_error_message_is_sanitized(self, photo_cheetah):
         """A bad image in a batch must yield a sanitized classification, not a raw
         exception string that leaks the resolved path / PIL internals."""

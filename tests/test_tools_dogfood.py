@@ -11,6 +11,9 @@ import pytest
 
 from fastmcp.exceptions import ToolError
 
+pytestmark = pytest.mark.dogfood
+
+from ai_eyes_mcp import EXPECTED_TOOL_NAMES
 from ai_eyes_mcp.server import (
     mcp,
     image_contains,
@@ -378,15 +381,7 @@ class TestMCPToolRegistration:
     Uses the same async _list_tools() API as verify.sh.
     """
 
-    EXPECTED_TOOLS = {
-        "image_contains",
-        "image_classify",
-        "image_compare",
-        "image_score_batch",
-        "image_verify",
-        "eyes_selftest",
-        "eyes_status",
-    }
+    EXPECTED_TOOLS = EXPECTED_TOOL_NAMES
 
     def _get_tools(self):
         return asyncio.run(mcp._list_tools())

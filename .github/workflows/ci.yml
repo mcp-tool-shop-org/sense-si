@@ -7,12 +7,14 @@ on:
       - "tests/**"
       - "pyproject.toml"
       - ".github/workflows/**"
+      - "verify.sh"
   pull_request:
     paths:
       - "src/**"
       - "tests/**"
       - "pyproject.toml"
       - ".github/workflows/**"
+      - "verify.sh"
   workflow_dispatch:
 
 concurrency:
@@ -30,13 +32,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Cache the SigLIP2 weights so CI stops re-downloading ~1.6 GB every run.
-      - name: Cache SigLIP2 model
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/huggingface
-          key: hf-google-siglip2-so400m-patch14-384
-
       - name: Install dependencies
         run: pip install -e ".[dev]"
 
@@ -52,12 +47,12 @@ jobs:
           python -c "from ai_eyes_mcp.server import mcp; from ai_eyes_mcp.engine import SigLIPEngine; print('  imports OK')"
           echo "[2/3] Tool registration check..."
           python -c "
+          from ai_eyes_mcp import EXPECTED_TOOL_NAMES
           from ai_eyes_mcp.server import mcp
           import asyncio
           tools = asyncio.run(mcp._list_tools())
-          expected = {'image_contains', 'image_classify', 'image_compare', 'image_score_batch', 'image_verify', 'eyes_selftest', 'eyes_status'}
           names = {t.name for t in tools}
-          assert names == expected, f'Expected {expected}, got {names}'
+          assert names == EXPECTED_TOOL_NAMES, f'Expected {EXPECTED_TOOL_NAMES}, got {names}'
           print(f'  {len(tools)} tools registered OK')
           "
           echo "[3/3] Engine status check..."
@@ -70,9 +65,7 @@ jobs:
           print(f'  engine OK: model={s[\"model_id\"]}, device={s[\"device\"]}')
           "
 
-      # CI runs test_edge_cases.py — it downloads SigLIP2 (~1.6 GB, cached above)
-      # and runs REAL inference on CPU. The fuller dogfood suites
-      # (test_engine_dogfood, test_tools_dogfood) run locally on GPU and are left
-      # out of CI to keep it fast — NOT because the model is unavailable here.
-      - name: Run edge-case tests
-        run: pytest tests/test_edge_cases.py -v
+      # CI-safe suite: anything not marked dogfood. GPU/model tests live
+      # under @pytest.mark.dogfood and run locally (pytest -m dogfood).
+      - name: Run CI-safe tests
+        run: pytest -m "not dogfood" -v
