@@ -1,6 +1,6 @@
 [project]
 name = "ai-eyes-mcp"
-version = "1.1.0"
+version = "1.2.0"
 description = "Grounded visual evaluator MCP server — honest image judgment via SigLIP2"
 readme = "README.md"
 license = { text = "MIT" }

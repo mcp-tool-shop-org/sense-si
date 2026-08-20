@@ -1,6 +1,6 @@
 """ai-eyes-mcp — Grounded visual evaluator MCP server."""
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 # Single source for the shipped MCP tool set. CI, verify.sh, and tests import
 # this rather than each maintaining a frozenset literal (W1-CITOOL-001).

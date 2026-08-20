@@ -4,7 +4,7 @@
 
 # ai-eyes-mcp
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 
 Grounded visual evaluator MCP server. Gives Claude honest image judgment via SigLIP2 — it *measures*, it doesn't narrate, so it doesn't hallucinate.
 
