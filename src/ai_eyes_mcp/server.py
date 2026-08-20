@@ -23,7 +23,16 @@ from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 from pydantic import Field
 
-from ai_eyes_mcp.engine import SigLIPEngine, DEFAULT_MODEL_ID, DEFAULT_MODEL_REVISION, DEFAULT_CACHE_DIR, DEFAULT_DEVICE, DEFAULT_DTYPE, DEFAULT_THRESHOLD
+from ai_eyes_mcp.engine import (
+    SigLIPEngine,
+    DEFAULT_MODEL_ID,
+    DEFAULT_MODEL_REVISION,
+    DEFAULT_CACHE_DIR,
+    DEFAULT_DEVICE,
+    DEFAULT_DTYPE,
+    DEFAULT_THRESHOLD,
+    round_preserving_gt,
+)
 
 logger = logging.getLogger("ai_eyes_mcp")
 
@@ -49,13 +58,29 @@ if not logger.handlers:
 
 mcp = FastMCP(name="ai-eyes")
 
-engine = SigLIPEngine(
-    model_id=os.environ.get("AI_EYES_MODEL_ID", DEFAULT_MODEL_ID),
-    revision=os.environ.get("AI_EYES_MODEL_REVISION", DEFAULT_MODEL_REVISION),
-    cache_dir=DEFAULT_CACHE_DIR,
-    device=DEFAULT_DEVICE,
-    dtype=DEFAULT_DTYPE,
-)
+
+def _construct_engine() -> SigLIPEngine:
+    """Build the process engine. Eager-load failures must not dump a traceback
+    (W1-COORD-007 / SHIP_GATE B)."""
+    try:
+        return SigLIPEngine(
+            model_id=os.environ.get("AI_EYES_MODEL_ID", DEFAULT_MODEL_ID),
+            revision=os.environ.get("AI_EYES_MODEL_REVISION", DEFAULT_MODEL_REVISION),
+            cache_dir=DEFAULT_CACHE_DIR,
+            device=DEFAULT_DEVICE,
+            dtype=DEFAULT_DTYPE,
+        )
+    except Exception as exc:
+        logger.debug("engine construction failed", exc_info=exc)
+        sys.stderr.write(
+            "Failed to initialize ai-eyes engine. "
+            "Check AI_EYES_MODEL_ID, AI_EYES_MODEL_DIR, AI_EYES_DEVICE. "
+            "Set AI_EYES_LOG_LEVEL=DEBUG for the traceback.\n"
+        )
+        raise SystemExit(1) from None
+
+
+engine = _construct_engine()
 
 
 # ---------------------------------------------------------------------------
@@ -88,6 +113,24 @@ def _tool_error(exc: Exception) -> ToolError:
     )
 
 
+def _load_error(exc: Exception) -> ToolError:
+    """Sanitized load failure — never interpolate the raw exception (W1-SERVER-004)."""
+    logger.debug("model load failed", exc_info=exc)
+    return ToolError(
+        "Model not loaded. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network. "
+        "Set AI_EYES_LOG_LEVEL=DEBUG on the server for the full traceback."
+    )
+
+
+def _ensure_engine_ready() -> None:
+    if engine.loaded:
+        return
+    try:
+        engine._ensure_loaded()
+    except Exception as exc:
+        raise _load_error(exc) from None
+
+
 # ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
@@ -117,23 +160,22 @@ def image_contains(
     if not (0.0 <= threshold <= 1.0):  # NaN-safe: a NaN threshold fails the chained compare
         raise ToolError("threshold must be between 0.0 and 1.0 (sigmoid score range)")
     image_path = str(Path(image_path).resolve())
-    if not engine.loaded:
-        try:
-            engine._ensure_loaded()
-        except Exception as e:
-            raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
+    _ensure_engine_ready()
     try:
         score = engine.score(image_path, query)
+        truncated = engine.query_truncated(query)
     except Exception as e:
         raise _tool_error(e) from None
 
+    present = score > threshold
     elapsed = round((time.perf_counter() - t0) * 1000)
     logger.debug("image_contains completed in %.3fs", elapsed / 1000)
     return {
-        "present": score > threshold,
-        "score": round(score, 4),
+        "present": present,
+        "score": round_preserving_gt(score, threshold),
         "threshold": threshold,
         "query": query,
+        "truncated": truncated,
         "elapsed_ms": elapsed,
     }
 
@@ -147,10 +189,12 @@ def image_classify(
 
     Returns independent sigmoid scores for EACH label — these are NOT softmax.
     Multiple labels can score high simultaneously (e.g. an image with both a
-    cat and a dog). A label scoring low means it's NOT confidently present.
+    cat and a dog). ``best`` is the highest of the labels you supplied, not a
+    presence verdict.
 
-    This is measurement, not conversation. The model looks at the pixels and
-    reports similarity to each text description.
+    Absolute scores are query-phrasing sensitive: a low number can mean a weak
+    phrase rather than absence. Compare labels to each other. For a relative
+    yes/no against caller-supplied contrasts, prefer ``image_verify``.
     """
     if not labels:
         raise ToolError("At least one label is required")
@@ -159,13 +203,10 @@ def image_classify(
 
     t0 = time.perf_counter()
     image_path = str(Path(image_path).resolve())
-    if not engine.loaded:
-        try:
-            engine._ensure_loaded()
-        except Exception as e:
-            raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
+    _ensure_engine_ready()
     try:
         scores = engine.score_multi(image_path, labels)
+        truncated = any(engine.query_truncated(label) for label in labels)
     except Exception as e:
         raise _tool_error(e) from None
 
@@ -179,6 +220,7 @@ def image_classify(
         "scores": sorted_scores,
         "best": best_label,
         "best_score": rounded[best_label],
+        "truncated": truncated,
         "elapsed_ms": elapsed,
     }
 
@@ -199,11 +241,7 @@ def image_compare(
     t0 = time.perf_counter()
     image_a = str(Path(image_a).resolve())
     image_b = str(Path(image_b).resolve())
-    if not engine.loaded:
-        try:
-            engine._ensure_loaded()
-        except Exception as e:
-            raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
+    _ensure_engine_ready()
     try:
         similarity = engine.compare(image_a, image_b)
     except Exception as e:
@@ -239,27 +277,25 @@ def image_score_batch(
 
     t0 = time.perf_counter()
     image_paths = [str(Path(p).resolve()) for p in image_paths]
-    if not engine.loaded:
-        try:
-            engine._ensure_loaded()
-        except Exception as e:
-            raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
+    _ensure_engine_ready()
     results = []
     errors = []
 
     # Encode text ONCE via the engine, then score each image with pre-encoded text
     try:
         text_inputs = engine._encode_text(query)
+        truncated = engine.query_truncated(query)
     except Exception as e:
         raise _tool_error(e) from None
 
     for path in image_paths:
         try:
             score = engine._score_with_text_inputs(path, text_inputs)
+            present = score > threshold
             results.append({
                 "path": path,
-                "score": round(score, 4),
-                "present": score > threshold,
+                "score": round_preserving_gt(score, threshold),
+                "present": present,
             })
         except FileNotFoundError:
             errors.append({"path": path, "error": "not found"})
@@ -287,6 +323,7 @@ def image_score_batch(
         "errors": len(errors),
         "results": results,
         "error_details": errors if errors else None,
+        "truncated": truncated,
         "elapsed_ms": elapsed,
     }
     if results:
@@ -344,13 +381,12 @@ def image_verify(
     """
     t0 = time.perf_counter()
     image_path = str(Path(image_path).resolve())
-    if not engine.loaded:
-        try:
-            engine._ensure_loaded()
-        except Exception as e:
-            raise ToolError(f"Model not loaded: {e}. Check AI_EYES_MODEL_DIR, AI_EYES_DEVICE, and network.")
+    _ensure_engine_ready()
     try:
         result = engine.verify(image_path, target, alternatives)
+        result["truncated"] = engine.query_truncated(target) or any(
+            engine.query_truncated(a) for a in alternatives
+        )
     except Exception as e:
         raise _tool_error(e) from None
     result["elapsed_ms"] = round((time.perf_counter() - t0) * 1000)
