@@ -139,3 +139,68 @@ def test_ci_and_verify_select_not_dogfood():
     assert "pytest tests/test_edge_cases.py" not in verify, (
         "verify.sh still pins a single test file by name"
     )
+
+
+# ---------------------------------------------------------------------------
+# Version pinning — three strings that agreed only because a human said so
+# ---------------------------------------------------------------------------
+
+_README_VERSION = re.compile(r"^\*\*Version:\*\*\s*(\S+)\s*$", re.M)
+
+
+def _manifest_version() -> str:
+    try:
+        import tomllib
+    except ImportError:  # pragma: no cover — 3.10
+        import tomli as tomllib
+    data = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
+    return data["project"]["version"]
+
+
+def test_version_agrees_across_manifest_package_and_readme():
+    """pyproject, __init__, and the README version line must be one number.
+
+    Adjacent to SHIP_GATE D ("version in manifest matches git tag"): nothing
+    enforced that the three agreed — they read 1.2.0 because a human set each
+    one. A release that bumps the manifest and forgets __init__ ships a package
+    whose eyes_status reports a version it is not, and the README advertises a
+    third. Read-only on the README; the docs freeze is about authorship.
+    """
+    from ai_eyes_mcp import __version__ as package_version
+
+    manifest = _manifest_version()
+    match = _README_VERSION.search((REPO / "README.md").read_text(encoding="utf-8"))
+    assert match, (
+        "README.md must carry a '**Version:** X.Y.Z' line for the version gate "
+        "to anchor on; if the line moved, update this regex deliberately"
+    )
+    readme = match.group(1)
+
+    assert manifest == package_version, (
+        f"pyproject.toml version {manifest!r} != ai_eyes_mcp.__version__ "
+        f"{package_version!r} — the built wheel and the running package disagree"
+    )
+    assert readme == package_version, (
+        f"README.md states version {readme!r} but ai_eyes_mcp.__version__ is "
+        f"{package_version!r} — bump both in the release commit"
+    )
+
+
+def test_version_is_a_release_number_not_a_placeholder():
+    """W1-CITOOL-002 shape: a gate that only checks equality passes on '0.0.0'.
+
+    Three strings can agree and still be wrong. SHIP_GATE requires v1.0.0
+    minimum, so the shared value must parse as a real release triple at or
+    above 1.0.0 — otherwise the agreement gate above is satisfiable by a
+    placeholder in all three places.
+    """
+    from ai_eyes_mcp import __version__ as package_version
+
+    parts = package_version.split(".")
+    assert len(parts) == 3 and all(p.isdigit() for p in parts), (
+        f"__version__ {package_version!r} is not a MAJOR.MINOR.PATCH triple"
+    )
+    assert int(parts[0]) >= 1, (
+        f"__version__ {package_version!r} is pre-1.0; SHIP_GATE requires a "
+        f"v1.0.0 minimum for a shipped repo"
+    )
