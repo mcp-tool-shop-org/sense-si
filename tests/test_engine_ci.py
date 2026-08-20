@@ -1,0 +1,241 @@
+"""CI-safe engine tests — no GPU, no weights.
+
+These pin measurement honesty (Class 1 / Class 2), the load lock, and
+status field labeling. They stub the model/processor; they must go red
+on unmodified engine.py.
+"""
+
+from __future__ import annotations
+
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+
+import pytest
+import torch
+
+from ai_eyes_mcp.engine import SigLIPEngine
+
+
+# ---------------------------------------------------------------------------
+# Class 1 — displayed numbers must imply the verdict
+# ---------------------------------------------------------------------------
+
+
+def _stub_score_multi(mapping):
+    def fake(self, image_path, queries):
+        return {q: mapping[q] for q in queries}
+    return fake
+
+
+def test_verify_tiny_margin_does_not_display_as_zero(monkeypatch):
+    """W1-ENGINE-003: present true + margin 0.0 is a self-contradicting payload."""
+    e = SigLIPEngine()
+    monkeypatch.setattr(
+        SigLIPEngine,
+        "score_multi",
+        lambda self, path, queries: {queries[0]: 0.50002, queries[1]: 0.50000},
+    )
+    r = e.verify("unused.png", "target", ["alt"])
+    assert r["present"] is True
+    assert r["margin"] > 0
+    assert r["target_score"] > r["best_alternative_score"], (
+        f"displayed scores contradict present=True: {r}"
+    )
+
+
+def test_verify_confidence_band_matches_displayed_margin(monkeypatch):
+    """A 0.29999 gap is 'moderate'; displaying 0.3 would read as 'high'."""
+    e = SigLIPEngine()
+    monkeypatch.setattr(
+        SigLIPEngine,
+        "score_multi",
+        lambda self, path, queries: {queries[0]: 0.5, queries[1]: 0.5 - 0.29999},
+    )
+    r = e.verify("unused.png", "target", ["alt"])
+    assert "moderate" in r["confidence"]
+    assert abs(r["margin"]) < 0.3, (
+        f"displayed margin {r['margin']} would imply high, but confidence is moderate"
+    )
+
+
+def test_display_round_never_prints_zero_for_nonzero_sigmoid():
+    """W1-COORD-003: selftest measured_b: 0 for a tiny sigmoid is a calibrated-looking lie."""
+    from ai_eyes_mcp.engine import display_round
+
+    rounded = display_round(1.23e-8, ndigits=5)
+    assert rounded != 0
+    assert rounded != 0.0
+    assert float(rounded) > 0
+
+
+# ---------------------------------------------------------------------------
+# Class 2 — truncation is a returned fact, not a stderr aside
+# ---------------------------------------------------------------------------
+
+
+class _FakeTok:
+    def __init__(self, n_tokens: int):
+        self.n_tokens = n_tokens
+
+    def __call__(self, query, truncation=False, add_special_tokens=True):
+        return {"input_ids": list(range(self.n_tokens))}
+
+
+class _FakeTextCfg:
+    max_position_embeddings = 64
+
+
+class _FakeCfg:
+    text_config = _FakeTextCfg()
+    max_position_embeddings = None
+
+
+def _engine_with_tokenizer(n_tokens: int) -> SigLIPEngine:
+    e = SigLIPEngine()
+    e._processor = type("P", (), {"tokenizer": _FakeTok(n_tokens)})()
+    e._model = type("M", (), {"config": _FakeCfg()})()
+    return e
+
+
+def test_query_truncated_true_when_over_encoder_limit():
+    """W1-ENGINE-002: 80 tokens against a 64-position encoder is truncated."""
+    e = _engine_with_tokenizer(80)
+    assert e.query_truncated("unused") is True
+
+
+def test_query_truncated_false_when_under_limit():
+    e = _engine_with_tokenizer(10)
+    assert e.query_truncated("a cheetah") is False
+
+
+def test_char_cap_does_not_bound_tokens():
+    """The 500-char cap still admits queries that tokenize past 64."""
+    from ai_eyes_mcp.engine import MAX_QUERY_LENGTH
+
+    q = "cat dog fox " * 39
+    assert len(q) < MAX_QUERY_LENGTH
+    e = _engine_with_tokenizer(119)
+    assert e.query_truncated(q) is True
+
+
+# ---------------------------------------------------------------------------
+# W1-ENGINE-001 — load lock, not the forward lock
+# ---------------------------------------------------------------------------
+
+
+def test_ensure_loaded_single_flight(monkeypatch):
+    """Two concurrent first-calls must load the model once, not twice."""
+    e = SigLIPEngine()
+    loads = []
+
+    class FakeModel(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.w = torch.nn.Parameter(torch.zeros(1))
+
+        def eval(self):
+            return self
+
+        def to(self, device):
+            time.sleep(0.15)
+            loads.append(threading.current_thread().name)
+            return self
+
+    class FakeProc:
+        pass
+
+    def fake_processor(*a, **k):
+        return FakeProc()
+
+    def fake_model(*a, **k):
+        return FakeModel()
+
+    import transformers
+
+    monkeypatch.setattr(transformers.AutoProcessor, "from_pretrained", fake_processor)
+    monkeypatch.setattr(transformers.AutoModel, "from_pretrained", fake_model)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futs = [pool.submit(e._ensure_loaded) for _ in range(2)]
+        for f in futs:
+            f.result()
+
+    assert len(loads) == 1, f"loaded {len(loads)} times (threads={loads})"
+    assert e.loaded
+
+
+def test_load_lock_is_not_the_forward_lock():
+    """Holding the forward lock across a 10-20s load would stall every caller."""
+    e = SigLIPEngine()
+    assert hasattr(e, "_load_lock")
+    assert e._load_lock is not e._forward_lock
+
+
+# ---------------------------------------------------------------------------
+# W1-ENGINE-004 — dtype is measured, not echoed
+# ---------------------------------------------------------------------------
+
+
+def test_status_dtype_reads_parameter_dtype_not_constructor_string():
+    e = SigLIPEngine(dtype="fp16")
+
+    class M(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.w = torch.nn.Parameter(torch.zeros(2, dtype=torch.float32))
+
+    e._model = M()
+    e._processor = object()
+    s = e.status()
+    assert "float32" in str(s["dtype"]), (
+        f"status dtype echoed constructor {e.dtype!r} instead of parameter dtype; got {s['dtype']!r}"
+    )
+    assert s["dtype"] != "fp16"
+
+
+# ---------------------------------------------------------------------------
+# W1-COORD-002 — vram_mb is this engine's load delta, not process-wide
+# ---------------------------------------------------------------------------
+
+
+def test_vram_mb_is_load_delta_not_current_process_allocation(monkeypatch):
+    e = SigLIPEngine(device="cuda")
+    mem = [100 * 1024 * 1024]  # 100 MiB
+
+    def fake_allocated(*_a, **_k):
+        return mem[0]
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "memory_allocated", fake_allocated)
+
+    class FakeModel(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.w = torch.nn.Parameter(torch.zeros(1))
+
+        def eval(self):
+            return self
+
+        def to(self, device):
+            mem[0] = 500 * 1024 * 1024  # 500 MiB after load
+            return self
+
+    import transformers
+
+    monkeypatch.setattr(
+        transformers.AutoProcessor, "from_pretrained", lambda *a, **k: object()
+    )
+    monkeypatch.setattr(
+        transformers.AutoModel, "from_pretrained", lambda *a, **k: FakeModel()
+    )
+
+    e._ensure_loaded()
+    mem[0] = 900 * 1024 * 1024  # another consumer allocates after load
+    s = e.status()
+    assert "vram_mb" in s
+    # Delta at load was 400 MiB; process-wide now would be 900.
+    assert s["vram_mb"] == 400, (
+        f"vram_mb should be the load delta (400), not process allocated "
+        f"({s['vram_mb']})"
+    )

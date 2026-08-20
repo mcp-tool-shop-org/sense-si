@@ -36,7 +36,7 @@ DEFAULT_MODEL_REVISION = os.environ.get("AI_EYES_MODEL_REVISION", None)
 DEFAULT_CACHE_DIR = os.environ.get("AI_EYES_MODEL_DIR", None)
 DEFAULT_DEVICE = os.environ.get("AI_EYES_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 DEFAULT_DTYPE = os.environ.get("AI_EYES_DTYPE", None)  # "float16" | "bfloat16" | None (full precision)
-MAX_QUERY_LENGTH = 500  # CLIP-family tokenizers truncate beyond ~77 tokens; 500 chars is generous
+MAX_QUERY_LENGTH = 500  # character cap; the text encoder holds 64 tokens (see query_truncated)
 try:
     DEFAULT_THRESHOLD = float(os.environ.get("AI_EYES_DEFAULT_THRESHOLD", "0.02"))
 except (ValueError, TypeError):
@@ -46,6 +46,57 @@ except (ValueError, TypeError):
         os.environ.get('AI_EYES_DEFAULT_THRESHOLD'),
         DEFAULT_THRESHOLD,
     )
+
+
+def display_round(value: float, ndigits: int = 4) -> float:
+    """Round ``value`` for a payload without turning a non-zero into 0.0.
+
+    Decide on full precision elsewhere; this is display only. A tiny
+    sigmoid that would round to 0 at ``ndigits`` keeps significant digits
+    so the payload does not look like a calibrated zero.
+    """
+    rounded = round(value, ndigits)
+    if value != 0 and rounded == 0:
+        return float(format(abs(value), ".5g")) * (1.0 if value > 0 else -1.0)
+    return rounded
+
+
+def round_preserving_gt(value: float, other: float, ndigits: int = 4) -> float:
+    """Round ``value`` so ``(value > other)`` is unchanged after rounding."""
+    present = value > other
+    for d in range(ndigits, 16):
+        r = display_round(value, d)
+        if (r > other) == present:
+            return r
+    return value
+
+
+def round_pair_preserving_order(a: float, b: float, ndigits: int = 4) -> tuple[float, float]:
+    """Round a pair so ``(a > b)`` equals ``(ra > rb)``."""
+    present = a > b
+    for d in range(ndigits, 16):
+        ra, rb = display_round(a, d), display_round(b, d)
+        if (ra > rb) == present:
+            return ra, rb
+    return a, b
+
+
+def confidence_from_magnitude(magnitude: float) -> str:
+    if magnitude >= 0.3:
+        return "high"
+    if magnitude >= 0.1:
+        return "moderate"
+    return "low — target and best alternative are close; treat as inconclusive"
+
+
+def round_margin(margin: float, ndigits: int = 4) -> float:
+    """Round a margin so its confidence band matches the unrounded band."""
+    band = confidence_from_magnitude(abs(margin))
+    for d in range(ndigits, 16):
+        r = display_round(margin, d)
+        if confidence_from_magnitude(abs(r)) == band:
+            return r
+    return margin
 
 
 class _TokenIdConfigWarningFilter(logging.Filter):
@@ -82,11 +133,13 @@ class SigLIPEngine:
         self.dtype = dtype
         self._model = None
         self._processor = None
-        # Serialize GPU forward passes. The engine is documented as standalone-
-        # usable and is exercised concurrently by the test suite; a future
-        # threaded / HTTP MCP transport would call it in parallel. The lock is
-        # effectively free — inference is GPU-bound and serial on one device.
+        self._vram_mb: int | None = None
+        # Serialize GPU forward passes. FastMCP runs sync tools on a worker
+        # threadpool against one engine; inference is GPU-bound and serial
+        # on one device. Do NOT reuse this lock for model load — a 10-20s
+        # load would stall every in-flight caller (W1-ENGINE-001).
         self._forward_lock = threading.Lock()
+        self._load_lock = threading.Lock()
         # Optional eager load: surface a broken model/cache at construction
         # (server start) instead of on the first tool call.
         if os.environ.get("AI_EYES_EAGER_LOAD", "").strip().lower() in ("1", "true", "yes", "on"):
@@ -105,6 +158,14 @@ class SigLIPEngine:
         On any failure both attributes stay ``None`` and the next call
         retries cleanly.
         """
+        if self._model is not None:
+            return
+
+        with self._load_lock:
+            self._ensure_loaded_locked()
+
+    def _ensure_loaded_locked(self):
+        """Load the model. Caller holds ``_load_lock``. Re-checks after acquire."""
         if self._model is not None:
             return
 
@@ -127,6 +188,9 @@ class SigLIPEngine:
             kwargs["cache_dir"] = self.cache_dir
         if self.revision:
             kwargs["revision"] = self.revision
+
+        cuda = self.device == "cuda" and torch.cuda.is_available()
+        vram_before = torch.cuda.memory_allocated() if cuda else None
 
         try:
             processor = AutoProcessor.from_pretrained(self.model_id, **kwargs)
@@ -162,6 +226,9 @@ class SigLIPEngine:
         # Commit only after full success
         self._processor = processor
         self._model = model
+        if vram_before is not None:
+            delta = torch.cuda.memory_allocated() - vram_before
+            self._vram_mb = round(delta / 1024 / 1024)
 
         param_count = sum(p.numel() for p in self._model.parameters())
         logger.info("Loaded on %s, %.0fM params", self.device, param_count / 1e6)
@@ -194,18 +261,25 @@ class SigLIPEngine:
                 f"Query too long ({len(query)} chars, max {MAX_QUERY_LENGTH})"
             )
 
-    def _warn_if_truncated(self, query: str) -> None:
+    def query_truncated(self, query: str) -> bool:
+        """Return True if ``query`` tokenizes past the text encoder's capacity.
+
+        The encoder holds ``max_position_embeddings`` tokens (64 for SigLIP2),
+        not CLIP's 77 and not ``MAX_QUERY_LENGTH`` characters. Must never raise.
+        """
+        return self._warn_if_truncated(query)
+
+    def _warn_if_truncated(self, query: str) -> bool:
         """Log a warning when a query tokenizes past the text encoder's limit.
 
-        SigLIP's tokenizer silently truncates long prompts, so the score would
-        reflect only the first N tokens without the caller knowing. Observability
-        only — it must never raise (a truncation *check* breaking a scoring call
-        would be worse than the truncation it reports).
+        Returns True if the score will reflect a truncated prefix. Observability
+        must never raise (a truncation *check* breaking a scoring call would be
+        worse than the truncation it reports).
         """
         try:
             tok = getattr(self._processor, "tokenizer", None)
             if tok is None:
-                return
+                return False
             # The real limit is the text encoder's positional capacity
             # (max_position_embeddings, e.g. 64 for SigLIP) — NOT the tokenizer's
             # model_max_length, which SigLIP leaves as a huge sentinel.
@@ -217,7 +291,7 @@ class SigLIPEngine:
                     if max_len:
                         break
             if not max_len:
-                return
+                return False
             n = len(tok(query, truncation=False, add_special_tokens=True)["input_ids"])
             if n > max_len:
                 logger.warning(
@@ -226,8 +300,10 @@ class SigLIPEngine:
                     "tokens. Shorten the query.",
                     n, max_len, max_len,
                 )
+                return True
+            return False
         except Exception:  # noqa: BLE001 — observability must never break scoring
-            pass
+            return False
 
     def score(self, image_path: str, query: str) -> float:
         """Score a single image against a single text query.
@@ -421,20 +497,16 @@ class SigLIPEngine:
         best_alt = max(alt_scores, key=alt_scores.get)
         best_alt_score = alt_scores[best_alt]
         margin = target_score - best_alt_score
-        magnitude = abs(margin)  # confidence = how decisive the gap is, either way
-        if magnitude >= 0.3:
-            confidence = "high"
-        elif magnitude >= 0.1:
-            confidence = "moderate"
-        else:
-            confidence = "low — target and best alternative are close; treat as inconclusive"
+        present = target_score > best_alt_score
+        confidence = confidence_from_magnitude(abs(margin))
+        disp_target, disp_alt = round_pair_preserving_order(target_score, best_alt_score)
         return {
-            "present": target_score > best_alt_score,
+            "present": present,
             "target": target,
-            "target_score": round(target_score, 4),
+            "target_score": disp_target,
             "best_alternative": best_alt,
-            "best_alternative_score": round(best_alt_score, 4),
-            "margin": round(margin, 4),
+            "best_alternative_score": disp_alt,
+            "margin": round_margin(margin),
             "confidence": confidence,
         }
 
@@ -446,7 +518,6 @@ class SigLIPEngine:
             "ai_eyes_version": _package_version,
             "model_id": self.model_id,
             "device": self.device,
-            "dtype": self.dtype or "float32",
             "loaded": self.loaded,
             "cache_dir": self.cache_dir or "default",
             "python_version": sys.version,
@@ -454,11 +525,16 @@ class SigLIPEngine:
             "transformers_version": transformers.__version__,
         }
         if self.loaded:
+            param_dtype = next(self._model.parameters()).dtype
+            info["dtype"] = str(param_dtype).replace("torch.", "")
             param_count = sum(p.numel() for p in self._model.parameters())
             info["parameters"] = f"{param_count/1e6:.0f}M"
-            if self.device == "cuda" and torch.cuda.is_available():
-                vram_mb = torch.cuda.memory_allocated() / 1024 / 1024
-                info["vram_mb"] = round(vram_mb)
+            if self._vram_mb is not None:
+                info["vram_mb"] = self._vram_mb
+        else:
+            info["dtype"] = (
+                self.dtype if self.dtype in ("float16", "bfloat16") else "float32"
+            )
         return info
 
     def selftest(self) -> dict:
@@ -476,11 +552,12 @@ class SigLIPEngine:
         checks: list[dict] = []
 
         def _order(name: str, a: float, b: float, note: str) -> None:
+            disp_a, disp_b = round_pair_preserving_order(a, b, ndigits=5)
             checks.append({
                 "name": name,
                 "expected": note,
-                "measured_a": round(a, 5),
-                "measured_b": round(b, 5),
+                "measured_a": display_round(disp_a, 5),
+                "measured_b": display_round(disp_b, 5),
                 "ok": a > b,
             })
 
