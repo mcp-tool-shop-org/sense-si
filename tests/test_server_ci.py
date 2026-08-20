@@ -12,12 +12,16 @@ import sys
 import pytest
 from fastmcp.exceptions import ToolError
 
+from ai_eyes_mcp import EXPECTED_TOOL_NAMES
 from ai_eyes_mcp.engine import PINNED_MODEL_REVISION
 from ai_eyes_mcp.server import (
     image_classify,
+    image_compare,
     image_contains,
     image_score_batch,
     image_verify,
+    eyes_selftest,
+    eyes_status,
     _tool_error,
 )
 
@@ -182,12 +186,12 @@ def test_eyes_status_includes_revision():
     assert len(r["revision"]) == 40
 
 
-def test_scoring_payloads_name_the_resolved_revision(monkeypatch):
-    """W5-SERVER-001 / W5-TESTS-002: every scoring payload names the pin.
+def test_every_model_backed_payload_names_the_resolved_revision(monkeypatch):
+    """W5-SERVER-001 / W5-TESTS-002: ANY payload with a model number names the pin.
 
-    scoring_guidance tells callers to treat a payload with no revision as
-    incomplete. This gate must fail if any scoring tool omits the field or
-    echoes a constant that is not the resolved revision.
+    scoring_guidance says treat a payload with no revision as incomplete.
+    The list is EXPECTED_TOOL_NAMES so a new tool inherits the assertion
+    instead of quietly escaping a hand-enumerated four.
     """
     from ai_eyes_mcp import server
 
@@ -214,20 +218,51 @@ def test_scoring_payloads_name_the_resolved_revision(monkeypatch):
     )
     monkeypatch.setattr(server.engine, "_encode_text", lambda query: {})
     monkeypatch.setattr(server.engine, "_score_with_text_inputs", lambda path, text: 0.1)
+    monkeypatch.setattr(server.engine, "compare", lambda a, b: 0.8)
+    monkeypatch.setattr(
+        server.engine,
+        "selftest",
+        lambda: {
+            "passed": True,
+            "checks": [],
+            "model_id": "google/siglip2-so400m-patch14-384",
+            "revision": _PIN,
+            "device": "cpu",
+            "torch_version": "x",
+            "transformers_version": "x",
+        },
+    )
+    monkeypatch.setattr(
+        server.engine,
+        "status",
+        lambda: {
+            "model_id": "google/siglip2-so400m-patch14-384",
+            "revision": _PIN,
+            "device": "cpu",
+            "loaded": True,
+        },
+    )
 
-    payloads = {
-        "image_contains": image_contains("unused.png", "a query"),
-        "image_classify": image_classify("unused.png", ["a", "b"]),
-        "image_verify": image_verify("unused.png", "a", ["b"]),
-        "image_score_batch": image_score_batch(["unused.png"], "a query"),
+    callers = {
+        "image_contains": lambda: image_contains("unused.png", "a query"),
+        "image_classify": lambda: image_classify("unused.png", ["a", "b"]),
+        "image_compare": lambda: image_compare("unused.png", "other.png"),
+        "image_score_batch": lambda: image_score_batch(["unused.png"], "a query"),
+        "image_verify": lambda: image_verify("unused.png", "a", ["b"]),
+        "eyes_selftest": eyes_selftest,
+        "eyes_status": eyes_status,
     }
+    uncovered = EXPECTED_TOOL_NAMES - set(callers)
+    extra = set(callers) - EXPECTED_TOOL_NAMES
+    assert not uncovered and not extra, (
+        f"gate dispatch must equal EXPECTED_TOOL_NAMES; "
+        f"uncovered={sorted(uncovered)} extra={sorted(extra)}"
+    )
+
+    payloads = {name: fn() for name, fn in callers.items()}
     missing = [name for name, p in payloads.items() if "revision" not in p]
-    assert not missing, f"scoring payloads missing revision: {missing}"
-    wrong = [
-        name
-        for name, p in payloads.items()
-        if p.get("revision") != _PIN
-    ]
+    assert not missing, f"payloads missing revision: {missing}"
+    wrong = [name for name, p in payloads.items() if p.get("revision") != _PIN]
     assert not wrong, (
         f"revision is not the resolved SHA on {wrong}: "
         + ", ".join(f"{n}={payloads[n].get('revision')!r}" for n in wrong)

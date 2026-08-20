@@ -255,6 +255,7 @@ def image_compare(
         "similarity": round(similarity, 4),
         "image_a": image_a,
         "image_b": image_b,
+        "revision": engine._resolved_revision,
         "elapsed_ms": elapsed,
     }
 
