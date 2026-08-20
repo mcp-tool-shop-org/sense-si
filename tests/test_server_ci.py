@@ -21,6 +21,33 @@ from ai_eyes_mcp.server import (
 )
 
 
+def test_classify_best_uses_raw_scores_not_rounded(monkeypatch):
+    """W1-COORD-009: labels that round to the same 4dp must not flip `best`
+    based on caller order. Ranking is the only thing image_classify does."""
+    from ai_eyes_mcp import server
+
+    raw = {"generic": 0.123441, "knight": 0.123449}
+    monkeypatch.setattr(
+        server.engine,
+        "score_multi",
+        lambda path, labels: {lab: raw[lab] for lab in labels},
+    )
+    monkeypatch.setattr(server.engine, "query_truncated", lambda query: False)
+    monkeypatch.setattr(type(server.engine), "loaded", property(lambda self: True))
+
+    first = image_classify("unused.png", ["generic", "knight"])
+    swapped = image_classify("unused.png", ["knight", "generic"])
+    assert first["best"] == "knight", (
+        f"true best is knight (0.123449 > 0.123441); got {first['best']!r} "
+        f"from caller order generic-first. payload={first}"
+    )
+    assert swapped["best"] == "knight"
+    assert first["best"] == swapped["best"]
+    # displayed scores stay consistent with that choice
+    assert first["scores"]["knight"] >= first["scores"]["generic"]
+    assert first["best_score"] == first["scores"]["knight"]
+
+
 def test_contains_displayed_score_agrees_with_present(monkeypatch):
     """W1-SERVER-001: raw 0.02004 vs threshold 0.02 must not emit score 0.02."""
     from ai_eyes_mcp import server

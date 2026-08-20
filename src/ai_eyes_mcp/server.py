@@ -31,6 +31,7 @@ from ai_eyes_mcp.engine import (
     DEFAULT_DTYPE,
     DEFAULT_THRESHOLD,
     round_preserving_gt,
+    display_round,
 )
 
 logger = logging.getLogger("ai_eyes_mcp")
@@ -210,16 +211,25 @@ def image_classify(
     except Exception as e:
         raise _tool_error(e) from None
 
-    rounded = {k: round(v, 4) for k, v in scores.items()}
-    sorted_scores = dict(sorted(rounded.items(), key=lambda kv: kv[1], reverse=True))
-    best_label = max(rounded, key=rounded.get)
+    # Rank on full precision (Class 1). Rounding first collapses gaps < 1e-4
+    # and max() then follows caller label order — W1-COORD-009.
+    best_label = max(scores, key=scores.get)
+    ranked = dict(sorted(scores.items(), key=lambda kv: kv[1], reverse=True))
+    displayed = None
+    for digits in range(4, 16):
+        candidate = {k: display_round(v, digits) for k, v in ranked.items()}
+        if candidate[best_label] >= max(candidate.values()):
+            displayed = candidate
+            break
+    if displayed is None:
+        displayed = ranked
 
     elapsed = round((time.perf_counter() - t0) * 1000)
     logger.debug("image_classify completed in %.3fs", elapsed / 1000)
     return {
-        "scores": sorted_scores,
+        "scores": displayed,
         "best": best_label,
-        "best_score": rounded[best_label],
+        "best_score": displayed[best_label],
         "truncated": truncated,
         "elapsed_ms": elapsed,
     }
