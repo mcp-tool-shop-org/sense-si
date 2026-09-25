@@ -1,0 +1,164 @@
+{
+  "authored": [
+    ".github/",
+    "docs/",
+    "root",
+    "site/"
+  ],
+  "breaks": [
+    {
+      "doors": 2,
+      "importedBy": [],
+      "importedByTests": [
+        "tests"
+      ],
+      "kind": "part",
+      "name": "src",
+      "partLabel": "src"
+    }
+  ],
+  "changes": {
+    "first": true
+  },
+  "changesTogether": [],
+  "changesTogetherNote": [
+    "Window: 180 days; a pair counts from 3 shared commits, since 3 source files reach 10 revisions; the floor rises to 10 when 25 do."
+  ],
+  "changesTogetherWithTests": 0,
+  "commit": "f8d83a6835d008cddddd79ee5c1f976a5b23cb97",
+  "defaultBranch": "main",
+  "derived": "6 parts, mostly Python (11 files), TypeScript (2) and JavaScript (1). Work enters through 3 doors; the busiest is CI, which reaches 2 parts. People run ai-eyes-mcp.",
+  "doors": [
+    {
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
+      "file": ".github/workflows/ci.yml",
+      "id": ".github/workflows/ci.yml",
+      "landings": [],
+      "name": "CI",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "tests",
+          "depth": 0,
+          "files": 7
+        },
+        {
+          "boundary": "src",
+          "depth": 1,
+          "files": 3
+        }
+      ],
+      "runs": [
+        "tests/"
+      ],
+      "runsCount": 1,
+      "runsMore": 0,
+      "sends": [],
+      "stages": [],
+      "triggers": [
+        "on a pull request touching 6 paths",
+        "on a push touching 6 paths",
+        "or by hand"
+      ]
+    },
+    {
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
+      "file": ".github/workflows/pages.yml",
+      "id": ".github/workflows/pages.yml",
+      "landings": [],
+      "name": "Deploy site to GitHub Pages",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "runs": [
+        "site/astro.config.mjs",
+        "site/src/"
+      ],
+      "runsCount": 2,
+      "runsMore": 0,
+      "sends": [
+        "deploys the site"
+      ],
+      "stages": [],
+      "triggers": [
+        "on a push to main touching 2 paths",
+        "or by hand"
+      ]
+    },
+    {
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
+      "file": "pyproject.toml",
+      "id": "pyproject.toml#ai-eyes-mcp",
+      "kind": "command",
+      "landings": [],
+      "name": "ai-eyes-mcp",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "runs": [
+        "src/ai_eyes_mcp/server.py"
+      ],
+      "runsCount": 1,
+      "runsMore": 0,
+      "sends": [],
+      "stages": [],
+      "triggers": []
+    }
+  ],
+  "duplicates": [],
+  "duplicatesLead": null,
+  "duplicatesNote": [],
+  "edges": [],
+  "generated": [],
+  "generatedAt": "2026-09-25T02:40:43.685Z",
+  "limits": [
+    "Statistics confidence is low: fewer than 20 source files reach 10 revisions in the window."
+  ],
+  "mainDoor": ".github/workflows/ci.yml",
+  "partLabels": {
+    ".github": ".github",
+    "docs": "docs",
+    "root": "the repository root",
+    "site": "the site",
+    "src": "src",
+    "tests": "tests"
+  },
+  "parts": 6,
+  "readers": [],
+  "repo": "mcp-tool-shop-org/ai-eyes-mcp",
+  "sequences": [],
+  "startDoor": "pyproject.toml#ai-eyes-mcp",
+  "startHere": [
+    "src/ai_eyes_mcp/server.py"
+  ],
+  "startReason": "This path follows ai-eyes-mcp (a command people run) from its entry, since CI runs only tests.",
+  "summary": null,
+  "summaryFrom": null,
+  "testFiles": 18,
+  "testedBy": {
+    "src": 7
+  },
+  "unnamedWrites": 0,
+  "unread": [],
+  "unreadFiles": 0,
+  "unreadNote": [],
+  "untested": [],
+  "untestedNote": [],
+  "written": 0
+}

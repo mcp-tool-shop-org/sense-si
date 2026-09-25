@@ -1,0 +1,1105 @@
+{
+  "boundaries": [
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "7876109a3e21fc9798aa66b5364f025b8183de53a59a32d59130f8e35bac1d23",
+          "path": ".github/workflows/ci.yml"
+        },
+        {
+          "hash": "fe1db5f18ca42c6e2363f0860db9c117b03a6bff39b375189f7c9d2f1882b4a1",
+          "path": ".github/workflows/pages.yml"
+        }
+      ],
+      "globs": [
+        ".github/**"
+      ],
+      "importConfidence": "full",
+      "name": ".github",
+      "origin": "authored",
+      "role": "config",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "b2176b02803744826defed1db3c5a80b191d3d250249caa8f59ff229f4e675af",
+          "path": "docs/README.md"
+        },
+        {
+          "hash": "dfd8bb8b5f15332c813137be7aeecfc844c653a476819239074f68979c73d3b2",
+          "path": "docs/architecture.md"
+        },
+        {
+          "hash": "29688b8cff2a20c62bada5294be2d00b01419732f7f4e63b230f5abd86ee6104",
+          "path": "docs/architecture.svg"
+        },
+        {
+          "hash": "ccb2dd6b72f08e07f5feeab426f7b38dc418a20b156ab694e70251c20ec71f69",
+          "path": "docs/honest-judgment.md"
+        },
+        {
+          "hash": "18166e66a0d3a01b65c6b29290c5c9bb3a00de0f27e29b0219ae9d50b59460b5",
+          "path": "docs/install-and-validate.md"
+        },
+        {
+          "hash": "035bc8e76db5a0162240f752311e64b210f68d39db81d7663f2cf72571e136ee",
+          "path": "docs/logo.png"
+        },
+        {
+          "hash": "48333c5983289b99fc9ef0f9c77ce3d68a49fde21c0c31996ca5814d169f3400",
+          "path": "docs/tools.md"
+        }
+      ],
+      "globs": [
+        "docs/**"
+      ],
+      "importConfidence": "full",
+      "name": "docs",
+      "origin": "authored",
+      "role": "docs",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "b7061c0287d56af8fb774e2d0f53d94ade971aa71b4a734d2cdd275abea7abae",
+          "path": ".gitignore"
+        },
+        {
+          "hash": "5ec4e9e70e5bc59760cf01253b25d8e457d1aa9c21b7dfdb43fb8fc8e1951072",
+          "path": "CHANGELOG.md"
+        },
+        {
+          "hash": "367e5141e4f5884e5791c4021f33a9faa958840a5decf44e1b273a87aad1c459",
+          "path": "LICENSE"
+        },
+        {
+          "hash": "d0a434f9764454366c03e3e996ccad3e503d50b13e7097fc2e784470a36eecff",
+          "path": "README.es.md"
+        },
+        {
+          "hash": "3e9489805ab060bc4c16bce7a10d9fd50e8214fde71508d2db5e70807842bfb3",
+          "path": "README.fr.md"
+        },
+        {
+          "hash": "969087f5ae71283a255163a63772347186876371c7f8b7437712399f1099da1b",
+          "path": "README.hi.md"
+        },
+        {
+          "hash": "b2093265cc46301eceaeb2c3b9237ff1d7c9eac1fc3106c6a9c9dffed106394a",
+          "path": "README.it.md"
+        },
+        {
+          "hash": "ab4c9d0d1ca5c6c1d6ac45b4010d372836a10648dce9bd8c9ee613f34f860190",
+          "path": "README.ja.md"
+        },
+        {
+          "hash": "46e3844eda86b2cf711e18c87dfc538a534a7d9669f730509342f51136f00f6a",
+          "path": "README.md"
+        },
+        {
+          "hash": "49a221fd5727b0b5d54071eb87f855dce66b1cc1563e71d5ae87b81d663d636d",
+          "path": "README.pt-BR.md"
+        },
+        {
+          "hash": "e47fe7f724e01a69fa50588e8dd05961604001d81fecaf6a1a6a25405e609633",
+          "path": "README.zh.md"
+        },
+        {
+          "hash": "0f787586a791d51d643942b805a97b8e19f284de7879cf7b8ea4e2e481777ea9",
+          "path": "SECURITY.md"
+        },
+        {
+          "hash": "7bab9f7f9e8ea99677f8f2b381259263dab30f74944ebd9b5c7bab6d013f6769",
+          "path": "SHIP_GATE.md"
+        },
+        {
+          "hash": "3acda019b2a576c8d59552b04d2877676fa46f939e8452b0c05163455e26ff2e",
+          "path": "pyproject.toml"
+        },
+        {
+          "hash": "4191e309d7b0a70551026570ed5ade8ae7b829cd88c02f38d7d1b9000af4ad39",
+          "path": "verify.sh"
+        }
+      ],
+      "globs": [
+        "*"
+      ],
+      "importConfidence": "full",
+      "name": "root",
+      "origin": "authored",
+      "role": "config",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "3a79af2f0dfcdb4e6da6bddab3ef3e0e1144d0a309bd8bda92e352f8ea2922f1",
+          "path": "site/astro.config.mjs"
+        },
+        {
+          "hash": "af5d4f54dca60686724d306eb58759fb25b6f5ba4d66559ab84a968112a184e5",
+          "path": "site/package-lock.json"
+        },
+        {
+          "hash": "ede5fe47605b55555e8d3ed7b2eb904e0c9b03a975348882ae0a870ef5b98bb7",
+          "path": "site/package.json"
+        },
+        {
+          "hash": "035bc8e76db5a0162240f752311e64b210f68d39db81d7663f2cf72571e136ee",
+          "path": "site/src/assets/logo.png"
+        },
+        {
+          "hash": "ee756dfba4122d2acc94a39b2555d9f200fff56a87a8c0b10f9cd01df26a8b62",
+          "path": "site/src/content.config.ts"
+        },
+        {
+          "hash": "36b89144d96d8e3ab2a01951d7a657561f58270c99a87781dac9f0fca89d97f6",
+          "path": "site/src/content/docs/handbook/getting-started.md"
+        },
+        {
+          "hash": "19cc47c78bede57b44649797b9004ce6674e6810ec7c748d7d347d37fa3d2b7d",
+          "path": "site/src/content/docs/handbook/honest-measurement.md"
+        },
+        {
+          "hash": "fa4bfe3f2a97c19898085293f9b5df3f15c4a69ec156fbf1f50cdeeb27e1dfce",
+          "path": "site/src/content/docs/handbook/index.md"
+        },
+        {
+          "hash": "0bfaeeb0e926c8b82031c0c9a183e5c5060bb81cf7536a297f649f95cabc2f93",
+          "path": "site/src/content/docs/handbook/reproducibility.md"
+        },
+        {
+          "hash": "70011d71f1640c7d32ffad281044e908bed2f94fe715f13aac4f5d95ed7a5017",
+          "path": "site/src/content/docs/handbook/tools.md"
+        },
+        {
+          "hash": "391533713539035d3c92282579d43de0f137067867fdb502d7eaea3c74601d2a",
+          "path": "site/src/pages/index.astro"
+        },
+        {
+          "hash": "08b63213b4cdbb95de68f44ed881f8db48004c5c072dc11dc87152c479f23c19",
+          "path": "site/src/site-config.ts"
+        },
+        {
+          "hash": "29ee8df91833e694bdba973126b34a6177de4cf01dab6d9ef7d3126e8e2b67fb",
+          "path": "site/src/styles/global.css"
+        },
+        {
+          "hash": "caf3bea3424477e9528b80490e442ff4fad4ccc7562df9457497382c5bd62339",
+          "path": "site/src/styles/starlight-custom.css"
+        },
+        {
+          "hash": "b5b0a5b04a14cddd7713c5e1c82e86c79c17c2f86b170e26e9b170b3d5e01cd9",
+          "path": "site/tsconfig.json"
+        }
+      ],
+      "globs": [
+        "site/**"
+      ],
+      "importConfidence": "full",
+      "name": "site",
+      "origin": "authored",
+      "role": "site",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [
+        "src/ai_eyes_mcp/server.py"
+      ],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "71c6c122dda19de73a2be46468f853e6cb2dde0aeaeae3fd59dfa2fd843fe53a",
+          "path": "src/ai_eyes_mcp/__init__.py"
+        },
+        {
+          "hash": "492379e8600334c6b1e4dc9c6263d783effca16210735be9aebaa4e4d3c761a9",
+          "importsFiles": [
+            "src/ai_eyes_mcp/server.py"
+          ],
+          "path": "src/ai_eyes_mcp/__main__.py"
+        },
+        {
+          "hash": "070e679401206e4eb239cb63d9c49e10ad92cfcb8987c742f70d75f6253d5ae2",
+          "path": "src/ai_eyes_mcp/assets/selftest/cheetah.jpg"
+        },
+        {
+          "hash": "385a033093b6176b10bebe27e87b9abe469e645c582f0d2c44df42a7e780e964",
+          "path": "src/ai_eyes_mcp/assets/selftest/cook.png"
+        },
+        {
+          "hash": "64933dd3380fd2abc7df436876b7e414ddf642b27d402664581a56647d29dc54",
+          "path": "src/ai_eyes_mcp/assets/selftest/knight.png"
+        },
+        {
+          "entry": "configure_logging",
+          "entryRule": 1,
+          "exports": [
+            "assert_cold_status",
+            "confidence_from_magnitude",
+            "configure_logging",
+            "display_round",
+            "round_margin",
+            "round_pair_preserving_order",
+            "round_preserving_gt",
+            "validate_model_revision"
+          ],
+          "hash": "b1e07759021e37bc553b829c3ad0102ff42683a8268ef4d6fbc193d7b20d6750",
+          "importsFiles": [
+            "src/ai_eyes_mcp/__init__.py"
+          ],
+          "path": "src/ai_eyes_mcp/engine.py",
+          "sequences": []
+        },
+        {
+          "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "src/ai_eyes_mcp/py.typed"
+        },
+        {
+          "entry": "main",
+          "entryRule": 0,
+          "exports": [
+            "eyes_selftest",
+            "eyes_status",
+            "image_classify",
+            "image_compare",
+            "image_contains",
+            "image_rank",
+            "image_score_batch",
+            "image_verify",
+            "main"
+          ],
+          "hash": "d0f865b5a5f67e4397fdba645e51ecb52b22f4be950399b0a7d4fc7d79d8195c",
+          "importsFiles": [
+            "src/ai_eyes_mcp/engine.py"
+          ],
+          "path": "src/ai_eyes_mcp/server.py",
+          "sequences": [
+            {
+              "calls": [
+                {
+                  "line": 58,
+                  "name": "SigLIPEngine",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                },
+                {
+                  "line": 62,
+                  "name": "DEFAULT_CACHE_DIR",
+                  "passed": true,
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                },
+                {
+                  "line": 63,
+                  "name": "DEFAULT_DEVICE",
+                  "passed": true,
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                },
+                {
+                  "line": 64,
+                  "name": "DEFAULT_DTYPE",
+                  "passed": true,
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": true,
+              "isDefaultExport": false,
+              "name": "_construct_engine"
+            },
+            {
+              "calls": [
+                {
+                  "line": 110,
+                  "name": "round_margin",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                },
+                {
+                  "line": 112,
+                  "name": "confidence_from_magnitude",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "_separation"
+            },
+            {
+              "calls": [
+                {
+                  "line": 205,
+                  "name": "round_preserving_gt",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "image_contains"
+            },
+            {
+              "calls": [
+                {
+                  "line": 250,
+                  "name": "display_round",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "image_classify"
+            },
+            {
+              "calls": [
+                {
+                  "line": 110,
+                  "name": "round_margin",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  },
+                  "via": "_separation"
+                },
+                {
+                  "line": 112,
+                  "name": "confidence_from_magnitude",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  },
+                  "via": "_separation"
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "image_compare"
+            },
+            {
+              "calls": [
+                {
+                  "line": 391,
+                  "name": "round_margin",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "image_rank"
+            },
+            {
+              "calls": [
+                {
+                  "line": 445,
+                  "name": "round_preserving_gt",
+                  "target": {
+                    "file": "src/ai_eyes_mcp/engine.py"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "image_score_batch"
+            }
+          ]
+        }
+      ],
+      "globs": [
+        "src/**"
+      ],
+      "importConfidence": "full",
+      "name": "src",
+      "origin": "authored",
+      "role": "code",
+      "testedBy": 7,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "396c7b535869e4418fd9d9657635e5134c6ba626819059f0b26e9b8fbc82a761",
+          "path": "tests/assets/photos/bus.png"
+        },
+        {
+          "hash": "29b0090f5ec471dad0264abc20ecc3c80a0133a63a03d11df920e39a093fe6c8",
+          "path": "tests/assets/photos/cheetah.jpg"
+        },
+        {
+          "hash": "4c45ece00075f152cb2e6cfd5f1dfd7dc8e83042264685b4f470026240eff3ef",
+          "path": "tests/assets/photos/lion.jpg"
+        },
+        {
+          "hash": "f57f96f7a71f89739d27ae8ffc09f73cd2f17415d16c94d42dcb0d571f4eb0ee",
+          "path": "tests/assets/photos/tower.jpg"
+        },
+        {
+          "hash": "5a24c69d021bd7a94ae19c8f4e73328d8886433c08f42d67478b320de9e2bfbc",
+          "path": "tests/assets/sprites/avar_armed_front.png"
+        },
+        {
+          "hash": "efab16643db58d62c86e3e081dbd671ec762b87b8ec0756d230edd3f9b645c70",
+          "path": "tests/assets/sprites/avar_desperate_front.png"
+        },
+        {
+          "hash": "af79969a00c661cdbca2302ec0bd8b74bf068b466e0b50707660f7cae891b3f5",
+          "path": "tests/assets/sprites/goblin_cook_front.png"
+        },
+        {
+          "hash": "d5727121e831c36da8598897ac1919e993b15afc464391baf98e5d2d0ed728bc",
+          "path": "tests/assets/sprites/hero_bard_front.png"
+        },
+        {
+          "hash": "c128666c2e7b06a3ad1d261478896115d24107769ed16cc1eacb03c40ca7ef55",
+          "path": "tests/assets/sprites/knight_battleaxe_front.png"
+        },
+        {
+          "hash": "618aaf257f38023fd4d33201d45c6d8fb78140422411d6dea284ac3ce7f3f4c2",
+          "path": "tests/assets/sprites/knight_sword_front.png"
+        },
+        {
+          "hash": "cf51df2e65d67322ce55ff31fa6f5b6a255361f1d20c32ad6b667e046e29ce63",
+          "path": "tests/assets/sprites/knight_sword_left.png"
+        },
+        {
+          "exports": [
+            "assert_identical_scores",
+            "avar_armed_front",
+            "avar_desperate_front",
+            "engine",
+            "goblin_cook_front",
+            "hero_bard_front",
+            "is_missing_weights_error",
+            "knight_battleaxe_front",
+            "knight_sword_front",
+            "knight_sword_left",
+            "photo_bus",
+            "photo_cheetah",
+            "photo_lion",
+            "photo_tower"
+          ],
+          "hash": "d428ca3435ca49fd996ff9b6b69db80f99f2a1af706dcf0266426f24b54976e1",
+          "importsFiles": [
+            "src/ai_eyes_mcp/engine.py"
+          ],
+          "path": "tests/conftest.py"
+        },
+        {
+          "exports": [
+            "test_canonical_constant_matches_the_independent_anchor",
+            "test_ci_and_verify_select_not_dogfood",
+            "test_ci_yml_uses_canonical_tool_names",
+            "test_cold_status_gate_passes_fresh_engine",
+            "test_cold_status_gate_rejects_loaded_lie",
+            "test_cold_status_gate_rejects_wrong_revision",
+            "test_dev_extra_includes_hatchling",
+            "test_live_registration_matches_the_independent_anchor",
+            "test_shipped_tool_count_matches_the_shipped_set",
+            "test_verify_and_ci_use_cold_status_gate",
+            "test_verify_sh_asserts_the_shipped_tool_set",
+            "test_version_agrees_across_manifest_package_and_readme",
+            "test_version_is_a_release_number_not_a_placeholder"
+          ],
+          "hash": "fc1b421f502f48fd5867837a2d0cf8d0b466e3d5c3ee9841a367350676671e08",
+          "importsFiles": [
+            "src/ai_eyes_mcp/__init__.py",
+            "src/ai_eyes_mcp/engine.py",
+            "src/ai_eyes_mcp/server.py"
+          ],
+          "path": "tests/test_ci_gates.py"
+        },
+        {
+          "hash": "901642c198c4c3481ce4f4360ccdd36e402fb1d7c064344915632ca2b67fbe30",
+          "importsFiles": [
+            "src/ai_eyes_mcp/engine.py",
+            "src/ai_eyes_mcp/server.py"
+          ],
+          "path": "tests/test_edge_cases.py"
+        },
+        {
+          "exports": [
+            "test_baseline_embeddings_are_reused_across_calls",
+            "test_char_cap_does_not_bound_tokens",
+            "test_configure_logging_is_idempotent",
+            "test_default_revision_is_forty_char_hex",
+            "test_display_round_never_prints_zero_for_nonzero_sigmoid",
+            "test_embedding_cache_hands_back_a_private_copy",
+            "test_embedding_cache_invalidates_when_the_file_changes",
+            "test_embedding_cache_is_bounded",
+            "test_engine_score_returns_score_with_qualifiers",
+            "test_ensure_loaded_single_flight",
+            "test_env_main_raises_at_construction",
+            "test_from_pretrained_always_receives_revision",
+            "test_identical_scores_gate_fires_on_any_difference",
+            "test_load_lock_is_not_the_forward_lock",
+            "test_missing_weights_helper_does_not_treat_oom_as_absent",
+            "test_non_sha_revision_raises_actionable_error",
+            "test_out_of_range_threshold_falls_back_with_warning",
+            "test_query_truncated_false_when_under_limit",
+            "test_query_truncated_true_when_over_encoder_limit",
+            "test_score_object_behaves_as_float_and_carries_qualifiers",
+            "test_standalone_engine_honours_log_level",
+            "test_standalone_engine_honours_model_id_env",
+            "test_status_dtype_reads_parameter_dtype_not_constructor_string",
+            "test_status_includes_revision_when_unloaded",
+            "test_valid_sha_override_reaches_from_pretrained",
+            "test_verify_confidence_band_matches_displayed_margin",
+            "test_verify_tiny_margin_does_not_display_as_zero",
+            "test_vram_mb_is_load_delta_not_current_process_allocation"
+          ],
+          "hash": "40d1440c4723372b92593731aeef2d9e1233ed970ccc78473cd5876d6b040e50",
+          "importsFiles": [
+            "src/ai_eyes_mcp/engine.py",
+            "tests/conftest.py"
+          ],
+          "path": "tests/test_engine_ci.py"
+        },
+        {
+          "hash": "161bcd50f882f1089163456375827d0c254fd58f8022ae107467cc7c94a6f235",
+          "importsFiles": [
+            "src/ai_eyes_mcp/engine.py",
+            "tests/conftest.py"
+          ],
+          "path": "tests/test_engine_dogfood.py"
+        },
+        {
+          "exports": [
+            "test_baseline_floor_is_not_re_embedded_on_every_call",
+            "test_baseline_pair_accepts_lists_and_tuples_of_two_paths",
+            "test_baseline_pair_rejects_two_character_string",
+            "test_baseline_pair_rejects_wrong_shapes_with_actionable_error",
+            "test_batch_displayed_score_agrees_with_present",
+            "test_classify_best_uses_raw_scores_not_rounded",
+            "test_classify_docstring_does_not_equate_low_score_with_absence",
+            "test_classify_exposes_truncated_flag",
+            "test_compare_incomplete_without_baselines",
+            "test_compare_separated_uses_caller_baseline_not_a_fixed_band",
+            "test_contains_displayed_score_agrees_with_present",
+            "test_contains_exposes_truncated_flag",
+            "test_eager_server_import_does_not_leak_traceback",
+            "test_every_model_backed_payload_names_the_resolved_revision",
+            "test_eyes_status_includes_revision",
+            "test_image_rank_incomplete_without_baselines",
+            "test_image_rank_nothing_close_returns_empty_matches",
+            "test_load_failure_does_not_forward_raw_exception",
+            "test_verify_exposes_truncated_flag"
+          ],
+          "hash": "3ad4fc40bc8824c8eab3da0efd7745a1f365deb2d120606db42f16e5ee84f44b",
+          "importsFiles": [
+            "src/ai_eyes_mcp/__init__.py",
+            "src/ai_eyes_mcp/engine.py",
+            "src/ai_eyes_mcp/server.py"
+          ],
+          "path": "tests/test_server_ci.py"
+        },
+        {
+          "hash": "0d46afe5c7f23016e23ed29bd8d6ffef211e3d5cd39e19da2c84284f35dc3283",
+          "importsFiles": [
+            "src/ai_eyes_mcp/__init__.py",
+            "src/ai_eyes_mcp/server.py",
+            "tests/test_ci_gates.py"
+          ],
+          "path": "tests/test_tools_dogfood.py"
+        }
+      ],
+      "globs": [
+        "tests/**"
+      ],
+      "importConfidence": "full",
+      "name": "tests",
+      "origin": "authored",
+      "role": "test",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    }
+  ],
+  "doors": [
+    {
+      "checksCount": 0,
+      "commands": [
+        {
+          "job": "test",
+          "step": "Atlas check",
+          "text": "npx --yes @dogfood-lab/atlas@1.20.0 check"
+        },
+        {
+          "job": "test",
+          "step": "Install dependencies",
+          "text": "pip install -e \".[dev]\""
+        },
+        {
+          "job": "test",
+          "step": "Dependency scan (advisory)",
+          "text": "pip install pip-audit\npip-audit\n"
+        },
+        {
+          "job": "test",
+          "step": "Verify imports and tool registration",
+          "text": "echo \"[1/3] Import check...\"\npython -c \"from ai_eyes_mcp.server import mcp; from ai_eyes_mcp.engine import SigLIPEngine; print('  imports OK')\"\necho \"[2/3] Tool registration check...\"\npython -c \"\nfrom ai_eyes_mcp import EXPECTED_TOOL_NAMES\nfrom ai_eyes_mcp.server import mcp\nimport asyncio\ntools = asyncio.run(mcp._list_tools())\nnames = {t.name for t in tools}\nassert names == EXPECTED_TOOL_NAMES, f'Expected {EXPECTED_TOOL_NAMES}, got {names}'\nprint(f'  {len(tools)} tools registered OK')\n\"\necho \"[3/3] Engine status check...\"\npython -c \"\nfrom ai_eyes_mcp.engine import SigLIPEngine, assert_cold_status\ns = SigLIPEngine().status()\nassert_cold_status(s)\nprint(f'  engine OK: model={s[\\\"model_id\\\"]}, revision={s[\\\"revision\\\"]}, loaded={s[\\\"loaded\\\"]}')\n\"\n"
+        },
+        {
+          "job": "test",
+          "step": "Run CI-safe tests",
+          "text": "pytest -m \"not dogfood\" -v"
+        }
+      ],
+      "elsewhere": [],
+      "file": ".github/workflows/ci.yml",
+      "landings": [],
+      "mentions": [],
+      "name": "CI",
+      "permissions": [],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "tests",
+          "depth": 0,
+          "files": 7
+        },
+        {
+          "boundary": "src",
+          "depth": 1,
+          "enters": {
+            "file": "src/ai_eyes_mcp/engine.py",
+            "from": "tests/conftest.py"
+          },
+          "files": 3
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "directory": true,
+          "job": "test",
+          "matched": true,
+          "path": "tests/",
+          "runKind": "executes",
+          "via": "pytest pyproject.toml"
+        }
+      ],
+      "runsCount": 1,
+      "secrets": [],
+      "sends": {
+        "deploysPages": false,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "triggers": [
+        {
+          "event": "pull_request",
+          "paths": [
+            ".github/workflows/**",
+            "atlas/**",
+            "pyproject.toml",
+            "src/**",
+            "tests/**",
+            "verify.sh"
+          ]
+        },
+        {
+          "event": "push",
+          "paths": [
+            ".github/workflows/**",
+            "atlas/**",
+            "pyproject.toml",
+            "src/**",
+            "tests/**",
+            "verify.sh"
+          ]
+        },
+        {
+          "event": "workflow_dispatch"
+        }
+      ],
+      "uses": [
+        "actions/checkout",
+        "actions/setup-node",
+        "actions/setup-python"
+      ],
+      "usesWorkflowToken": false
+    },
+    {
+      "checksCount": 0,
+      "commands": [
+        {
+          "job": "build",
+          "step": "Install site dependencies",
+          "text": "npm ci"
+        },
+        {
+          "job": "build",
+          "step": "Build site",
+          "text": "npm run build"
+        }
+      ],
+      "elsewhere": [],
+      "file": ".github/workflows/pages.yml",
+      "landings": [],
+      "mentions": [],
+      "name": "Deploy site to GitHub Pages",
+      "permissions": [
+        "contents:read",
+        "id-token:write",
+        "pages:write"
+      ],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "job": "build",
+          "matched": true,
+          "path": "site/astro.config.mjs",
+          "runKind": "executes",
+          "via": "astro build"
+        },
+        {
+          "directory": true,
+          "job": "build",
+          "matched": true,
+          "path": "site/src/",
+          "runKind": "executes",
+          "via": "astro build"
+        }
+      ],
+      "runsCount": 2,
+      "secrets": [],
+      "sends": {
+        "deploysPages": true,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "triggers": [
+        {
+          "branches": [
+            "main"
+          ],
+          "event": "push",
+          "paths": [
+            ".github/workflows/pages.yml",
+            "site/**"
+          ]
+        },
+        {
+          "event": "workflow_dispatch"
+        }
+      ],
+      "uses": [
+        "actions/checkout",
+        "actions/deploy-pages",
+        "actions/setup-node",
+        "actions/upload-pages-artifact"
+      ],
+      "usesWorkflowToken": false
+    },
+    {
+      "checksCount": 0,
+      "commands": [],
+      "elsewhere": [],
+      "file": "pyproject.toml",
+      "kind": "command",
+      "landings": [],
+      "mentions": [],
+      "name": "ai-eyes-mcp",
+      "permissions": [],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "path": "src/ai_eyes_mcp/server.py",
+          "runKind": "executes"
+        }
+      ],
+      "runsCount": 1,
+      "secrets": [],
+      "sends": {
+        "deploysPages": false,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "triggers": [],
+      "uses": [],
+      "usesWorkflowToken": false
+    }
+  ],
+  "edges": [
+    {
+      "from": "tests",
+      "fromTests": true,
+      "kind": "file",
+      "to": "src"
+    }
+  ],
+  "generatedFrom": {
+    "commit": "f8d83a6835d008cddddd79ee5c1f976a5b23cb97",
+    "tracked": 65
+  },
+  "landings": [
+    {
+      "readers": [
+        {
+          "by": "tests/test_ci_gates.py",
+          "call": "read_text",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": ".github/workflows/ci.yml",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        },
+        {
+          "by": "tests/test_ci_gates.py",
+          "call": "read_text",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "README.md",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "tests/test_ci_gates.py",
+          "call": "read_text",
+          "confidence": "ast",
+          "fromTests": true
+        },
+        {
+          "by": "tests/test_edge_cases.py",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "pyproject.toml",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "site/astro.config.mjs",
+          "call": "content-collection",
+          "confidence": "ast"
+        }
+      ],
+      "target": "site/src/content/docs",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "site/astro.config.mjs",
+          "call": "autogenerate",
+          "confidence": "ast"
+        }
+      ],
+      "target": "site/src/content/docs/handbook",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        }
+      ],
+      "target": "src/ai_eyes_mcp",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "src/ai_eyes_mcp/engine.py",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "src/ai_eyes_mcp/assets/selftest",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "src/ai_eyes_mcp/engine.py",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "src/ai_eyes_mcp/assets/selftest/cheetah.jpg",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "src/ai_eyes_mcp/engine.py",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "src/ai_eyes_mcp/assets/selftest/cook.png",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "src/ai_eyes_mcp/engine.py",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "src/ai_eyes_mcp/assets/selftest/knight.png",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "tests/conftest.py",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "tests/assets",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "tests/conftest.py",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "tests/assets/photos",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "tests/conftest.py",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "tests/assets/sprites",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "tests/test_ci_gates.py",
+          "call": "read_text",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "verify.sh",
+      "writers": []
+    }
+  ],
+  "overlaps": [],
+  "submodules": [],
+  "symlinks": [],
+  "testFiles": 18,
+  "unassigned": []
+}
