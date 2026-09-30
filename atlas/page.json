@@ -18,16 +18,63 @@
     }
   ],
   "changes": {
-    "first": true
+    "fileCounts": {
+      "added": 1,
+      "changed": 2,
+      "moved": 0,
+      "parts": 2,
+      "removed": 0
+    },
+    "items": [
+      {
+        "kind": "door",
+        "sentence": "CI's pull request trigger now also names `codecov.yml`.",
+        "subjects": [
+          ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "kind": "door",
+        "sentence": "CI's push trigger now also names `codecov.yml`.",
+        "subjects": [
+          ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "kind": "door",
+        "sentence": "CI now also runs src/ai_eyes_mcp/__init__.py, src/ai_eyes_mcp/engine.py and src/ai_eyes_mcp/server.py.",
+        "subjects": [
+          ".github/workflows/ci.yml",
+          "src/ai_eyes_mcp/__init__.py",
+          "src/ai_eyes_mcp/engine.py",
+          "src/ai_eyes_mcp/server.py"
+        ]
+      },
+      {
+        "kind": "door",
+        "sentence": "And 1 more change to a door.",
+        "subjects": []
+      },
+      {
+        "kind": "counts",
+        "sentence": "1 file added and 2 changed content, across 2 parts.",
+        "subjects": []
+      }
+    ],
+    "since": {
+      "commit": "f8d83a6835d008cddddd79ee5c1f976a5b23cb97",
+      "generatedAt": "2026-09-25T02:40:43.685Z"
+    },
+    "unchanged": false
   },
   "changesTogether": [],
   "changesTogetherNote": [
     "Window: 180 days; a pair counts from 3 shared commits, since 3 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "f8d83a6835d008cddddd79ee5c1f976a5b23cb97",
+  "commit": "11998651e6550c721d152d4b6d4c4d84f598c25f",
   "defaultBranch": "main",
-  "derived": "6 parts, mostly Python (11 files), TypeScript (2) and JavaScript (1). Work enters through 3 doors; the busiest is CI, which reaches 2 parts. People run ai-eyes-mcp.",
+  "derived": "6 parts, mostly Python (11 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; CI, Deploy site to GitHub Pages and ai-eyes-mcp each reach 1 part, and CI is followed because a pull request goes through it. It deploys a site to GitHub Pages. People run ai-eyes-mcp.",
   "doors": [
     {
       "checks": [],
@@ -40,26 +87,25 @@
       "pushes": false,
       "reach": [
         {
-          "boundary": "tests",
-          "depth": 0,
-          "files": 7
-        },
-        {
           "boundary": "src",
-          "depth": 1,
+          "depth": 0,
           "files": 3
         }
       ],
       "runs": [
-        "tests/"
+        "src/ai_eyes_mcp/__init__.py",
+        "src/ai_eyes_mcp/engine.py",
+        "src/ai_eyes_mcp/server.py"
       ],
-      "runsCount": 1,
+      "runsCount": 3,
       "runsMore": 0,
-      "sends": [],
+      "sends": [
+        "uploads coverage to Codecov"
+      ],
       "stages": [],
       "triggers": [
-        "on a pull request touching 6 paths",
-        "on a push touching 6 paths",
+        "on a pull request touching 7 paths",
+        "on a push touching 7 paths",
         "or by hand"
       ]
     },
@@ -76,7 +122,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 3
+          "files": 5
         }
       ],
       "runs": [
@@ -125,10 +171,11 @@
   "duplicatesLead": null,
   "duplicatesNote": [],
   "edges": [],
+  "engine": "1.24.0",
   "generated": [],
-  "generatedAt": "2026-09-25T02:40:43.685Z",
+  "generatedAt": "2026-09-30T20:06:30.460Z",
   "limits": [
-    "Statistics confidence is low: fewer than 20 source files reach 10 revisions in the window."
+    "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/ci.yml",
   "partLabels": {
@@ -143,11 +190,12 @@
   "readers": [],
   "repo": "mcp-tool-shop-org/ai-eyes-mcp",
   "sequences": [],
-  "startDoor": "pyproject.toml#ai-eyes-mcp",
+  "startDoor": ".github/workflows/ci.yml",
   "startHere": [
-    "src/ai_eyes_mcp/server.py"
+    ".github/workflows/ci.yml",
+    "src/ai_eyes_mcp/server.py",
+    "src/ai_eyes_mcp/engine.py"
   ],
-  "startReason": "This path follows ai-eyes-mcp (a command people run) from its entry, since CI runs only tests.",
   "summary": null,
   "summaryFrom": null,
   "testFiles": 18,
@@ -159,6 +207,9 @@
   "unreadFiles": 0,
   "unreadNote": [],
   "untested": [],
-  "untestedNote": [],
+  "untestedNote": [
+    "6 test files run in no workflow: tests/test_ci_gates.py, tests/test_edge_cases.py, tests/test_engine_ci.py and 3 more.",
+    "verify.sh runs in no workflow."
+  ],
   "written": 0
 }

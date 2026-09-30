@@ -1,25 +1,29 @@
 # ai-eyes-mcp: how it works
 
-Mapped at 2026-09-25 from commit f8d83a6.
+Mapped at 2026-09-30 from commit 1199865 by Atlas 1.24.0.
 
 ## What this is
 
-6 parts, mostly Python (11 files), TypeScript (2) and JavaScript (1). Work enters through 3 doors; the busiest is CI, which reaches 2 parts. People run ai-eyes-mcp.
+6 parts, mostly Python (11 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; CI, Deploy site to GitHub Pages and ai-eyes-mcp each reach 1 part, and CI is followed because a pull request goes through it. It deploys a site to GitHub Pages. People run ai-eyes-mcp.
 
-## What changed since the last map
+## What changed since 2026-09-25 (f8d83a6)
 
-This is the first map.
+- CI's pull request trigger now also names `codecov.yml`.
+- CI's push trigger now also names `codecov.yml`.
+- CI now also runs src/ai_eyes_mcp/__init__.py, src/ai_eyes_mcp/engine.py and src/ai_eyes_mcp/server.py.
+- And 1 more change to a door.
+- 1 file added and 2 changed content, across 2 parts.
 
 ## What comes in
 
-1. **CI.** On a pull request touching 6 paths; on a push touching 6 paths; or by hand. Runs tests/.
+1. **CI.** On a pull request touching 7 paths; on a push touching 7 paths; or by hand. Runs src/ai_eyes_mcp/__init__.py, src/ai_eyes_mcp/engine.py and src/ai_eyes_mcp/server.py.
 2. **Deploy site to GitHub Pages.** On a push to main touching 2 paths; or by hand. Runs site/astro.config.mjs and site/src/.
 3. **ai-eyes-mcp** (a command people run). Runs src/ai_eyes_mcp/server.py.
 
 ## What happens through CI
 
-1. The workflow runs tests/ in tests.
-2. That reaches src (3 files).
+1. The workflow runs src/ai_eyes_mcp/__init__.py, src/ai_eyes_mcp/engine.py and src/ai_eyes_mcp/server.py in src.
+2. It uploads coverage to Codecov.
 
 ## Who reads the results
 
@@ -45,6 +49,10 @@ Window: 180 days; a pair counts from 3 shared commits, since 3 source files reac
 
 Every code part is imported by at least one test.
 
+6 test files run in no workflow: tests/test_ci_gates.py, tests/test_edge_cases.py, tests/test_engine_ci.py and 3 more.
+
+verify.sh runs in no workflow.
+
 ## Written but never read
 
 No place this map can see is written, so none goes unread.
@@ -63,12 +71,12 @@ People write .github/, docs/, the repository root and site/. Nothing in this rep
 
 ## Where to start
 
-src/ai_eyes_mcp/server.py
+.github/workflows/ci.yml → src/ai_eyes_mcp/server.py → src/ai_eyes_mcp/engine.py
 
-Read those in order to follow one run of ai-eyes-mcp end to end. This path follows ai-eyes-mcp (a command people run) from its entry, since CI runs only tests.
+Read those in order to follow one pull request end to end.
 
 ## What this map cannot see
 
-- Statistics confidence is low: fewer than 20 source files reach 10 revisions in the window.
+- Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window.
 
 Regenerate with `npx --yes @dogfood-lab/atlas map`.

@@ -9,7 +9,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "7876109a3e21fc9798aa66b5364f025b8183de53a59a32d59130f8e35bac1d23",
+          "hash": "f1e84bdf6125080becee13b5eac9a909d132d6e44c82e3777058885f942d398c",
           "path": ".github/workflows/ci.yml"
         },
         {
@@ -135,7 +135,11 @@
           "path": "SHIP_GATE.md"
         },
         {
-          "hash": "3acda019b2a576c8d59552b04d2877676fa46f939e8452b0c05163455e26ff2e",
+          "hash": "59ca3f6a5be96b80fee73bebf2b778211208d17cd3fb82e2134608dff0729c76",
+          "path": "codecov.yml"
+        },
+        {
+          "hash": "68738407e547254d77d7fc777a9d75f7159a28f677066767873b9c8646a4f8b7",
           "path": "pyproject.toml"
         },
         {
@@ -178,6 +182,7 @@
           "path": "site/src/assets/logo.png"
         },
         {
+          "constantOnly": true,
           "hash": "ee756dfba4122d2acc94a39b2555d9f200fff56a87a8c0b10f9cd01df26a8b62",
           "path": "site/src/content.config.ts"
         },
@@ -203,9 +208,18 @@
         },
         {
           "hash": "391533713539035d3c92282579d43de0f137067867fdb502d7eaea3c74601d2a",
+          "importOrder": [
+            "site/src/styles/global.css",
+            "site/src/site-config.ts"
+          ],
+          "importsFiles": [
+            "site/src/site-config.ts",
+            "site/src/styles/global.css"
+          ],
           "path": "site/src/pages/index.astro"
         },
         {
+          "constantOnly": true,
           "hash": "08b63213b4cdbb95de68f44ed881f8db48004c5c072dc11dc87152c479f23c19",
           "path": "site/src/site-config.ts"
         },
@@ -278,6 +292,121 @@
             "round_preserving_gt",
             "validate_model_revision"
           ],
+          "failurePaths": [
+            {
+              "kind": "except",
+              "line": 96
+            },
+            {
+              "kind": "except",
+              "line": 106
+            },
+            {
+              "in": "assert_cold_status",
+              "kind": "raise",
+              "line": 134
+            },
+            {
+              "in": "assert_cold_status",
+              "kind": "raise",
+              "line": 139
+            },
+            {
+              "in": "assert_cold_status",
+              "kind": "raise",
+              "line": 144
+            },
+            {
+              "in": "validate_model_revision",
+              "kind": "raise",
+              "line": 161
+            },
+            {
+              "in": "_ensure_loaded_locked",
+              "kind": "except",
+              "line": 336
+            },
+            {
+              "in": "_ensure_loaded_locked",
+              "kind": "raise",
+              "line": 351
+            },
+            {
+              "in": "_load_image",
+              "kind": "raise",
+              "line": 370
+            },
+            {
+              "in": "_load_image",
+              "kind": "raise",
+              "line": 372
+            },
+            {
+              "in": "_load_image",
+              "kind": "except",
+              "line": 375
+            },
+            {
+              "in": "_load_image",
+              "kind": "raise",
+              "line": 376
+            },
+            {
+              "in": "_load_image",
+              "kind": "except",
+              "line": 379
+            },
+            {
+              "in": "_load_image",
+              "kind": "raise",
+              "line": 380
+            },
+            {
+              "in": "_validate_query",
+              "kind": "raise",
+              "line": 388
+            },
+            {
+              "in": "_validate_query",
+              "kind": "raise",
+              "line": 390
+            },
+            {
+              "in": "_warn_if_truncated",
+              "kind": "except",
+              "line": 435
+            },
+            {
+              "in": "score_multi",
+              "kind": "raise",
+              "line": 475
+            },
+            {
+              "in": "score_batch",
+              "kind": "raise",
+              "line": 628
+            },
+            {
+              "in": "_embed_cache_key",
+              "kind": "except",
+              "line": 649
+            },
+            {
+              "in": "similarities_to_reference",
+              "kind": "raise",
+              "line": 710
+            },
+            {
+              "in": "verify",
+              "kind": "raise",
+              "line": 734
+            },
+            {
+              "in": "verify",
+              "kind": "raise",
+              "line": 745
+            }
+          ],
           "hash": "b1e07759021e37bc553b829c3ad0102ff42683a8268ef4d6fbc193d7b20d6750",
           "importsFiles": [
             "src/ai_eyes_mcp/__init__.py"
@@ -302,6 +431,163 @@
             "image_score_batch",
             "image_verify",
             "main"
+          ],
+          "failurePaths": [
+            {
+              "in": "_construct_engine",
+              "kind": "except",
+              "line": 66
+            },
+            {
+              "in": "_construct_engine",
+              "kind": "raise",
+              "line": 73
+            },
+            {
+              "in": "_parse_baseline_pairs",
+              "kind": "raise",
+              "line": 96
+            },
+            {
+              "in": "_ensure_engine_ready",
+              "kind": "except",
+              "line": 160
+            },
+            {
+              "in": "_ensure_engine_ready",
+              "kind": "raise",
+              "line": 161
+            },
+            {
+              "in": "image_contains",
+              "kind": "raise",
+              "line": 191
+            },
+            {
+              "in": "image_contains",
+              "kind": "except",
+              "line": 197
+            },
+            {
+              "in": "image_contains",
+              "kind": "raise",
+              "line": 198
+            },
+            {
+              "in": "image_classify",
+              "kind": "raise",
+              "line": 231
+            },
+            {
+              "in": "image_classify",
+              "kind": "raise",
+              "line": 233
+            },
+            {
+              "in": "image_classify",
+              "kind": "except",
+              "line": 241
+            },
+            {
+              "in": "image_classify",
+              "kind": "raise",
+              "line": 242
+            },
+            {
+              "in": "image_compare",
+              "kind": "except",
+              "line": 302
+            },
+            {
+              "in": "image_compare",
+              "kind": "raise",
+              "line": 303
+            },
+            {
+              "in": "image_rank",
+              "kind": "raise",
+              "line": 350
+            },
+            {
+              "in": "image_rank",
+              "kind": "raise",
+              "line": 352
+            },
+            {
+              "in": "image_rank",
+              "kind": "raise",
+              "line": 354
+            },
+            {
+              "in": "image_rank",
+              "kind": "except",
+              "line": 365
+            },
+            {
+              "in": "image_rank",
+              "kind": "raise",
+              "line": 366
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "raise",
+              "line": 420
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "raise",
+              "line": 422
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "raise",
+              "line": 424
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "except",
+              "line": 436
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "raise",
+              "line": 437
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "except",
+              "line": 448
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "except",
+              "line": 450
+            },
+            {
+              "in": "image_score_batch",
+              "kind": "except",
+              "line": 456
+            },
+            {
+              "in": "image_verify",
+              "kind": "except",
+              "line": 551
+            },
+            {
+              "in": "image_verify",
+              "kind": "raise",
+              "line": 552
+            },
+            {
+              "in": "eyes_selftest",
+              "kind": "except",
+              "line": 569
+            },
+            {
+              "in": "eyes_selftest",
+              "kind": "raise",
+              "line": 570
+            }
           ],
           "hash": "d0f865b5a5f67e4397fdba645e51ecb52b22f4be950399b0a7d4fc7d79d8195c",
           "importsFiles": [
@@ -457,6 +743,9 @@
           ]
         }
       ],
+      "frameworks": [
+        "mcp"
+      ],
       "globs": [
         "src/**"
       ],
@@ -540,7 +829,8 @@
           "importsFiles": [
             "src/ai_eyes_mcp/engine.py"
           ],
-          "path": "tests/conftest.py"
+          "path": "tests/conftest.py",
+          "testFramework": "pytest"
         },
         {
           "exports": [
@@ -559,12 +849,18 @@
             "test_version_is_a_release_number_not_a_placeholder"
           ],
           "hash": "fc1b421f502f48fd5867837a2d0cf8d0b466e3d5c3ee9841a367350676671e08",
+          "importOrder": [
+            "src/ai_eyes_mcp/__init__.py",
+            "src/ai_eyes_mcp/server.py",
+            "src/ai_eyes_mcp/engine.py"
+          ],
           "importsFiles": [
             "src/ai_eyes_mcp/__init__.py",
             "src/ai_eyes_mcp/engine.py",
             "src/ai_eyes_mcp/server.py"
           ],
-          "path": "tests/test_ci_gates.py"
+          "path": "tests/test_ci_gates.py",
+          "testFramework": "pytest"
         },
         {
           "hash": "901642c198c4c3481ce4f4360ccdd36e402fb1d7c064344915632ca2b67fbe30",
@@ -572,7 +868,8 @@
             "src/ai_eyes_mcp/engine.py",
             "src/ai_eyes_mcp/server.py"
           ],
-          "path": "tests/test_edge_cases.py"
+          "path": "tests/test_edge_cases.py",
+          "testFramework": "pytest"
         },
         {
           "exports": [
@@ -610,7 +907,8 @@
             "src/ai_eyes_mcp/engine.py",
             "tests/conftest.py"
           ],
-          "path": "tests/test_engine_ci.py"
+          "path": "tests/test_engine_ci.py",
+          "testFramework": "pytest"
         },
         {
           "hash": "161bcd50f882f1089163456375827d0c254fd58f8022ae107467cc7c94a6f235",
@@ -618,7 +916,8 @@
             "src/ai_eyes_mcp/engine.py",
             "tests/conftest.py"
           ],
-          "path": "tests/test_engine_dogfood.py"
+          "path": "tests/test_engine_dogfood.py",
+          "testFramework": "pytest"
         },
         {
           "exports": [
@@ -648,7 +947,8 @@
             "src/ai_eyes_mcp/engine.py",
             "src/ai_eyes_mcp/server.py"
           ],
-          "path": "tests/test_server_ci.py"
+          "path": "tests/test_server_ci.py",
+          "testFramework": "pytest"
         },
         {
           "hash": "0d46afe5c7f23016e23ed29bd8d6ffef211e3d5cd39e19da2c84284f35dc3283",
@@ -657,7 +957,8 @@
             "src/ai_eyes_mcp/server.py",
             "tests/test_ci_gates.py"
           ],
-          "path": "tests/test_tools_dogfood.py"
+          "path": "tests/test_tools_dogfood.py",
+          "testFramework": "pytest"
         }
       ],
       "globs": [
@@ -676,66 +977,142 @@
       "checksCount": 0,
       "commands": [
         {
+          "dir": "",
           "job": "test",
-          "step": "Atlas check",
-          "text": "npx --yes @dogfood-lab/atlas@1.20.0 check"
+          "programs": [
+            "npx"
+          ],
+          "step": "Atlas check"
         },
         {
+          "dir": "",
           "job": "test",
-          "step": "Install dependencies",
-          "text": "pip install -e \".[dev]\""
+          "programs": [
+            "pip"
+          ],
+          "step": "Install dependencies"
         },
         {
+          "dir": "",
           "job": "test",
-          "step": "Dependency scan (advisory)",
-          "text": "pip install pip-audit\npip-audit\n"
+          "programs": [
+            "pip",
+            "pip-audit"
+          ],
+          "step": "Dependency scan (advisory)"
         },
         {
+          "dir": "",
           "job": "test",
-          "step": "Verify imports and tool registration",
-          "text": "echo \"[1/3] Import check...\"\npython -c \"from ai_eyes_mcp.server import mcp; from ai_eyes_mcp.engine import SigLIPEngine; print('  imports OK')\"\necho \"[2/3] Tool registration check...\"\npython -c \"\nfrom ai_eyes_mcp import EXPECTED_TOOL_NAMES\nfrom ai_eyes_mcp.server import mcp\nimport asyncio\ntools = asyncio.run(mcp._list_tools())\nnames = {t.name for t in tools}\nassert names == EXPECTED_TOOL_NAMES, f'Expected {EXPECTED_TOOL_NAMES}, got {names}'\nprint(f'  {len(tools)} tools registered OK')\n\"\necho \"[3/3] Engine status check...\"\npython -c \"\nfrom ai_eyes_mcp.engine import SigLIPEngine, assert_cold_status\ns = SigLIPEngine().status()\nassert_cold_status(s)\nprint(f'  engine OK: model={s[\\\"model_id\\\"]}, revision={s[\\\"revision\\\"]}, loaded={s[\\\"loaded\\\"]}')\n\"\n"
+          "programs": [
+            "echo",
+            "python"
+          ],
+          "step": "Verify imports and tool registration"
         },
         {
+          "dir": "",
           "job": "test",
-          "step": "Run CI-safe tests",
-          "text": "pytest -m \"not dogfood\" -v"
+          "programs": [
+            "pytest"
+          ],
+          "step": "Run CI-safe tests"
         }
       ],
       "elsewhere": [],
       "file": ".github/workflows/ci.yml",
+      "jobs": [
+        {
+          "basis": "declared",
+          "name": "test",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "3.12",
+                  "range": ">=3.12.0 <3.13.0-0"
+                }
+              ],
+              "step": "1",
+              "uses": "actions/setup-python",
+              "version": "3.12"
+            },
+            {
+              "ranges": [
+                {
+                  "from": "22",
+                  "range": ">=22.0.0 <23.0.0-0"
+                }
+              ],
+              "step": "2",
+              "uses": "actions/setup-node",
+              "version": "22"
+            }
+          ]
+        },
+        {
+          "basis": "declared",
+          "name": "codecov",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ]
+        }
+      ],
       "landings": [],
       "mentions": [],
       "name": "CI",
-      "permissions": [],
+      "permissions": [
+        "contents:read",
+        "id-token:write"
+      ],
       "pushes": false,
       "reach": [
         {
-          "boundary": "tests",
-          "depth": 0,
-          "files": 7
-        },
-        {
           "boundary": "src",
-          "depth": 1,
-          "enters": {
-            "file": "src/ai_eyes_mcp/engine.py",
-            "from": "tests/conftest.py"
-          },
+          "depth": 0,
           "files": 3
         }
       ],
       "readers": [],
       "runs": [
         {
-          "directory": true,
           "job": "test",
-          "matched": true,
-          "path": "tests/",
-          "runKind": "executes",
-          "via": "pytest pyproject.toml"
+          "path": "src/ai_eyes_mcp/__init__.py",
+          "runKind": "executes"
+        },
+        {
+          "job": "test",
+          "path": "src/ai_eyes_mcp/engine.py",
+          "runKind": "executes"
+        },
+        {
+          "job": "test",
+          "path": "src/ai_eyes_mcp/server.py",
+          "runKind": "executes"
         }
       ],
-      "runsCount": 1,
+      "runsCount": 3,
       "secrets": [],
       "sends": {
         "deploysPages": false,
@@ -748,12 +1125,23 @@
         "releases": false
       },
       "stages": [],
+      "tests": [
+        {
+          "config": "pyproject.toml",
+          "files": 0,
+          "job": "test",
+          "junit": true,
+          "runner": "pytest",
+          "step": "Run CI-safe tests"
+        }
+      ],
       "triggers": [
         {
           "event": "pull_request",
           "paths": [
             ".github/workflows/**",
             "atlas/**",
+            "codecov.yml",
             "pyproject.toml",
             "src/**",
             "tests/**",
@@ -765,6 +1153,7 @@
           "paths": [
             ".github/workflows/**",
             "atlas/**",
+            "codecov.yml",
             "pyproject.toml",
             "src/**",
             "tests/**",
@@ -777,8 +1166,11 @@
       ],
       "uses": [
         "actions/checkout",
+        "actions/download-artifact",
         "actions/setup-node",
-        "actions/setup-python"
+        "actions/setup-python",
+        "actions/upload-artifact",
+        "codecov/codecov-action"
       ],
       "usesWorkflowToken": false
     },
@@ -786,18 +1178,74 @@
       "checksCount": 0,
       "commands": [
         {
+          "dir": "site",
           "job": "build",
-          "step": "Install site dependencies",
-          "text": "npm ci"
+          "programs": [
+            "npm"
+          ],
+          "step": "Install site dependencies"
         },
         {
+          "dir": "site",
           "job": "build",
-          "step": "Build site",
-          "text": "npm run build"
+          "programs": [
+            "npm"
+          ],
+          "step": "Build site"
         }
       ],
       "elsewhere": [],
       "file": ".github/workflows/pages.yml",
+      "jobs": [
+        {
+          "basis": "declared",
+          "name": "build",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "22",
+                  "range": ">=22.0.0 <23.0.0-0"
+                }
+              ],
+              "step": "1",
+              "uses": "actions/setup-node",
+              "version": "22"
+            }
+          ]
+        },
+        {
+          "basis": "declared",
+          "environment": {
+            "name": "github-pages"
+          },
+          "name": "deploy",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ]
+        }
+      ],
       "landings": [],
       "mentions": [],
       "name": "Deploy site to GitHub Pages",
@@ -811,7 +1259,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 3
+          "files": 5
         }
       ],
       "readers": [],
@@ -919,9 +1367,10 @@
       "to": "src"
     }
   ],
+  "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "f8d83a6835d008cddddd79ee5c1f976a5b23cb97",
-    "tracked": 65
+    "commit": "11998651e6550c721d152d4b6d4c4d84f598c25f",
+    "tracked": 66
   },
   "landings": [
     {
@@ -1101,5 +1550,13 @@
   "submodules": [],
   "symlinks": [],
   "testFiles": 18,
+  "testsNotRun": [
+    "tests/test_ci_gates.py",
+    "tests/test_edge_cases.py",
+    "tests/test_engine_ci.py",
+    "tests/test_engine_dogfood.py",
+    "tests/test_server_ci.py",
+    "tests/test_tools_dogfood.py"
+  ],
   "unassigned": []
 }
