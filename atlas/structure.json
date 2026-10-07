@@ -1,0 +1,789 @@
+{
+  "boundaries": [
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "579196c3929ed53e4c3c535c8c98448ddd4365a1aedc336761e9e9a592487efd",
+          "path": ".github/workflows/ci.yml"
+        }
+      ],
+      "globs": [
+        ".github/**"
+      ],
+      "importConfidence": "full",
+      "name": ".github",
+      "origin": "authored",
+      "role": "config",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "18317f6773fc70ab4bd026224bfd66c7bb4fe64441ee972880332e478756ba65",
+          "path": "packages/decisions/pyproject.toml"
+        },
+        {
+          "hash": "37966e8b1c7c269c7dc366d0225b990510c283e678f5579191b53a0ca72967f3",
+          "importsFiles": [
+            "packages/decisions/src/decisions/client.py"
+          ],
+          "path": "packages/decisions/src/decisions/__init__.py"
+        },
+        {
+          "exports": [
+            "create_decisions_client",
+            "require_pinned",
+            "validate_answer"
+          ],
+          "failurePaths": [
+            {
+              "in": "require_pinned",
+              "kind": "raise",
+              "line": 138
+            },
+            {
+              "in": "validate_answer",
+              "kind": "raise",
+              "line": 154
+            },
+            {
+              "in": "validate_answer",
+              "kind": "raise",
+              "line": 158
+            },
+            {
+              "in": "validate_answer",
+              "kind": "raise",
+              "line": 164
+            },
+            {
+              "in": "validate_answer",
+              "kind": "raise",
+              "line": 174
+            },
+            {
+              "in": "_default_fetch",
+              "kind": "except",
+              "line": 197
+            },
+            {
+              "in": "_default_fetch",
+              "kind": "except",
+              "line": 200
+            },
+            {
+              "in": "_default_fetch",
+              "kind": "raise",
+              "line": 201
+            },
+            {
+              "in": "create_decisions_client",
+              "kind": "raise",
+              "line": 216
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 227
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 232
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 281
+            },
+            {
+              "in": "client",
+              "kind": "except",
+              "line": 283
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 284
+            },
+            {
+              "in": "client",
+              "kind": "except",
+              "line": 285
+            },
+            {
+              "in": "client",
+              "kind": "except",
+              "line": 294
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 310
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 330
+            }
+          ],
+          "hash": "e820f00eb3966a7e57aadbad66c4160024ae3ee72747b638bd578e1cd5fa7bfb",
+          "path": "packages/decisions/src/decisions/client.py"
+        },
+        {
+          "exports": [
+            "test_choice_must_be_one_of_the_options",
+            "test_empty_key_builds_nothing",
+            "test_import_does_not_require_a_key",
+            "test_posts_the_pin_and_stamps_the_date_on_the_answer",
+            "test_refuses_a_request_with_no_questions_before_calling",
+            "test_refuses_a_router_that_comes_back_on_the_answer",
+            "test_refuses_anything_but_the_pin_before_the_request",
+            "test_rejects_a_malformed_answer_instead_of_guessing",
+            "test_retries_429_and_5xx_but_not_other_4xx",
+            "test_score_must_be_numeric"
+          ],
+          "hash": "bc99e86c18e22b998d97d0684dd5b0dc46c85a7da1e52b1369eadb7dd9aaaf59",
+          "importsFiles": [
+            "packages/decisions/src/decisions/__init__.py",
+            "packages/decisions/src/decisions/client.py"
+          ],
+          "path": "packages/decisions/tests/test_client.py",
+          "testFramework": "pytest"
+        }
+      ],
+      "globs": [
+        "packages/decisions/**"
+      ],
+      "importConfidence": "full",
+      "name": "decisions",
+      "origin": "authored",
+      "role": "code",
+      "testRunners": [
+        "pytest"
+      ],
+      "testedBy": 2,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "8c86d0854ad93cc764eecb35a8f231e2a75ad962e9145333b02a4371c9ec9ccb",
+          "path": "docs/adapter.md"
+        },
+        {
+          "hash": "f94cc086818791a4af584cecde28859e41f7573cdcdeded1dd5aeeff4c00bf77",
+          "path": "docs/contract.md"
+        }
+      ],
+      "globs": [
+        "docs/**"
+      ],
+      "importConfidence": "full",
+      "name": "docs",
+      "origin": "authored",
+      "role": "docs",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "712d339845216418f56cc15c7f4c5da352c89535f6b6fc8dcf17b2e4086b7e2b",
+          "path": "packages/ears/pyproject.toml"
+        },
+        {
+          "hash": "fda96708fe4400d5ca9fd0efb2dad0d0477227c4c46e21e92a3c4507f6ea079a",
+          "importsFiles": [
+            "packages/ears/src/ai_ears/questions.py",
+            "packages/ears/src/ai_ears/record.py"
+          ],
+          "path": "packages/ears/src/ai_ears/__init__.py"
+        },
+        {
+          "exports": [
+            "load_question_result",
+            "phrase_clean",
+            "which_take"
+          ],
+          "failurePaths": [
+            {
+              "in": "load_question_result",
+              "kind": "raise",
+              "line": 69
+            },
+            {
+              "in": "_check_instructions",
+              "kind": "raise",
+              "line": 90
+            },
+            {
+              "in": "_check_instructions",
+              "kind": "raise",
+              "line": 92
+            },
+            {
+              "in": "_check_pin",
+              "kind": "raise",
+              "line": 97
+            },
+            {
+              "in": "_probabilities",
+              "kind": "raise",
+              "line": 102
+            },
+            {
+              "in": "_probabilities",
+              "kind": "raise",
+              "line": 106
+            },
+            {
+              "in": "_probabilities",
+              "kind": "raise",
+              "line": 109
+            },
+            {
+              "in": "which_take",
+              "kind": "raise",
+              "line": 124
+            },
+            {
+              "in": "which_take",
+              "kind": "raise",
+              "line": 128
+            },
+            {
+              "in": "which_take",
+              "kind": "raise",
+              "line": 130
+            },
+            {
+              "in": "which_take",
+              "kind": "raise",
+              "line": 147
+            },
+            {
+              "in": "phrase_clean",
+              "kind": "raise",
+              "line": 175
+            },
+            {
+              "in": "phrase_clean",
+              "kind": "raise",
+              "line": 177
+            },
+            {
+              "in": "phrase_clean",
+              "kind": "raise",
+              "line": 188
+            }
+          ],
+          "hash": "9e641f995ea94c4579aa62caa026c3f1e715ae81257783e347ef8c24df3c5505",
+          "importsFiles": [
+            "packages/decisions/src/decisions/__init__.py",
+            "packages/ears/src/ai_ears/record.py"
+          ],
+          "path": "packages/ears/src/ai_ears/questions.py"
+        },
+        {
+          "exports": [
+            "detector_revision",
+            "from_jam_take",
+            "reject_gate_keys",
+            "review_marks",
+            "transcript_from_scores"
+          ],
+          "failurePaths": [
+            {
+              "in": "reject_gate_keys",
+              "kind": "raise",
+              "line": 27
+            },
+            {
+              "in": "__post_init__",
+              "kind": "raise",
+              "line": 116
+            },
+            {
+              "in": "__post_init__",
+              "kind": "raise",
+              "line": 200
+            },
+            {
+              "in": "__post_init__",
+              "kind": "raise",
+              "line": 202
+            },
+            {
+              "in": "_timing_rows",
+              "kind": "raise",
+              "line": 237
+            },
+            {
+              "in": "_timing_rows",
+              "kind": "raise",
+              "line": 246
+            },
+            {
+              "in": "_pitch_rows",
+              "kind": "raise",
+              "line": 280
+            },
+            {
+              "in": "_pitch_rows",
+              "kind": "raise",
+              "line": 286
+            },
+            {
+              "in": "transcript_from_scores",
+              "kind": "raise",
+              "line": 336
+            },
+            {
+              "in": "transcript_from_scores",
+              "kind": "except",
+              "line": 339
+            },
+            {
+              "in": "transcript_from_scores",
+              "kind": "raise",
+              "line": 340
+            },
+            {
+              "in": "review_marks",
+              "kind": "raise",
+              "line": 368
+            },
+            {
+              "in": "review_marks",
+              "kind": "raise",
+              "line": 380
+            },
+            {
+              "in": "review_marks",
+              "kind": "raise",
+              "line": 382
+            },
+            {
+              "in": "review_marks",
+              "kind": "raise",
+              "line": 386
+            },
+            {
+              "in": "from_jam_take",
+              "kind": "raise",
+              "line": 419
+            },
+            {
+              "in": "from_jam_take",
+              "kind": "raise",
+              "line": 425
+            }
+          ],
+          "hash": "083741f4159a2a547882cb62a4f9c984264f00007c507a02a3b85c2721efbcfb",
+          "path": "packages/ears/src/ai_ears/record.py"
+        },
+        {
+          "hash": "57b4f9278f0bef6db952532406ab0a7923268525a3c8f23a34e2e9054d67a2cf",
+          "path": "packages/ears/tests/fixtures/phrase-scores.json"
+        },
+        {
+          "hash": "f39c74c75190398e1cc0728a7083f0bdb2371682dae37ecef48e14358fb89691",
+          "path": "packages/ears/tests/fixtures/pitch.json"
+        },
+        {
+          "hash": "d9fde096c9354ad77f72d59225f224f026f297cd48b3a7964f5535ae1c56eb05",
+          "path": "packages/ears/tests/fixtures/receipt.json"
+        },
+        {
+          "hash": "d519e7eb491131126024b631919e43c5c2d59b5e533b45bd27742e724a3691b1",
+          "path": "packages/ears/tests/fixtures/verify-energy.json"
+        },
+        {
+          "exports": [
+            "test_a_gate_word_in_the_question_never_calls",
+            "test_band_edges_are_uncertain",
+            "test_load_rejects_pass_and_fail_and_a_winner",
+            "test_missing_confidence_is_too_close_to_call",
+            "test_phrase_clean_reports_p_yes_and_the_band",
+            "test_which_take_returns_probabilities_and_no_winner",
+            "test_which_take_through_the_real_client_never_leaves_the_machine"
+          ],
+          "hash": "313e14590ee15fa47a2346012ad996db490c8238f44bdb44870f93437ceba819",
+          "importsFiles": [
+            "packages/decisions/src/decisions/__init__.py",
+            "packages/decisions/src/decisions/client.py",
+            "packages/ears/src/ai_ears/questions.py",
+            "packages/ears/src/ai_ears/record.py"
+          ],
+          "path": "packages/ears/tests/test_questions.py",
+          "testFramework": "pytest"
+        },
+        {
+          "exports": [
+            "test_gate_keys_are_rejected_on_a_result_shaped_object",
+            "test_listener_transcript_must_stay_advisory",
+            "test_placed_receipt_keeps_measurements_and_drops_the_gate",
+            "test_raw_take_has_no_aligner_reading",
+            "test_review_mark_keeps_the_level",
+            "test_swift_fields_are_not_a_cross_check",
+            "test_take_id_cannot_be_a_gate_word",
+            "test_tracker_name_is_read_from_the_receipt"
+          ],
+          "hash": "08789e35f05660bed2500a2bd135a6b222f54852cb312f520d49a5f776cd46b8",
+          "importsFiles": [
+            "packages/ears/src/ai_ears/record.py"
+          ],
+          "path": "packages/ears/tests/test_record.py",
+          "testFramework": "pytest"
+        }
+      ],
+      "globs": [
+        "packages/ears/**"
+      ],
+      "importConfidence": "full",
+      "name": "ears",
+      "origin": "authored",
+      "role": "code",
+      "testRunners": [
+        "pytest"
+      ],
+      "testedBy": 2,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "4575fc0176b34a0c8bdc5ee6d90facf934b1352daa0b27cac18581cb049b3bef",
+          "path": ".gitignore"
+        },
+        {
+          "hash": "367e5141e4f5884e5791c4021f33a9faa958840a5decf44e1b273a87aad1c459",
+          "path": "LICENSE"
+        },
+        {
+          "hash": "a12b82686ee74c97f8577e067b815555566ae3358b830ebc14d4619a3a030c0f",
+          "path": "README.md"
+        },
+        {
+          "hash": "b44c0d4c24125f8d602f4e9bc6440e0976ec36cf9f7ef8911ac5ac9171e0e52f",
+          "path": "pyproject.toml"
+        }
+      ],
+      "globs": [
+        "*"
+      ],
+      "importConfidence": "full",
+      "name": "root",
+      "origin": "authored",
+      "role": "config",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    }
+  ],
+  "doors": [
+    {
+      "checksCount": 0,
+      "commands": [
+        {
+          "dir": "",
+          "job": "pytest",
+          "programs": [
+            "python"
+          ],
+          "step": "Install pytest"
+        },
+        {
+          "dir": "",
+          "job": "pytest",
+          "programs": [
+            "python"
+          ],
+          "step": "pytest"
+        },
+        {
+          "dir": "",
+          "job": "atlas",
+          "programs": [
+            "npx"
+          ],
+          "step": "Atlas check"
+        }
+      ],
+      "elsewhere": [],
+      "file": ".github/workflows/ci.yml",
+      "jobs": [
+        {
+          "basis": "declared",
+          "name": "pytest",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "3.11",
+                  "range": ">=3.11.0 <3.12.0-0"
+                },
+                {
+                  "from": "3.12",
+                  "range": ">=3.12.0 <3.13.0-0"
+                }
+              ],
+              "step": "Set up Python ${{ matrix.python-version }}",
+              "uses": "actions/setup-python",
+              "version": "${{ matrix.python-version }}"
+            }
+          ]
+        },
+        {
+          "basis": "declared",
+          "name": "atlas",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "22",
+                  "range": ">=22.0.0 <23.0.0-0"
+                }
+              ],
+              "step": "Set up Node",
+              "uses": "actions/setup-node",
+              "version": "22"
+            }
+          ]
+        }
+      ],
+      "landings": [],
+      "mentions": [],
+      "name": "CI",
+      "permissions": [
+        "contents:read"
+      ],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "decisions",
+          "depth": 0,
+          "files": 3
+        },
+        {
+          "boundary": "ears",
+          "depth": 0,
+          "files": 4
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "directory": true,
+          "job": "pytest",
+          "matched": true,
+          "path": "packages/decisions/tests/",
+          "runKind": "executes",
+          "via": "pytest pyproject.toml"
+        },
+        {
+          "directory": true,
+          "job": "pytest",
+          "matched": true,
+          "path": "packages/ears/tests/",
+          "runKind": "executes",
+          "via": "pytest pyproject.toml"
+        }
+      ],
+      "runsCount": 2,
+      "secrets": [],
+      "sends": {
+        "deploysPages": false,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "tests": [
+        {
+          "config": "pyproject.toml",
+          "files": 3,
+          "job": "pytest",
+          "runner": "pytest",
+          "step": "pytest"
+        }
+      ],
+      "triggers": [
+        {
+          "event": "pull_request"
+        },
+        {
+          "event": "push",
+          "paths": [
+            ".github/workflows/**",
+            "packages/**",
+            "pyproject.toml"
+          ]
+        },
+        {
+          "event": "workflow_dispatch"
+        }
+      ],
+      "uses": [
+        "actions/checkout",
+        "actions/setup-node",
+        "actions/setup-python"
+      ],
+      "usesWorkflowToken": false
+    }
+  ],
+  "edges": [
+    {
+      "from": "ears",
+      "kind": "file",
+      "to": "decisions"
+    }
+  ],
+  "engine": "1.24.0",
+  "generatedFrom": {
+    "commit": "52198bbe6099468cc3319ae2b35f275916164b7f",
+    "tracked": 21
+  },
+  "landings": [
+    {
+      "readers": [
+        {
+          "by": "pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        }
+      ],
+      "target": "README.md",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "packages/ears/pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        }
+      ],
+      "target": "packages/decisions",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "packages/decisions/pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        },
+        {
+          "by": "pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        }
+      ],
+      "target": "packages/decisions/src",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        }
+      ],
+      "target": "packages/decisions/tests",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "packages/ears/pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        },
+        {
+          "by": "pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        }
+      ],
+      "target": "packages/ears/src",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "pyproject.toml",
+          "call": "configuration",
+          "confidence": "config"
+        }
+      ],
+      "target": "packages/ears/tests",
+      "writers": []
+    }
+  ],
+  "overlaps": [],
+  "submodules": [],
+  "symlinks": [],
+  "testFiles": 7,
+  "unassigned": []
+}
