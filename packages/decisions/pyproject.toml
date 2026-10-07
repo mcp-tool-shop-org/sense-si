@@ -1,0 +1,15 @@
+[project]
+name = "sense-si-decisions"
+version = "0.0.0"
+description = "Pinned Jev client. Probabilities in, no pass or fail out."
+requires-python = ">=3.10"
+
+[tool.hatch.build.targets.wheel]
+packages = ["decisions"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,74 @@
+{
+  "verdict": "FAIL",
+  "per_note": {
+    "pass": false,
+    "fail_cents": 50.0,
+    "warn_cents": 25.0,
+    "warn": [],
+    "fail": [
+      "v44"
+    ]
+  },
+  "global_offset_cents": 6.2,
+  "global_pass": true,
+  "global_fail_cents": 20.0,
+  "scatter_sd_cents": 17.0,
+  "scatter_warn": false,
+  "rows": [
+    {
+      "id": "v00",
+      "lyric": "A",
+      "midi": 62,
+      "ref_hz": 293.66,
+      "window": [
+        11.761,
+        12.298
+      ],
+      "frames": 107,
+      "voiced_fraction": 1.0,
+      "cents_mean": -8.5,
+      "cents_median": -0.0,
+      "cents_sd": 43.8,
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "id": "v01",
+      "lyric": "ma",
+      "midi": 67,
+      "ref_hz": 392.0,
+      "window": [
+        12.725,
+        13.967
+      ],
+      "frames": 248,
+      "voiced_fraction": 1.0,
+      "cents_mean": 24.1,
+      "cents_median": 20.0,
+      "cents_sd": 13.0,
+      "status": "PASS",
+      "reason": ""
+    },
+    {
+      "id": "v44",
+      "lyric": "cious",
+      "midi": 74,
+      "ref_hz": 587.33,
+      "window": [
+        69.255,
+        69.533
+      ],
+      "frames": 55,
+      "voiced_fraction": 1.0,
+      "cents_mean": -47.2,
+      "cents_median": -0.0,
+      "cents_sd": 84.3,
+      "status": "untrackable",
+      "reason": "mean/median split 47 c"
+    }
+  ],
+  "tracker": "pyin",
+  "vocal": "tmp/vocal-clock/sing/amazing-grace-new-britain/phrase16w2/placed-local.wav",
+  "vocal_sha256": "2b3c5633954e9a39c478fa6211034819d0668af4ea0c8d3f97a0d6033d34e889",
+  "onsets_from": "tmp/vocal-clock/sing/amazing-grace-new-britain/phrase16w2/receipt.json"
+}

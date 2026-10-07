@@ -1,0 +1,24 @@
+{
+  "listener": {
+    "model": "Qwen3-Omni-30B-A3B-Instruct-Q4_K_M.gguf",
+    "mmproj": "mmproj-Qwen3-Omni-30B-A3B-Instruct-Q8_0.gguf",
+    "prompt": "This is an isolated sung vocal from a hymn. Transcribe exactly the words that are sung, in order, as plain lowercase words with no punctuation. Write only the words. If a word is unclear, write your best guess of what was sung; do not add words that were not sung.",
+    "temperature": 0,
+    "seed": 1
+  },
+  "takes": {
+    "take-01": {
+      "phrases": {
+        "0": {
+          "words": 6,
+          "mean_abs_cents": 13.3,
+          "notes": 9,
+          "pitch_fails": 0,
+          "heard": "amazing grace how sweet the sound",
+          "matched": 6,
+          "intelligibility": 1.0
+        }
+      }
+    }
+  }
+}

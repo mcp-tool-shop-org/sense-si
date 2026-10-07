@@ -1,0 +1,19 @@
+[project]
+name = "ai-ears"
+version = "0.0.0"
+description = "Hearing records and typed questions over them. Jev does not pass or fail."
+requires-python = ">=3.10"
+dependencies = ["sense-si-decisions"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ai_ears"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+sense-si-decisions = { path = "../decisions", editable = true }

@@ -1,0 +1,10 @@
+[project]
+name = "sense-si"
+version = "0.0.0"
+description = "Python instruments for seeing and hearing. Jev answers questions over their records."
+requires-python = ">=3.10"
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["packages/decisions/tests", "packages/ears/tests"]
+pythonpath = ["packages/decisions/src", "packages/ears/src"]

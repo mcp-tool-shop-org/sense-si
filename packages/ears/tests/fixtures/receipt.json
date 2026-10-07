@@ -1,0 +1,149 @@
+{
+  "verdict": "FAIL",
+  "checks": {
+    "aligner_cross_check": {
+      "info": true,
+      "used": true,
+      "offset_ms": -16.8,
+      "measured_from": 107,
+      "rescued": 2,
+      "both_off": 2,
+      "unconfirmed": 0,
+      "disputed": 37,
+      "rescued_ids": [
+        "v07",
+        "v63"
+      ],
+      "failing_ids": [
+        "v06",
+        "v48"
+      ],
+      "disputed_ids": [
+        "v00",
+        "v02",
+        "v05",
+        "v09",
+        "v14",
+        "v15",
+        "v17",
+        "v18",
+        "v19",
+        "v22",
+        "v23",
+        "v29",
+        "v34",
+        "v36",
+        "v37",
+        "v40",
+        "v41",
+        "v50",
+        "v52",
+        "v53",
+        "v55",
+        "v57",
+        "v58",
+        "v60",
+        "v61",
+        "v62",
+        "v64",
+        "v71",
+        "v73",
+        "v79",
+        "v80",
+        "v81",
+        "v82",
+        "v91",
+        "v93",
+        "v108",
+        "v110"
+      ]
+    },
+    "onset_abs_ms": {
+      "pass": false,
+      "gate_ms": 40.0,
+      "worst_ms": 239.61
+    },
+    "order": {
+      "pass": false,
+      "reason": "no transcript of the placed stem"
+    },
+    "one_voice": {
+      "pass": false,
+      "reason": "no transcript of the placed stem"
+    },
+    "fits_timeline": {
+      "pass": false,
+      "reason": "no transcript of the placed stem",
+      "last_clip_end": 160.0
+    },
+    "length_match": {
+      "pass": true,
+      "vocal_frames": 7920000,
+      "bed_frames": 7920000,
+      "clock_frames": 7920000
+    }
+  },
+  "table": [
+    {
+      "id": "v00",
+      "lyric": "A",
+      "t_score": 11.666666666666666,
+      "method": "rise",
+      "t_vowel": 11.657603688035838,
+      "peak": 0.23364527749438932,
+      "reason": "ok",
+      "dip_db": 49.0,
+      "err_ms": -9.06,
+      "pass": true,
+      "aligner_err_ms": -71.1,
+      "cross_check": "disputed"
+    },
+    {
+      "id": "v01",
+      "lyric": "ma",
+      "t_score": 12.5,
+      "method": "rise",
+      "t_vowel": 12.497531083070351,
+      "peak": 0.25605776516076195,
+      "reason": "ok",
+      "dip_db": 27.3,
+      "err_ms": -2.47,
+      "pass": true,
+      "aligner_err_ms": 3.6
+    },
+    {
+      "id": "v02",
+      "lyric": "zing",
+      "t_score": 14.166666666666666,
+      "method": "rise",
+      "t_vowel": 14.166959251602966,
+      "peak": 0.27001279072308243,
+      "reason": "ok",
+      "dip_db": 41.3,
+      "err_ms": 0.29,
+      "pass": true,
+      "aligner_err_ms": 428.6,
+      "cross_check": "disputed"
+    }
+  ],
+  "artifacts": {
+    "clock": "scores/amazing-grace-new-britain.score-clock.v1.json",
+    "vocal": "tmp/vocal-clock/sing/amazing-grace-new-britain/phrase16w2/placed-local.wav",
+    "vocal_sha256": "2b3c5633954e9a39c478fa6211034819d0668af4ea0c8d3f97a0d6033d34e889",
+    "bed": "tmp/vocal-clock/sing/amazing-grace-new-britain/piano-bed.wav",
+    "bed_sha256": "ec91d3baf3534b3190f5b150c3478d8f8f84c687d4be46eea4fcd885441d59c3",
+    "words": null,
+    "plan": "tmp/vocal-clock/sing/amazing-grace-new-britain/phrase16w2/plan.json"
+  },
+  "detector": {
+    "band_hz": [
+      400.0,
+      3000.0
+    ],
+    "rise_fraction": 0.5,
+    "env_win_s": 0.008,
+    "env_hop_s": 0.0005,
+    "slope_min_db": 3.0,
+    "principle": "vowel onset = sung tone start (Sundberg 2007); the same detector and per-event method date the source take and the placed artifact"
+  }
+}
