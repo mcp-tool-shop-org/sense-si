@@ -1,0 +1,41 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Testing
+.pytest_cache/
+.benchmarks/
+
+# Packaging / distribution
+dist/
+build/
+*.egg-info/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+
+# Linting
+.ruff_cache/
+
+# ML model artifacts
+*.pt
+*.bin
+*.safetensors
+*.onnx
+models/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+site/.astro/
+
+# Node deps for the Astro site (never tracked)
+node_modules/
+site/dist/
+
+# polyglot translation cache (local, regenerated)
+.polyglot-cache.json

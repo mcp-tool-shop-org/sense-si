@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 210" role="img" aria-label="ai-eyes data flow: image and query into SigLIP2, out to a sigmoid score and an honest verdict">
+  <style>
+    .box  { fill: none; stroke: #1b2733; stroke-width: 2; rx: 8; }
+    .acc  { fill: none; stroke: #2f7d6b; stroke-width: 2; }
+    .accf { fill: #2f7d6b; }
+    .t    { fill: #1b2733; font: 600 15px system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .ts   { fill: #5b6b7b; font: 400 12px system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .arr  { stroke: #1b2733; stroke-width: 2; fill: none; }
+    @media (prefers-color-scheme: dark) {
+      .box { stroke: #e6edf3; } .t { fill: #e6edf3; } .ts { fill: #9fb0c0; }
+      .arr { stroke: #e6edf3; } .acc { stroke: #4bbfa3; } .accf { fill: #4bbfa3; }
+    }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+      <path d="M0 0 L6.5 3 L0 6 z" class="accf"/>
+    </marker>
+  </defs>
+
+  <!-- inputs -->
+  <rect class="box" x="12" y="34" width="140" height="44" rx="8"/>
+  <text class="t" x="82" y="61" text-anchor="middle">image path</text>
+  <rect class="box" x="12" y="128" width="140" height="44" rx="8"/>
+  <text class="t" x="82" y="155" text-anchor="middle">text query</text>
+
+  <!-- engine -->
+  <rect class="box" x="238" y="70" width="180" height="66" rx="8"/>
+  <text class="t" x="328" y="99" text-anchor="middle">SigLIP2 SO400M</text>
+  <text class="ts" x="328" y="118" text-anchor="middle">discriminative · no_grad · lock</text>
+
+  <!-- sigmoid -->
+  <rect class="box" x="470" y="76" width="110" height="54" rx="8"/>
+  <text class="t" x="525" y="100" text-anchor="middle">sigmoid</text>
+  <text class="ts" x="525" y="118" text-anchor="middle">score 0–1</text>
+
+  <!-- verdict -->
+  <rect class="box" x="600" y="70" width="108" height="66" rx="8"/>
+  <text class="t" x="654" y="99" text-anchor="middle">honest</text>
+  <text class="t" x="654" y="118" text-anchor="middle">verdict</text>
+
+  <!-- arrows -->
+  <path class="arr" marker-end="url(#ah)" d="M152 56 C 195 56, 200 100, 236 100"/>
+  <path class="arr" marker-end="url(#ah)" d="M152 150 C 195 150, 200 106, 236 106"/>
+  <path class="arr" marker-end="url(#ah)" d="M418 103 L 468 103"/>
+  <path class="arr" marker-end="url(#ah)" d="M580 103 L 598 103"/>
+</svg>

@@ -6,7 +6,7 @@ sense-si holds instruments and a question client. The instruments measure. The c
 
 ai-eyes answers "is this claim about the pixels true?" with SigLIP2. `image_verify` already returns a relative decision, a margin, and a confidence band. That decision stays inside eyes. Jev is not wired under it. Eyes evaluates images and nothing else, and it has no opinion about what a consumer does with the number.
 
-The package name is `ai-eyes`. Eyes is not in this checkout. The code still lives in the `ai-eyes-mcp` repository. When it moves, the console script `ai-eyes-mcp` keeps launching the server, and the payloads stay as they are.
+The package name is `ai-eyes`. The code lives in `packages/eyes`, and the import stays `ai_eyes_mcp`. The primary console script is `ai-eyes`. `ai-eyes-mcp` stays as a second entry point until the Claude Code MCP config is switched to `ai-eyes`, and comes out in a later pull request. The payloads stay as they are.
 
 ## Ears
 
