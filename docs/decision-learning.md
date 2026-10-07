@@ -151,6 +151,42 @@ The frozen 20 stay out of that training.
 
 <!-- result -->
 
-Not run.
+Model `typesafe/jev-1.13`, stamp `jev-1.13-20260917`. The question band is unchanged at 0.35–0.65.
+
+Phrases: 124. Extended-window clean: 73. Strict-window clean: 87. Labels flip on 14 phrases.
+Tags: certain 73, edge 45, mid 6.
+Jev full record, 0 shots, extended labels, Brier 0.3341. The same probabilities on the strict labels: 0.3863. Without the edge phrases: 0.4801.
+Extended minus strict: -0.0523 (-0.0798 to -0.0272). That difference clears 0.02.
+Dropping the edge phrases moves Brier by -0.1460 (-0.1811 to -0.1113). That difference clears 0.02.
+
+Repeated stratified 5-fold, 10 repeats, on the phrases that are not in the frozen 20. A Brier gap under 0.02 is not resolvable. The Nadeau–Bengio interval has to clear zero as well.
+
+base-rate: Brier 0.2426, log loss 0.6783. Minus logistic: -0.0006 (-0.0449 to 0.0436), not resolvable.
+logistic: Brier 0.2375, log loss 0.6763.
+logistic-timing: Brier 0.2346, log loss 0.6635. Minus logistic: -0.0066 (-0.0445 to 0.0313), not resolvable.
+logistic-pitch: Brier 0.2213, log loss 0.6417. Minus logistic: -0.0194 (-0.0484 to 0.0097), not resolvable.
+logistic-transcript: Brier 0.2522, log loss 0.6976. Minus logistic: 0.0105 (-0.0291 to 0.0501), not resolvable.
+gbdt: Brier 0.1620, log loss 0.4833. Minus logistic: -0.0719 (-0.1298 to -0.0141), the corrected interval clears 0.02.
+tabpfn: not run (fit).
+featllm: Brier 0.2457, log loss 0.6979. Minus logistic: 0.0055 (-0.0348 to 0.0458), not resolvable.
+logistic-strict: Brier 0.1834, log loss 0.5563.
+jev-full-0: Brier 0.3345, log loss 0.8859. Minus logistic: 0.0914 (0.0461 to 0.1366), the corrected interval clears 0.02.
+
+The frozen 20 are scored once. They are not used to claim a winner.
+
+Holdout base-rate: Brier 0.2402, log loss 0.6734, n=20.
+Holdout logistic: Brier 0.1808, log loss 0.5374, n=20.
+Holdout gbdt: Brier 0.1264, log loss 0.3880, n=20.
+Holdout tabpfn: not run (fit).
+Holdout featllm: Brier 0.2548, log loss 0.7092, n=20.
+
+Serialisation cells, extended labels, all 124 phrases.
+
+No new serialisation cell was completed.
+
+No new Jev calls. The recorded calibration spend is $0.0217 of the $0.25 cap.
+full-16 is not attempted: sixteen full records do not fit the state cap.
+Join features are not in these receipts, so no model sees them.
+The next labels are not drawn by uncertainty sampling. About 30% of each later round is random, and the frozen 20 stay out of training.
 
 <!-- /result -->
