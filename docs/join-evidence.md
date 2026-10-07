@@ -1,15 +1,25 @@
 # Join evidence
 
-The jam session's receipt will carry four measurements for each known join,
-and one non-join control from the same take. This page is the contract for
-those fields. The numbers are not computed in this repo. The phrase receipts
-read by `docs/decision-learning.md` do not contain them, and no model in that
-study sees a join feature.
+The jam session writes `phrase-evidence.json` into a reviewed mix folder.
+The schema is `ai-jam-sessions/phrase-evidence/v1`, revision 1. This page is
+the contract for the fields this repo maps. The numbers are not computed
+here. The hearing record stores them under the instrument id `phrase-evidence`.
+The instrument revision is the canonical JSON of the schema, the file
+revision, the F0 instrument, the mel settings, and the parameters. The file's
+directory is not copied into the record.
+
+Each phrase carries `joins`, `switches`, `air_ms_max`, `shift_diff_ms_max`,
+`shift_spread_ms`, `stretch_min`, `stretch_max`, `segment_boundary_s`, and the
+maxima `spectral_jump_max`, `repeat_similarity_max`, `click_z_max`,
+`f0_step_cents_max`, `pct_max`, `octave_jumps`, and `pitch_step_cents_max`.
+Each join under `at_joins` carries the four measurements, the percentile of
+each against the non-join controls in that take, and `octave`, `voicing_flip`,
+and `switch`.
 
 A join is the boundary between two consecutive placed cuts in one take. A
-non-join control is another time in that same take, at least 50 ms from every
-join. Word text is not a feature. A placed cut is not itself one of these
-four readings.
+non-join control is another time in that same take, kept clear of the joins
+by the file's `control_clear_s`. Word text is not a feature. A placed cut is
+not itself one of these four readings.
 
 Each feature is a measurement. When the jam session writes it, the number
 names its instrument and revision. A missing reading stays missing. This repo

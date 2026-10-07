@@ -5,8 +5,11 @@ import pytest
 
 from ai_ears.record import (
     EarsError,
+    EVIDENCE_INSTRUMENT,
     HearingRecord,
+    evidence_revision,
     from_jam_take,
+    phrase_evidence,
     reject_gate_keys,
     review_marks,
     transcript_from_scores,
@@ -429,3 +432,78 @@ def test_phrase_scores_and_marks_that_are_the_wrong_shape_are_refused():
         review_marks([{"note": "x"}])
     with pytest.raises(EarsError, match="needs a time"):
         review_marks(["nope"])
+
+
+def test_phrase_evidence_keeps_the_readings_and_drops_the_directory():
+    document = _load("phrase-evidence.json")
+    document["dir"] = "local-path"
+    evidence = phrase_evidence(document, 0)
+    state = evidence.to_state()
+    assert evidence.instrument == EVIDENCE_INSTRUMENT
+    assert "fcpe" in evidence.revision
+    assert evidence.joins == 1
+    assert evidence.f0_step_cents_max is None
+    assert evidence.segment_boundary_s is None
+    assert state["at_joins"][0]["spectral_jump"] == 8.998
+    assert state["at_joins"][0]["spectral_jump_pct"] == 1.0
+    assert "dir" not in state
+    assert "local-path" not in json.dumps(state)
+    assert "marks" not in _keys(state)
+    record = HearingRecord(take_id="take-05", phrase_id="0", evidence=evidence)
+    carried = record.to_state()["evidence"]
+    assert carried["instrument"] == EVIDENCE_INSTRUMENT
+    assert carried["joins"] == 1
+
+
+def test_phrase_evidence_refuses_marks_and_a_missing_phrase():
+    document = _load("phrase-evidence.json")
+    marked = dict(document)
+    marked["marks"] = []
+    with pytest.raises(EarsError, match="marks"):
+        phrase_evidence(marked, 0)
+    with pytest.raises(EarsError, match="no phrase"):
+        phrase_evidence(document, 9)
+    broken = json.loads(json.dumps(document))
+    broken["phrases"][0]["joins"] = 0
+    with pytest.raises(EarsError, match="join count"):
+        phrase_evidence(broken, 0)
+    with pytest.raises(EarsError, match="must be an object"):
+        phrase_evidence([], 0)
+    with pytest.raises(EarsError, match="pinned v1"):
+        phrase_evidence({"schema": "other", "revision": "1"}, 0)
+    with pytest.raises(EarsError, match="revision is not 1"):
+        phrase_evidence({**document, "revision": "2"}, 0)
+    with pytest.raises(EarsError, match="no phrases"):
+        phrase_evidence({**document, "phrases": {}}, 0)
+    phrase_marked = json.loads(json.dumps(document))
+    phrase_marked["phrases"][0]["marks"] = []
+    with pytest.raises(EarsError, match="marks"):
+        phrase_evidence(phrase_marked, 0)
+    no_list = json.loads(json.dumps(document))
+    no_list["phrases"][0]["at_joins"] = {}
+    with pytest.raises(EarsError, match="not a list"):
+        phrase_evidence(no_list, 0)
+    no_time = json.loads(json.dumps(document))
+    no_time["phrases"][0]["at_joins"] = [{"spectral_jump": 1.0}]
+    with pytest.raises(EarsError, match="needs a time"):
+        phrase_evidence(no_time, 0)
+    not_join = json.loads(json.dumps(document))
+    not_join["phrases"][0]["at_joins"] = ["nope"]
+    with pytest.raises(EarsError, match="needs a time"):
+        phrase_evidence(not_join, 0)
+    counted = json.loads(json.dumps(document))
+    counted["phrases"][0]["joins"] = True
+    with pytest.raises(EarsError, match="not a count"):
+        phrase_evidence(counted, 0)
+    bare = dict(document)
+    bare["instruments"] = "fcpe"
+    assert "fcpe" not in evidence_revision(bare)
+    assert evidence_revision(document) != evidence_revision(bare)
+    flipped = json.loads(json.dumps(document))
+    flipped["phrases"][0]["at_joins"][0]["voicing_flip"] = True
+    flipped["phrases"][0]["at_joins"][0]["octave"] = True
+    flipped["phrases"][0]["click_z_max"] = True
+    reading = phrase_evidence(flipped, 0)
+    assert reading.at_joins[0].voicing_flip is True
+    assert reading.at_joins[0].octave is True
+    assert reading.click_z_max is None

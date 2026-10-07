@@ -2,12 +2,13 @@
 
 import json
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools"))
 
 import decision_learning as study
-from ai_ears.record import HearingRecord, Measure, ReviewMark, Transcript
+from ai_ears.record import HearingRecord, JoinReading, Measure, PhraseEvidence, ReviewMark, Transcript
 
 
 def _features(**overrides) -> dict[str, float]:
@@ -190,6 +191,8 @@ def test_base_rate_reads_the_extended_and_strict_fields():
         features = _features(undated_fraction=float(index))
         items.append(
             {
+                "song": "a" if index < 12 else "b",
+                "mix": "one" if index < 12 else "two",
                 "label_extended": 1 if index < 12 else 0,
                 "label_strict": 0 if index < 12 else 1,
                 "features": features,
@@ -202,7 +205,8 @@ def test_base_rate_reads_the_extended_and_strict_fields():
     assert fitted["status"] == "ok"
     assert once["status"] == "ok"
     assert fitted["brier"] > 0.0
-    assert len(fitted["fold_brier"]) == study.FOLDS * study.REPEATS
+    assert len(fitted["fold_brier"]) == 2
+    assert fitted["within_brier"] is not None
 
 
 def test_zero_spend_does_not_claim_a_call_and_an_edge_drop_can_be_unresolvable():
@@ -232,7 +236,116 @@ def test_zero_spend_does_not_claim_a_call_and_an_edge_drop_can_be_unresolvable()
     assert "No new Jev calls." in text
     assert "New Jev calls cost" not in text
     assert "not move the result by a resolvable amount" in text
+    assert "Unclaimed: possible mix leakage" in text
+    assert "not a cleaned label" in text
+    assert "Join features are not in these receipts" not in text
+    assert "stay out of training" not in text
+    assert "tested negative" in text
     shift = study.edge_shift([0.0, 0.0, 1.0], ["certain", "certain", "edge"], 1)
     assert abs(shift["mean"] - (1.0 / 3.0)) < 1e-12
     assert shift["resolvable"] is False
     assert study.edge_shift([1.0], ["edge"], 1)["mean"] is None
+
+
+def test_leave_one_mix_out_holds_the_whole_mix_and_the_probe_bar_is_locked():
+    items = [
+        {"song": "a", "mix": "one"},
+        {"song": "a", "mix": "two"},
+        {"song": "a", "mix": "one"},
+        {"song": "b", "mix": "one"},
+    ]
+    folds = study.leave_one_mix_out(items)
+    assert [key for key, _train, _test in folds] == ["a:one", "a:two", "b:one"]
+    assert folds[0][1] == [1, 3]
+    assert folds[0][2] == [0, 2]
+    assert study.MIX_PROBE_MARGIN == 0.20
+    assert study.mix_identified(0.36, 0.16) is True
+    assert study.mix_identified(0.359, 0.16) is False
+    compared = study.compare_grouped(
+        [0.1, 0.1],
+        [0.0, 0.0],
+        [
+            {"song": "s", "mix": "a"},
+            {"song": "s", "mix": "a"},
+            {"song": "s", "mix": "b"},
+        ],
+    )
+    assert abs(compared["ratio"] - 1.25) < 1e-12
+    assert compared["resolvable"] is True
+    assert "words" not in study.PLUS_MEASURE_FEATURES
+    assert "spectral_jump_max" in study.PLUS_MEASURE_FEATURES
+    assert "words" in study.ALL_FEATURES
+    assert "gbdt-all" in study.EVIDENCE_COMPARED
+    assert "gbdt" not in study.EVIDENCE_COMPARED
+
+
+def _evidence() -> PhraseEvidence:
+    return PhraseEvidence(
+        instrument="phrase-evidence",
+        revision="rev",
+        joins=1,
+        switches=0,
+        air_ms_max=3.0,
+        shift_diff_ms_max=None,
+        shift_spread_ms=4.0,
+        stretch_min=None,
+        stretch_max=1.0,
+        segment_boundary_s=None,
+        spectral_jump_max=5.0,
+        repeat_similarity_max=0.2,
+        click_z_max=1.0,
+        f0_step_cents_max=None,
+        pct_max=0.9,
+        octave_jumps=1,
+        pitch_step_cents_max=10.0,
+        at_joins=(
+            JoinReading(
+                t=1.0,
+                spectral_jump=5.0,
+                repeat_similarity=0.2,
+                click_z=1.0,
+                step_cents=None,
+                spectral_jump_pct=1.0,
+                repeat_similarity_pct=0.5,
+                click_z_pct=0.1,
+                step_cents_pct=None,
+                octave=False,
+                voicing_flip=True,
+                switch=False,
+                air_ms=3.0,
+                shift_diff_ms=None,
+                stretch=None,
+            ),
+        ),
+    )
+
+
+def test_evidence_features_flag_the_three_missing_readings():
+    blank = study.evidence_feature_row(None)
+    assert blank["stretch_missing"] == 1.0
+    assert blank["segment_boundary_missing"] == 1.0
+    assert blank["f0_step_missing"] == 1.0
+    assert blank["joins"] == 0.0
+    row = study.evidence_feature_row(_evidence())
+    assert row["joins"] == 1.0
+    assert row["voicing_flips"] == 1.0
+    assert row["shift_diff_ms_max"] == 0.0
+    assert row["stretch_missing"] == 1.0
+    assert row["f0_step_missing"] == 1.0
+    assert row["segment_boundary_missing"] == 1.0
+    assert row["spectral_jump_max"] == 5.0
+
+
+def test_full_state_omits_evidence_and_pruned_keeps_the_receipt_features():
+    record = replace(_record(), evidence=_evidence())
+    features = _features(timing_n=2.0)
+    features["joins"] = 9.0
+    full = study.serialised_state("full", record, features, [])
+    pruned = study.serialised_state("pruned", record, features, [])
+    assert "evidence" not in full
+    assert full["marks"] == []
+    assert set(pruned["features"]) == set(study.FEATURE_NAMES)
+    assert pruned["features"]["timing_n"] == 2.0
+    assert "joins" not in pruned["features"]
+    assert study.state_ok(full, "full")
+    assert study.state_ok(pruned, "pruned")

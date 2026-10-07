@@ -9,6 +9,9 @@ feature definitions. Jev is not asked to invent them.
 
 New Jev calls stay inside the original $0.25 cap, counting the calibration
 spend that is already recorded.
+
+The winner split is leave-one-mix-out on every phrase. The ungrouped
+repeated cross-validation is not a claim.
 """
 
 from __future__ import annotations
@@ -75,6 +78,55 @@ FEATURE_NAMES = (
 TIMING_FEATURES = FEATURE_NAMES[:5]
 PITCH_FEATURES = FEATURE_NAMES[5:13]
 TRANSCRIPT_FEATURES = FEATURE_NAMES[13:]
+JOIN_FEATURES = ("joins", "switches")
+SEGMENT_FEATURES = (
+    "air_ms_max",
+    "shift_diff_ms_max",
+    "shift_spread_ms",
+    "stretch_min",
+    "stretch_max",
+    "stretch_missing",
+    "segment_boundary_s",
+    "segment_boundary_missing",
+)
+MEASURE_FEATURES = (
+    "spectral_jump_max",
+    "repeat_similarity_max",
+    "click_z_max",
+    "f0_step_cents_max",
+    "f0_step_missing",
+    "pct_max",
+    "octave_jumps",
+    "pitch_step_cents_max",
+    "voicing_flips",
+)
+EVIDENCE_FEATURES = JOIN_FEATURES + SEGMENT_FEATURES + MEASURE_FEATURES
+TIMING_PITCH_FEATURES = TIMING_FEATURES + PITCH_FEATURES
+PLUS_JOINS_FEATURES = TIMING_PITCH_FEATURES + JOIN_FEATURES
+PLUS_SEGMENT_FEATURES = PLUS_JOINS_FEATURES + SEGMENT_FEATURES
+PLUS_MEASURE_FEATURES = PLUS_SEGMENT_FEATURES + MEASURE_FEATURES
+ALL_FEATURES = FEATURE_NAMES + EVIDENCE_FEATURES
+GROUP_SEED = SEED + 70001
+PROBE_SEED = SEED + 60000
+MIX_PROBE_MARGIN = 0.20
+# Published on this branch before the folds were grouped. Not a claim.
+UNGROUPED_TREE = (
+    "Ungrouped repeated cross-validation on the 104, shallow tree minus logistic, "
+    "was -0.0719 (-0.1298 to -0.0141). Unclaimed: possible mix leakage."
+)
+# Compared with logistic on every feature, including the evidence family.
+# Every other extended row is compared with logistic on the twenty-two
+# receipt features. Locked before the grouped rerun.
+EVIDENCE_COMPARED = frozenset(
+    {
+        "logistic-timing-pitch",
+        "logistic-plus-joins",
+        "logistic-plus-segment",
+        "logistic-plus-measures",
+        "gbdt-all",
+        "tabpfn-all",
+    }
+)
 
 # Shot answers use the extended-window label. full-16 cannot fit the state cap.
 CELLS = (
@@ -131,7 +183,7 @@ def tag_phrase(start: float, end: float, times: list[float]) -> str:
 
 
 def frozen_test_indices(n: int, k: int = HOLDOUT_N, seed: int = HOLDOUT_SEED) -> list[int]:
-    """A fixed random holdout for later rounds. Not a stratified split."""
+    """Shot-pool exclusion for this serialisation sweep. Not a test."""
     if k >= n:
         raise ValueError("the holdout has to leave a training phrase")
     order = list(range(n))
@@ -206,14 +258,17 @@ def student_t_975(df: int) -> float:
     return 0.5 * (lo + hi)
 
 
-def nadeau_bengio(differences: list[float], n_train: int, n_test: int) -> dict:
-    """Corrected interval for a repeated-CV difference. Claim only past 0.02."""
+def nadeau_bengio(
+    differences: list[float], n_train: int, n_test: int, ratio: float | None = None
+) -> dict:
+    """Corrected interval for a fold difference. Claim only past 0.02."""
     count = len(differences)
     mean = sum(differences) / count
     if count < 2 or n_train < 1 or n_test < 1:
         return {"mean": mean, "low": None, "high": None, "resolvable": False}
     variance = sum((item - mean) ** 2 for item in differences) / (count - 1)
-    corrected = (1.0 / count + n_test / n_train) * variance
+    used = (n_test / n_train) if ratio is None else ratio
+    corrected = (1.0 / count + used) * variance
     half = student_t_975(count - 1) * math.sqrt(corrected)
     low, high = mean - half, mean + half
     resolvable = abs(mean) >= RESOLVE_BRIER and (high < 0.0 or low > 0.0)
@@ -296,6 +351,42 @@ def feature_row(record) -> dict[str, float]:
         "notes": 0.0 if notes is None else notes,
         "mean_abs_cents": 0.0 if cents is None else cents,
         "mean_abs_cents_missing": 1.0 if cents is None else 0.0,
+    }
+
+
+def _or_zero(value: float | None) -> float:
+    return 0.0 if value is None else float(value)
+
+
+def evidence_feature_row(evidence) -> dict[str, float]:
+    """Phrase-level join and segment numbers. A missing reading is 0 plus a flag."""
+    if evidence is None:
+        blank = {name: 0.0 for name in EVIDENCE_FEATURES}
+        blank["stretch_missing"] = 1.0
+        blank["segment_boundary_missing"] = 1.0
+        blank["f0_step_missing"] = 1.0
+        return blank
+    flips = sum(1 for join in evidence.at_joins if join.voicing_flip)
+    return {
+        "joins": float(evidence.joins),
+        "switches": float(evidence.switches),
+        "air_ms_max": _or_zero(evidence.air_ms_max),
+        "shift_diff_ms_max": _or_zero(evidence.shift_diff_ms_max),
+        "shift_spread_ms": _or_zero(evidence.shift_spread_ms),
+        "stretch_min": _or_zero(evidence.stretch_min),
+        "stretch_max": _or_zero(evidence.stretch_max),
+        "stretch_missing": 1.0 if evidence.stretch_min is None or evidence.stretch_max is None else 0.0,
+        "segment_boundary_s": _or_zero(evidence.segment_boundary_s),
+        "segment_boundary_missing": 1.0 if evidence.segment_boundary_s is None else 0.0,
+        "spectral_jump_max": _or_zero(evidence.spectral_jump_max),
+        "repeat_similarity_max": _or_zero(evidence.repeat_similarity_max),
+        "click_z_max": _or_zero(evidence.click_z_max),
+        "f0_step_cents_max": _or_zero(evidence.f0_step_cents_max),
+        "f0_step_missing": 1.0 if evidence.f0_step_cents_max is None else 0.0,
+        "pct_max": _or_zero(evidence.pct_max),
+        "octave_jumps": float(evidence.octave_jumps),
+        "pitch_step_cents_max": _or_zero(evidence.pitch_step_cents_max),
+        "voicing_flips": float(flips),
     }
 
 
@@ -467,6 +558,187 @@ def fixed_fold_scores(probs: list[float], labels: list[int], indices: list[int])
     return fold_brier, fold_log
 
 
+def mix_name(item: dict) -> str:
+    return f"{item['song']}:{item['mix']}"
+
+
+def leave_one_mix_out(items: list[dict]) -> list[tuple[str, list[int], list[int]]]:
+    """Each mix is the test fold once. Training never sees that mix."""
+    order: list[str] = []
+    groups: dict[str, list[int]] = {}
+    for index, item in enumerate(items):
+        key = mix_name(item)
+        if key not in groups:
+            order.append(key)
+            groups[key] = []
+        groups[key].append(index)
+    everyone = list(range(len(items)))
+    folds = []
+    for key in order:
+        test = groups[key]
+        held = set(test)
+        train = [index for index in everyone if index not in held]
+        folds.append((key, train, test))
+    return folds
+
+
+def _predict_fold(model: str, train, y_train, test, seed: int) -> list[float]:
+    if model == "base-rate":
+        return _predict_constant(y_train, len(test))
+    if model == "tabpfn":
+        return _fit_tabpfn(train, y_train, test)
+    if model == "logistic":
+        standardized_train, standardized_test = _standardize(train, test)
+        return _fit_sklearn(model, standardized_train, y_train, standardized_test, seed)
+    return _fit_sklearn(model, train, y_train, test, seed)
+
+
+def grouped_predictions(rows, labels, items, model: str):
+    """Leave-one-mix-out probabilities. Each phrase is scored once."""
+    losses: list[list[float]] = [[] for _ in rows]
+    fold_brier: list[float] = []
+    fold_log: list[float] = []
+    within: list[dict] = []
+    for fold_index, (key, train_index, test_index) in enumerate(leave_one_mix_out(items)):
+        if not train_index or not test_index:
+            continue
+        predicted = _predict_fold(
+            model,
+            [rows[index] for index in train_index],
+            [labels[index] for index in train_index],
+            [rows[index] for index in test_index],
+            GROUP_SEED + fold_index,
+        )
+        y_test = [labels[index] for index in test_index]
+        fold_value = brier(predicted, y_test)
+        fold_brier.append(fold_value)
+        fold_log.append(log_loss(predicted, y_test))
+        for index, prob in zip(test_index, predicted):
+            losses[index].append(prob)
+        within.append({"mix": key, "n": len(test_index), "brier": fold_value, "log_loss": fold_log[-1]})
+    return losses, fold_brier, fold_log, within
+
+
+def fixed_grouped_scores(probs: list[float], labels: list[int], items: list[dict]):
+    fold_brier: list[float] = []
+    fold_log: list[float] = []
+    within: list[dict] = []
+    for key, _train, test_index in leave_one_mix_out(items):
+        predicted = [probs[index] for index in test_index]
+        y_test = [labels[index] for index in test_index]
+        fold_value = brier(predicted, y_test)
+        fold_brier.append(fold_value)
+        fold_log.append(log_loss(predicted, y_test))
+        within.append({"mix": key, "n": len(test_index), "brier": fold_value, "log_loss": fold_log[-1]})
+    return fold_brier, fold_log, within
+
+
+def compare_grouped(candidate: list[float], reference: list[float], items: list[dict]) -> dict:
+    """Nadeau–Bengio on leave-one-mix-out, using the mean test/train ratio."""
+    differences = [item - ref for item, ref in zip(candidate, reference)]
+    ratios = [
+        len(test) / len(train)
+        for _key, train, test in leave_one_mix_out(items)
+        if train and test
+    ]
+    ratio = sum(ratios) / len(ratios) if ratios else 1.0
+    compared = nadeau_bengio(differences, 1, 1, ratio=ratio)
+    compared["ratio"] = ratio
+    return compared
+
+
+def _within_mean(within: list[dict]) -> float | None:
+    if not within:
+        return None
+    return sum(row["brier"] for row in within) / len(within)
+
+
+def mix_identified(accuracy: float, majority: float) -> bool:
+    """Locked before the probe is scored. Majority rate plus 0.20."""
+    return accuracy >= majority + MIX_PROBE_MARGIN
+
+
+def _assign_groups(labels: list[int], repeat: int) -> list[int]:
+    rng = random.Random(PROBE_SEED + repeat)
+    groups: dict[int, list[int]] = {}
+    for index, label in enumerate(labels):
+        groups.setdefault(label, []).append(index)
+    assignment = [0] * len(labels)
+    for indices in groups.values():
+        order = indices[:]
+        rng.shuffle(order)
+        for offset, index in enumerate(order):
+            assignment[index] = offset % FOLDS
+    return assignment
+
+
+def _fit_gbdt_class(train, labels, test, seed: int) -> list[int]:
+    import numpy as np
+    from sklearn.ensemble import GradientBoostingClassifier
+
+    model = GradientBoostingClassifier(
+        n_estimators=GBDT_TREES,
+        max_depth=GBDT_DEPTH,
+        learning_rate=GBDT_RATE,
+        random_state=seed,
+    )
+    model.fit(np.asarray(train, dtype=float), np.asarray(labels, dtype=int))
+    predicted = model.predict(np.asarray(test, dtype=float))
+    return [int(value) for value in predicted]
+
+
+def mix_probe(items: list[dict], names: tuple[str, ...]) -> dict:
+    """Can the same tree name the mix from these features? Every mix is in train and test."""
+    missing = _model_missing("gbdt")
+    if missing:
+        return {"status": "not-run", "reason": missing, "n_features": len(names)}
+    rows = _rows(items, names, "features")
+    keys: list[str] = []
+    labels: list[int] = []
+    for item in items:
+        key = mix_name(item)
+        if key not in keys:
+            keys.append(key)
+        labels.append(keys.index(key))
+    majority = max(labels.count(label) for label in set(labels)) / len(labels)
+    correct = 0
+    total = 0
+    per_mix = {label: [0, 0] for label in range(len(keys))}
+    try:
+        for repeat in range(REPEATS):
+            assignment = _assign_groups(labels, repeat)
+            for fold in range(FOLDS):
+                test_index = [index for index in range(len(items)) if assignment[index] == fold]
+                train_index = [index for index in range(len(items)) if assignment[index] != fold]
+                if not test_index or not train_index:
+                    continue
+                predicted = _fit_gbdt_class(
+                    [rows[index] for index in train_index],
+                    [labels[index] for index in train_index],
+                    [rows[index] for index in test_index],
+                    PROBE_SEED + repeat * FOLDS + fold,
+                )
+                for index, guess in zip(test_index, predicted):
+                    total += 1
+                    per_mix[labels[index]][1] += 1
+                    if guess == labels[index]:
+                        correct += 1
+                        per_mix[labels[index]][0] += 1
+    except Exception:
+        return {"status": "not-run", "reason": "fit", "n_features": len(names)}
+    accuracy = correct / total if total else 0.0
+    recalls = [hits / count for hits, count in per_mix.values() if count]
+    macro = sum(recalls) / len(recalls) if recalls else 0.0
+    return {
+        "status": "ok",
+        "n_features": len(names),
+        "accuracy": accuracy,
+        "majority": majority,
+        "macro_recall": macro,
+        "identified": mix_identified(accuracy, majority),
+    }
+
+
 def _fold_sizes(n_items: int) -> tuple[int, int]:
     n_test = int(round(n_items / FOLDS))
     n_test = min(max(n_test, 1), n_items - 1)
@@ -527,13 +799,16 @@ def _row_measurement(measure) -> dict:
 
 def serialised_state(kind: str, record, features: dict[str, float], examples: list[dict]) -> dict:
     if kind == "full":
+        # This sweep's full state was fixed before the evidence family existed.
+        # A resumed call has to keep sending that state.
         body = record.to_state()
+        body.pop("evidence", None)
     elif kind == "pruned":
         body = {
             "take_id": record.take_id,
             "phrase_id": record.phrase_id,
             "marks": [],
-            "features": features,
+            "features": {key: features[key] for key in FEATURE_NAMES},
         }
     elif kind == "rows":
         numbers = {
@@ -641,7 +916,18 @@ def edge_shift(losses: list[float], tags: list[str], seed: int) -> dict:
     }
 
 
+def _load_evidence(song: str, mix: str, index: int):
+    from ai_ears.record import phrase_evidence
+
+    path = calibration.VOCAL_ROOT / "sing" / song / mix / "phrase-evidence.json"
+    document = json.loads(path.read_text(encoding="utf-8"))
+    document.pop("dir", None)
+    return phrase_evidence(document, index)
+
+
 def prepare() -> list[dict]:
+    from dataclasses import replace
+
     calibration.assert_question()
     items = calibration.load_items()
     times = calibration._mark_times()
@@ -650,11 +936,16 @@ def prepare() -> list[dict]:
         f"{row['song']}/{row['mix']}/{row['index']}": float(row["p_yes"])
         for row in published["phrases"]
     }
-    holdout = set(frozen_test_indices(len(items)))
+    # The retired random 20 stays out of the shot pool only, so a resumed
+    # serialisation call does not change examples in the middle of a cell.
+    shot_pool = set(frozen_test_indices(len(items)))
     prepared = []
     for index, item in enumerate(items):
         key = (item["song"], item["mix"])
-        features = feature_row(item["record"])
+        evidence = _load_evidence(item["song"], item["mix"], item["index"])
+        record = replace(item["record"], evidence=evidence)
+        features = feature_row(record)
+        features.update(evidence_feature_row(evidence))
         prepared.append(
             {
                 "id": item["id"],
@@ -663,11 +954,11 @@ def prepare() -> list[dict]:
                 "index": item["index"],
                 "start": item["start"],
                 "end": item["end"],
-                "record": item["record"],
+                "record": record,
                 "label_extended": item["label"],
                 "label_strict": strict_label(item["start"], item["end"], times[key]),
                 "tag": tag_phrase(item["start"], item["end"], times[key]),
-                "future_test": index in holdout,
+                "future_test": index in shot_pool,
                 "features": features,
                 "rules": rule_row(features),
                 "p_yes_full_0": saved[item["id"]],
@@ -705,8 +996,8 @@ def _fit_scope(items: list[dict], indices: list[int], label_key: str, model: str
     labels = _label_values(items, label_key)
     rows = _rows(items, names, source)
     try:
-        buckets, fold_brier, fold_log = repeated_predictions(
-            rows, labels, indices, "logistic" if model == "featllm" else model
+        buckets, fold_brier, fold_log, within = grouped_predictions(
+            rows, labels, items, "logistic" if model == "featllm" else model
         )
     except Exception:
         return {"model": model, "status": "not-run", "reason": "fit"}
@@ -717,6 +1008,8 @@ def _fit_scope(items: list[dict], indices: list[int], label_key: str, model: str
         "status": "ok",
         "brier": brier([oof[index] for index in known], [labels[index] for index in known]),
         "log_loss": log_loss([oof[index] for index in known], [labels[index] for index in known]),
+        "within_brier": _within_mean(within),
+        "within": within,
         "fold_brier": fold_brier,
         "fold_log_loss": fold_log,
         "oof": [None if value is None else value for value in oof],
@@ -783,74 +1076,103 @@ def _label_movement(items: list[dict]) -> dict:
     }
 
 
+def _versus(candidate: list[float], reference: list[float] | None, ref_name: str, items: list[dict]) -> dict | None:
+    if not reference or len(candidate) != len(reference):
+        return None
+    compared = compare_grouped(candidate, reference, items)
+    compared["reference"] = ref_name
+    return compared
+
+
+def _attach_versus(result: dict, receipt_folds, evidence_folds, items: list[dict]) -> None:
+    """Receipt rows against the 22-feature logistic. Evidence rows against logistic-all."""
+    folds = result.get("fold_brier")
+    name = result.get("name")
+    if result.get("status") != "ok" or result.get("label") != "extended" or not folds:
+        result["versus_logistic"] = None
+        return
+    if name in {"logistic", "logistic-strict"}:
+        result["versus_logistic"] = None
+        return
+    if name == "logistic-all":
+        result["versus_logistic"] = _versus(folds, receipt_folds, "logistic", items)
+        return
+    if name in EVIDENCE_COMPARED:
+        result["versus_logistic"] = _versus(folds, evidence_folds, "logistic-all", items)
+        return
+    result["versus_logistic"] = _versus(folds, receipt_folds, "logistic", items)
+
+
 def run_models(items: list[dict]) -> dict:
-    train = [index for index, item in enumerate(items) if not item["future_test"]]
-    holdout = [index for index, item in enumerate(items) if item["future_test"]]
+    """Leave-one-mix-out on every phrase. The random 20 is not a test."""
+    everyone = list(range(len(items)))
+    shot = [index for index, item in enumerate(items) if item["future_test"]]
     specs = (
-        ("base-rate", "extended", FEATURE_NAMES, "features"),
-        ("logistic", "extended", FEATURE_NAMES, "features"),
-        ("logistic-timing", "extended", TIMING_FEATURES, "features"),
-        ("logistic-pitch", "extended", PITCH_FEATURES, "features"),
-        ("logistic-transcript", "extended", TRANSCRIPT_FEATURES, "features"),
-        ("gbdt", "extended", FEATURE_NAMES, "features"),
-        ("tabpfn", "extended", FEATURE_NAMES, "features"),
-        ("featllm", "extended", RULE_NAMES, "rules"),
-        ("logistic", "strict", FEATURE_NAMES, "features"),
+        ("base-rate", "base-rate", "extended", FEATURE_NAMES, "features", "prevalence"),
+        ("logistic", "logistic", "extended", FEATURE_NAMES, "features", "receipt"),
+        ("logistic-all", "logistic", "extended", ALL_FEATURES, "features", "all"),
+        ("logistic-timing", "logistic", "extended", TIMING_FEATURES, "features", "timing"),
+        ("logistic-pitch", "logistic", "extended", PITCH_FEATURES, "features", "pitch"),
+        ("logistic-transcript", "logistic", "extended", TRANSCRIPT_FEATURES, "features", "transcript"),
+        ("logistic-timing-pitch", "logistic", "extended", TIMING_PITCH_FEATURES, "features", "timing-pitch"),
+        ("logistic-plus-joins", "logistic", "extended", PLUS_JOINS_FEATURES, "features", "plus-joins"),
+        ("logistic-plus-segment", "logistic", "extended", PLUS_SEGMENT_FEATURES, "features", "plus-segment"),
+        ("logistic-plus-measures", "logistic", "extended", PLUS_MEASURE_FEATURES, "features", "plus-measures"),
+        ("gbdt", "gbdt", "extended", FEATURE_NAMES, "features", "receipt"),
+        ("gbdt-all", "gbdt", "extended", ALL_FEATURES, "features", "all"),
+        ("tabpfn", "tabpfn", "extended", FEATURE_NAMES, "features", "receipt"),
+        ("tabpfn-all", "tabpfn", "extended", ALL_FEATURES, "features", "all"),
+        ("featllm", "featllm", "extended", RULE_NAMES, "rules", "rules"),
+        ("logistic-strict", "logistic", "strict", FEATURE_NAMES, "features", "receipt"),
     )
     fitted = []
-    logistic_folds = None
-    for model, label_key, names, source in specs:
-        name = model if label_key == "extended" else f"{model}-strict"
-        result = _fit_scope(items, train, label_key, model.split("-")[0] if model.startswith("logistic") else model, names, source)
+    for name, model, label_key, names, source, family in specs:
+        result = _fit_scope(items, everyone, label_key, model, names, source)
         result["name"] = name
         result["label"] = label_key
-        result["family"] = {
-            "logistic-timing": "timing",
-            "logistic-pitch": "pitch",
-            "logistic-transcript": "transcript",
-        }.get(model, "all" if model != "featllm" else "rules")
-        if name == "logistic" and result.get("status") == "ok":
-            logistic_folds = result["fold_brier"]
+        result["family"] = family
+        result["n_features"] = 0 if model == "base-rate" else len(names)
         fitted.append(result)
+    receipt_folds = next(
+        (row["fold_brier"] for row in fitted if row["name"] == "logistic" and row.get("status") == "ok"),
+        None,
+    )
+    evidence_folds = next(
+        (row["fold_brier"] for row in fitted if row["name"] == "logistic-all" and row.get("status") == "ok"),
+        None,
+    )
     for result in fitted:
-        if result.get("status") == "ok" and logistic_folds is not None and result["name"] != "logistic":
-            if result["label"] == "extended" and len(result["fold_brier"]) == len(logistic_folds):
-                result["versus_logistic"] = compare_folds(result["fold_brier"], logistic_folds, len(train))
-            else:
-                result["versus_logistic"] = None
-        else:
-            result["versus_logistic"] = None
+        _attach_versus(result, receipt_folds, evidence_folds, items)
     labels = [item["label_extended"] for item in items]
     probs = [item["p_yes_full_0"] for item in items]
-    jev_folds, jev_logs = fixed_fold_scores(probs, labels, train)
+    jev_folds, jev_logs, within = fixed_grouped_scores(probs, labels, items)
     jev = {
         "name": "jev-full-0",
+        "model": "jev",
         "status": "ok",
-        "brier": brier([probs[index] for index in train], [labels[index] for index in train]),
-        "log_loss": log_loss([probs[index] for index in train], [labels[index] for index in train]),
+        "label": "extended",
+        "family": "published",
+        "n_features": 0,
+        "brier": brier(probs, labels),
+        "log_loss": log_loss(probs, labels),
+        "within_brier": _within_mean(within),
+        "within": within,
         "fold_brier": jev_folds,
         "fold_log_loss": jev_logs,
-        "versus_logistic": None
-        if logistic_folds is None or len(jev_folds) != len(logistic_folds)
-        else compare_folds(jev_folds, logistic_folds, len(train)),
     }
-    holdout_scores = [
-        _once(items, train, holdout, "extended", model, names, source)
-        for model, names, source in (
-            ("base-rate", FEATURE_NAMES, "features"),
-            ("logistic", FEATURE_NAMES, "features"),
-            ("gbdt", FEATURE_NAMES, "features"),
-            ("tabpfn", FEATURE_NAMES, "features"),
-            ("featllm", RULE_NAMES, "rules"),
-        )
-    ]
+    _attach_versus(jev, receipt_folds, evidence_folds, items)
     return {
-        "n_train": len(train),
-        "n_holdout": len(holdout),
+        "n_scored": len(everyone),
+        "n_mixes": len(leave_one_mix_out(items)),
+        "shot_pool_n": len(shot),
         "models": fitted,
         "jev": jev,
-        "holdout": holdout_scores,
+        "holdout": [],
         "labels": _label_movement(items),
+        "mix_probe": {
+            "receipt": mix_probe(items, FEATURE_NAMES),
+            "all": mix_probe(items, ALL_FEATURES),
+        },
     }
 
 
@@ -1010,8 +1332,118 @@ def _claim(compared: dict | None) -> str:
     return "not resolvable"
 
 
+def _complete_probs(items: list[dict], calls: object) -> list[float] | None:
+    if not items or not isinstance(calls, dict):
+        return None
+    probs = []
+    for item in items:
+        row = calls.get(item["id"])
+        if not isinstance(row, dict) or "p_yes" not in row:
+            return None
+        probs.append(float(row["p_yes"]))
+    return probs
+
+
+def _max_call_cost(cells: dict) -> float:
+    highest = UNIT_PRIOR
+    for rows in cells.values():
+        if not isinstance(rows, dict):
+            continue
+        for key, row in rows.items():
+            if key == "_status" or not isinstance(row, dict):
+                continue
+            cost = row.get("cost")
+            if isinstance(cost, bool) or not isinstance(cost, (int, float)):
+                continue
+            highest = max(highest, float(cost))
+    return highest
+
+
+def serialisation_table(items: list[dict], cells: dict, receipt_folds: list[float] | None) -> list[dict]:
+    """Grouped scores for each completed cell. Partial cells are not a Brier."""
+    labels = [item["label_extended"] for item in items]
+    rows = []
+    for kind, shots in CELLS:
+        name = cell_name(kind, shots)
+        probs = _complete_probs(items, cells.get(name))
+        if probs is None:
+            rows.append({"name": name, "status": "partial"})
+            continue
+        folds, logs, within = fixed_grouped_scores(probs, labels, items)
+        row = {
+            "name": name,
+            "status": "ok",
+            "brier": brier(probs, labels),
+            "log_loss": log_loss(probs, labels),
+            "within_brier": _within_mean(within),
+            "within": within,
+            "fold_brier": folds,
+            "fold_log_loss": logs,
+        }
+        if receipt_folds is not None and len(folds) == len(receipt_folds):
+            compared = compare_grouped(folds, receipt_folds, items)
+            compared["reference"] = "logistic"
+            row["versus_logistic"] = compared
+        rows.append(row)
+    return rows
+
+
+def _receipt_folds(study: dict) -> list[float] | None:
+    for result in study.get("models") or []:
+        if result.get("name") == "logistic" and result.get("status") == "ok":
+            folds = result.get("fold_brier")
+            if isinstance(folds, list):
+                return folds
+    return None
+
+
+def _score_line(name: str, result: dict) -> str:
+    if result.get("status") != "ok":
+        return f"{name}: not run ({result.get('reason', 'missing')})."
+    versus = result.get("versus_logistic")
+    extra = ""
+    if versus:
+        ref = versus.get("reference", "logistic")
+        extra = (
+            f" Minus {ref}: {_fmt(versus.get('mean'))} "
+            f"({_fmt(versus.get('low'))} to {_fmt(versus.get('high'))}), {_claim(versus)}."
+        )
+    within = result.get("within") or []
+    within_bits = ""
+    if within:
+        within_bits = " Within mix: " + ", ".join(f"{row['mix']} {_fmt(row['brier'])}" for row in within) + "."
+    features = ""
+    count = result.get("n_features")
+    if isinstance(count, int) and count > 0:
+        features = f" Features: {count}."
+    return (
+        f"{name}: pooled Brier {_fmt(result.get('brier'))}, "
+        f"within-mix mean {_fmt(result.get('within_brier'))}, "
+        f"log loss {_fmt(result.get('log_loss'))}.{features}{extra}{within_bits}"
+    )
+
+
+def _probe_line(label: str, probe: dict | None) -> str:
+    if not probe or probe.get("status") != "ok":
+        reason = (probe or {}).get("reason", "missing")
+        return f"Mix probe, {label}: not run ({reason})."
+    sentence = (
+        f"Mix probe, {label}: accuracy {_fmt(probe.get('accuracy'))}, "
+        f"majority {_fmt(probe.get('majority'))}, "
+        f"macro recall {_fmt(probe.get('macro_recall'))}."
+    )
+    if probe.get("identified"):
+        return sentence + " The same tree names the mix. The pooled score is a mix detector."
+    return sentence + " It does not clear the identification bar."
+
+
 def render_result(items: list[dict], study: dict, cells: dict) -> str:
     labels = study["labels"]
+    edge_sentence = (
+        "That difference clears 0.02."
+        if labels["edge_shift"]["resolvable"]
+        else "The edge cases do not move the result by a resolvable amount."
+    )
     lines = [
         f"Model `{PINNED_MODEL}`, stamp `{PINNED_DATE}`. "
         f"The question band is unchanged at 0.35–0.65.",
@@ -1034,54 +1466,50 @@ def render_result(items: list[dict], study: dict, cells: dict) -> str:
         "Dropping the edge phrases moves Brier by "
         f"{_fmt(labels['edge_shift']['mean'])} "
         f"({_fmt(labels['edge_shift']['low'])} to {_fmt(labels['edge_shift']['high'])}). "
-        + (
-            "That difference clears 0.02."
-            if labels["edge_shift"]["resolvable"]
-            else "The edge cases do not move the result by a resolvable amount."
-        ),
+        + edge_sentence
+        + " Dropping them is a sensitivity check. The defects sit at phrase edges, "
+        "where joins and segment boundaries fall. It is not a cleaned label.",
         "",
-        "Repeated stratified 5-fold, 10 repeats, on the phrases that are not in the frozen 20. "
-        "A Brier gap under 0.02 is not resolvable. The Nadeau–Bengio interval has to clear zero as well.",
+        f"Leave-one-mix-out on {len(items)} phrases. Each mix is the test fold once, "
+        "and training never sees that mix. Pooled Brier scores every phrase once. "
+        "Within-mix Brier is the score on that mix, and the within-mix mean is unweighted. "
+        "A Brier gap under 0.02 is not resolvable. The Nadeau–Bengio interval has to clear zero as well. "
+        "The test/train ratio is the mean of the per-fold ratios.",
+        UNGROUPED_TREE,
         "",
     ]
     for result in study["models"] + [study["jev"]]:
-        if result.get("status") != "ok":
-            lines.append(f"{result.get('name', result.get('model'))}: not run ({result.get('reason', 'missing')}).")
-            continue
-        versus = result.get("versus_logistic")
-        extra = ""
-        if versus:
-            extra = (
-                f" Minus logistic: {_fmt(versus['mean'])} "
-                f"({_fmt(versus['low'])} to {_fmt(versus['high'])}), {_claim(versus)}."
-            )
-        lines.append(
-            f"{result.get('name', result.get('model'))}: Brier {_fmt(result['brier'])}, "
-            f"log loss {_fmt(result['log_loss'])}.{extra}"
-        )
-    lines.extend(["", "The frozen 20 are scored once. They are not used to claim a winner.", ""])
-    for result in study["holdout"]:
-        if result.get("status") != "ok":
-            lines.append(f"Holdout {result['model']}: not run ({result.get('reason', 'missing')}).")
-        else:
-            lines.append(
-                f"Holdout {result['model']}: Brier {_fmt(result['brier'])}, "
-                f"log loss {_fmt(result['log_loss'])}, n={result['n']}."
-            )
-    scored = [("full-0", labels["brier_extended"])]
-    for kind, shots in CELLS:
-        name = cell_name(kind, shots)
-        value = _cell_brier(items, cells.get(name))
-        if value is not None:
-            scored.append((name, value))
-    lines.extend(["", "Serialisation cells, extended labels, all 124 phrases.", ""])
-    if len(scored) == 1:
+        lines.append(_score_line(str(result.get("name", result.get("model"))), result))
+    probes = study.get("mix_probe") or {}
+    if probes:
+        lines.extend(["", _probe_line("receipt features", probes.get("receipt")), _probe_line("all features", probes.get("all"))])
+    else:
+        lines.extend(["", "Mix probe was not run."])
+    lines.extend(
+        [
+            "",
+            "The random 20 drawn with seed 20261008 stays out of the shot pool for this sweep. "
+            "It is not a test. `future_test` in the phrase table marks that pool.",
+            "",
+            "Serialisation cells, leave-one-mix-out, extended labels. "
+            "This sweep's Jev states were fixed before the evidence block, and they do not include it. "
+            "A completed cell is compared with the receipt logistic.",
+            "",
+        ]
+    )
+    table = serialisation_table(items, cells, _receipt_folds(study))
+    completed = [row for row in table if row["status"] == "ok"]
+    if not completed:
         lines.append("No new serialisation cell was completed.")
     else:
-        values = [value for _name, value in scored]
-        spread = max(values) - min(values)
-        for name, value in scored:
-            lines.append(f"{name}: Brier {_fmt(value)}.")
+        pooled = [labels["brier_extended"]]
+        lines.append(f"full-0: pooled Brier {_fmt(labels['brier_extended'])}.")
+        if study.get("jev", {}).get("status") == "ok":
+            lines[-1] = _score_line("full-0", study["jev"])
+        for row in completed:
+            lines.append(_score_line(row["name"], row))
+            pooled.append(row["brier"])
+        spread = max(pooled) - min(pooled)
         lines.append(
             f"Spread {_fmt(spread)}. "
             + (
@@ -1090,6 +1518,15 @@ def render_result(items: list[dict], study: dict, cells: dict) -> str:
                 else "The spread is not resolvable at this n."
             )
         )
+    if items:
+        missing = [row["name"] for row in table if row["status"] != "ok"]
+        if missing and not room_for_cell(_spent(cells), _max_call_cost(cells), calibration.EXPECTED_PHRASES):
+            lines.append(
+                f"Not sent: {', '.join(missing)}. "
+                "The next cell's estimate would have passed the $0.25 cap, so the run stopped."
+            )
+        elif missing:
+            lines.append(f"Not scored: {', '.join(missing)}.")
     spent = _spent(cells)
     if spent <= 0.0:
         spend = (
@@ -1108,9 +1545,18 @@ def render_result(items: list[dict], study: dict, cells: dict) -> str:
             "",
             spend,
             "full-16 is not attempted: sixteen full records do not fit the state cap.",
-            "Join features are not in these receipts, so no model sees them.",
+            "The local models read phrase-evidence.json "
+            "(schema ai-jam-sessions/phrase-evidence/v1, revision 1). "
+            "This sweep's Jev states do not include that block.",
+            "Jev is a tested negative. Hosted Jev and local OpenJev, on these "
+            "124 records, neither beat the base rate once calibrated: Brier 0.252 "
+            "and 0.251 against 0.242. Within-mix AUC is 0.57 for hosted Jev and "
+            "0.59 for OpenJev. The serialisation cells are the spend record. "
+            "They are not a reason to continue. The evidence-family rows are "
+            "the grouped comparison.",
             "The next labels are not drawn by uncertainty sampling. "
-            "About 30% of each later round is random, and the frozen 20 stay out of training.",
+            "About 30% of each later round is random. "
+            "The random 20 is not held out of a later training set.",
         ]
     )
     return "\n".join(lines)
@@ -1158,9 +1604,13 @@ def write_report(items: list[dict], study: dict) -> None:
             {key: value for key, value in result.items() if key != "oof"}
             for result in study["models"]
         ],
+        "split": "leave-one-mix-out",
+        "shot_pool_n": study.get("shot_pool_n", HOLDOUT_N),
         "jev": study["jev"],
-        "holdout": study["holdout"],
+        "holdout": study.get("holdout", []),
+        "mix_probe": study.get("mix_probe"),
         "cells": [cell_name(kind, shots) for kind, shots in CELLS],
+        "serialisation": serialisation_table(items, cells, _receipt_folds(study)),
     }
     phrases = {
         "model": PINNED_MODEL,

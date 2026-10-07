@@ -22,7 +22,7 @@ This is not a CLAP-style score of a caption against a waveform. The record is te
 
 ### Joins
 
-A join is a boundary between consecutive placed cuts of one take. The jam receipt will carry four features for each known join, and a non-join control from the same take: a spectral jump, a repeat or skip, a click or noise burst, and an F0 break. The fields are specified in `docs/join-evidence.md`. These phrase receipts do not carry them, and nothing here invents the numbers.
+A join is a boundary between consecutive placed cuts of one take. The jam file `phrase-evidence.json`, schema `ai-jam-sessions/phrase-evidence/v1`, revision 1, carries the join count, the switch count, the segment readings, and the maxima of four join measurements for each phrase: a spectral jump, a repeat or skip, a click or noise burst, and an F0 break. Percentiles against the non-join controls in that take sit on each join. The fields are specified in `docs/join-evidence.md`. This repo maps that file. It does not compute the audio, and it does not invent a missing reading.
 
 ### Timing
 
