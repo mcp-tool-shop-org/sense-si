@@ -100,6 +100,35 @@ def test_refuses_a_router_that_comes_back_on_the_answer():
         _client(fetch)(DecisionRequest(state="s", questions=NOUL))
 
 
+def test_accepts_the_dated_snapshot_when_the_answer_echoes_it():
+    def fetch(url, init):
+        raw = json.dumps(
+            {
+                "model": f"typesafe/{PINNED_DATE}",
+                "answers": {"moves": {"noul": 0.4}},
+                "usage": {"cost": 0.0002},
+            }
+        )
+        return _response(200, raw)
+
+    result = _client(fetch)(DecisionRequest(state="s", questions=NOUL))
+    assert result.model == PINNED_MODEL
+    assert result.dated == PINNED_DATE
+    assert result.answers["moves"].noul == 0.4
+    assert result.cost == 0.0002
+
+
+def test_refuses_a_different_snapshot_on_the_answer():
+    def fetch(url, init):
+        raw = json.dumps(
+            {"model": "typesafe/jev-1.13-19990101", "answers": {"moves": {"noul": 0.4}}}
+        )
+        return _response(200, raw)
+
+    with pytest.raises(DecisionsError, match="not replayable"):
+        _client(fetch)(DecisionRequest(state="s", questions=NOUL))
+
+
 def test_retries_429_and_5xx_but_not_other_4xx():
     calls = {"n": 0}
 

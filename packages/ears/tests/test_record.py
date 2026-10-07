@@ -227,6 +227,31 @@ def test_a_record_needs_both_ids():
         HearingRecord(take_id="t", phrase_id="")
 
 
+def test_an_unvoiced_row_with_no_median_stays_unvoiced():
+    state = from_jam_take(
+        take_id="t",
+        phrase_id="0",
+        timing=_row(),
+        pitch={
+            "tracker": "pyin",
+            "rows": [{"id": "v", "cents_median": None, "status": "unvoiced", "reason": "no-pitch"}],
+        },
+    ).to_state()
+    assert state["pitch"][0]["value"] is None
+    assert state["pitch"][0]["measurement_state"] == "unvoiced"
+    assert state["pitch"][0]["observations"]["state_reason"] == "no-pitch"
+
+
+def test_a_null_median_without_a_pitch_state_is_refused():
+    with pytest.raises(EarsError, match="no numeric cents_median"):
+        from_jam_take(
+            take_id="t",
+            phrase_id="0",
+            timing=_row(),
+            pitch={"tracker": "pyin", "rows": [{"id": "v", "cents_median": None, "status": "flat"}]},
+        )
+
+
 def test_receipts_that_are_not_measurements_are_refused():
     with pytest.raises(EarsError, match="timing receipt must be an object"):
         from_jam_take(take_id="t", phrase_id="0", timing=[])
@@ -316,6 +341,7 @@ def test_pitch_states_and_a_different_vocal_hash_are_kept():
     assert state["pitch"][0]["measurement_state"] == "flat"
     assert "state_reason" not in state["pitch"][0].get("observations", {})
     assert state["pitch"][1]["measurement_state"] == "untrackable"
+    assert state["pitch"][1]["value"] == 0
     assert "measurement_state" not in state["pitch"][2]
     assert "global_offset_cents" not in state["tuning"]
     assert "scatter_sd_cents" not in state["tuning"]

@@ -1,19 +1,38 @@
 {
   "authored": [
     ".github/",
-    "docs/",
     "root"
+  ],
+  "authoredWritten": [
+    {
+      "place": "docs/calibration.md",
+      "untrackedInputs": true,
+      "writers": [
+        "tools/phrase_calibration.py"
+      ]
+    }
   ],
   "breaks": [
     {
       "doors": 1,
       "importedBy": [
-        "ears"
+        "ears",
+        "tools"
       ],
       "importedByTests": [],
       "kind": "part",
       "name": "decisions",
       "partLabel": "decisions"
+    },
+    {
+      "doors": 1,
+      "importedBy": [
+        "tools"
+      ],
+      "importedByTests": [],
+      "kind": "part",
+      "name": "ears",
+      "partLabel": "ears"
     },
     {
       "doors": 3,
@@ -27,7 +46,8 @@
       "doors": 1,
       "importedBy": [],
       "importedByTests": [
-        "decisions"
+        "decisions",
+        "ears"
       ],
       "kind": "part",
       "name": "tools",
@@ -36,85 +56,82 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 72,
-      "changed": 4,
+      "added": 5,
+      "changed": 11,
       "moved": 0,
-      "parts": 4,
+      "parts": 5,
       "removed": 0
     },
     "items": [
       {
-        "kind": "door",
-        "sentence": "CI now also runs packages/eyes/tests/.",
+        "kind": "cycle",
+        "sentence": "ears now imports tools, which closes the cycle ears → tools → ears.",
         "subjects": [
-          ".github/workflows/ci.yml",
-          "packages/eyes/tests/"
+          "ears",
+          "tools"
         ]
       },
       {
-        "kind": "door",
-        "sentence": "ai-eyes (packages/eyes/pyproject.toml) is a new command. It runs packages/eyes/src/ai_eyes_mcp/server.py.",
+        "kind": "cycle",
+        "sentence": "tools now imports decisions, which closes the cycle tools → decisions → tools.",
         "subjects": [
-          "packages/eyes/pyproject.toml",
-          "packages/eyes/src/ai_eyes_mcp/server.py"
+          "tools",
+          "decisions"
         ]
       },
       {
-        "kind": "door",
-        "sentence": "ai-eyes-mcp (packages/eyes/pyproject.toml) is a new command. It runs packages/eyes/src/ai_eyes_mcp/server.py.",
+        "kind": "cycle",
+        "sentence": "tools now imports ears, which closes the cycle tools → ears → tools.",
         "subjects": [
-          "packages/eyes/pyproject.toml",
-          "packages/eyes/src/ai_eyes_mcp/server.py"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": ".github/ is now read by packages/eyes/atlas/page.json.",
-        "subjects": [
-          ".github/",
-          "packages/eyes/atlas/page.json"
+          "tools",
+          "ears"
         ]
       },
       {
         "kind": "landing",
-        "sentence": ".github/workflows/ci.yml is now read by packages/eyes/atlas/page.json, packages/eyes/atlas/statistics.json and packages/eyes/atlas/structure.json.",
+        "sentence": "docs/calibration.md is now written by tools/phrase_calibration.py.",
         "subjects": [
-          ".github/workflows/ci.yml",
-          "packages/eyes/atlas/page.json",
-          "packages/eyes/atlas/statistics.json",
-          "packages/eyes/atlas/structure.json"
+          "docs/calibration.md",
+          "tools/phrase_calibration.py"
         ]
       },
       {
         "kind": "landing",
-        "sentence": ".gitignore is now read by packages/eyes/atlas/statistics.json and packages/eyes/atlas/structure.json.",
+        "sentence": "docs/calibration/corp.svg is now written by tools/phrase_calibration.py.",
         "subjects": [
-          ".gitignore",
-          "packages/eyes/atlas/statistics.json",
-          "packages/eyes/atlas/structure.json"
+          "docs/calibration/corp.svg",
+          "tools/phrase_calibration.py"
         ]
       },
       {
         "kind": "landing",
-        "sentence": "And 22 more new writers and readers of places.",
+        "sentence": "docs/calibration/phrases.json is now written by tools/phrase_calibration.py.",
+        "subjects": [
+          "docs/calibration/phrases.json",
+          "tools/phrase_calibration.py"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "And 4 more new writers and readers of places.",
         "subjects": []
       },
       {
-        "kind": "part",
-        "sentence": "eyes is a new part, drawn from `packages/eyes/**`.",
+        "kind": "origin",
+        "sentence": "docs was authored and is now mixed.",
         "subjects": [
-          "eyes"
+          "docs"
         ]
       },
       {
         "kind": "counts",
-        "sentence": "72 files added and 4 changed content, across 4 parts.",
+        "sentence": "5 files added and 11 changed content, across 5 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "5ad4c9677ea7192ce02075fbaf928b1d73a3f485",
-      "generatedAt": "2026-10-07T17:56:25.779Z"
+      "commit": "503d57acb4f1b53f69337c86afda5e58b3c71531",
+      "generatedAt": "2026-10-07T18:46:15.145Z"
     },
     "unchanged": false
   },
@@ -140,9 +157,9 @@
     "Window: 180 days; a pair counts from 3 shared commits, since 2 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "503d57acb4f1b53f69337c86afda5e58b3c71531",
+  "commit": "e4e89f53aaa86793b84e0669a32572c0221d083a",
   "defaultBranch": "main",
-  "derived": "7 parts, mostly Python (22 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes and ai-eyes-mcp.",
+  "derived": "7 parts, mostly Python (24 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes and ai-eyes-mcp.",
   "doors": [
     {
       "checks": [],
@@ -162,7 +179,7 @@
         {
           "boundary": "ears",
           "depth": 0,
-          "files": 4
+          "files": 5
         },
         {
           "boundary": "eyes",
@@ -172,7 +189,7 @@
         {
           "boundary": "tools",
           "depth": 0,
-          "files": 1
+          "files": 2
         }
       ],
       "runs": [
@@ -254,13 +271,35 @@
       "from": "decisions",
       "fromTests": true,
       "to": "tools"
+    },
+    {
+      "from": "ears",
+      "fromTests": false,
+      "to": "decisions"
+    },
+    {
+      "from": "ears",
+      "fromTests": true,
+      "to": "tools"
+    },
+    {
+      "from": "tools",
+      "fromTests": false,
+      "to": "decisions"
+    },
+    {
+      "from": "tools",
+      "fromTests": false,
+      "to": "ears"
     }
   ],
   "engine": "1.24.0",
   "generated": [],
-  "generatedAt": "2026-10-07T18:46:15.145Z",
+  "generatedAt": "2026-10-07T19:47:51.798Z",
   "limits": [
-    "1 read goes to a path its caller passes, not to this repository.",
+    "4 reads use paths built at run time and are not named here.",
+    "3 writes go to places this repository does not track, so they are not listed as generated.",
+    "1 write and 3 reads go to a path their caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/ci.yml",
@@ -285,12 +324,12 @@
   "startReason": "This path follows ai-eyes (a command people run) from its entry, since CI runs only tests and scripts that import no code here.",
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 27,
+  "testFiles": 30,
   "testedBy": {
-    "decisions": 2,
-    "ears": 2,
+    "decisions": 3,
+    "ears": 3,
     "eyes": 8,
-    "tools": 1
+    "tools": 2
   },
   "unnamedWrites": 0,
   "unread": [],
@@ -298,5 +337,5 @@
   "unreadNote": [],
   "untested": [],
   "untestedNote": [],
-  "written": 0
+  "written": 1
 }
