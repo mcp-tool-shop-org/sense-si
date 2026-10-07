@@ -91,6 +91,11 @@
     "definition": "commits is how many commits in the window touch the file, including merges and commits dropped from coupling. lines is added plus deleted in those commits.",
     "files": [
       {
+        "commits": 2,
+        "lines": 126,
+        "path": ".github/workflows/ci.yml"
+      },
+      {
         "commits": 1,
         "lines": 6,
         "path": ".gitignore"
@@ -104,6 +109,31 @@
         "commits": 1,
         "lines": 30,
         "path": "README.md"
+      },
+      {
+        "commits": 2,
+        "lines": 130,
+        "path": "atlas/README.md"
+      },
+      {
+        "commits": 2,
+        "lines": 44,
+        "path": "atlas/boundaries.yaml"
+      },
+      {
+        "commits": 2,
+        "lines": 218,
+        "path": "atlas/page.json"
+      },
+      {
+        "commits": 2,
+        "lines": 488,
+        "path": "atlas/statistics.json"
+      },
+      {
+        "commits": 2,
+        "lines": 1578,
+        "path": "atlas/structure.json"
       },
       {
         "commits": 1,
@@ -194,15 +224,15 @@
   },
   "confidence": {
     "level": "low",
-    "reason": "fewer than 30 qualifying commits in the window, and fewer than 20 source files reach 10 revisions"
+    "reason": "fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions"
   },
-  "generatedAt": "2026-10-07T17:11:20.025Z",
+  "generatedAt": "2026-10-07T17:17:39.834Z",
   "generatedFrom": {
-    "commit": "52198bbe6099468cc3319ae2b35f275916164b7f"
+    "commit": "e2b61390b2e80f615b5f7f95515d686848e08578"
   },
   "pairs": [],
   "parameters": {
-    "appliedChangesetLimit": 5.25,
+    "appliedChangesetLimit": 6.5,
     "changeset": 50,
     "changesetFraction": 0.25,
     "cohesionDrop": 0.2,
@@ -211,16 +241,16 @@
     "floor": "fallen",
     "floorHeld": false,
     "floorTrigger": "both",
-    "headDate": "2026-10-07T12:34:06-04:00",
-    "inScopeFiles": 21,
+    "headDate": "2026-10-07T10:12:55-07:00",
+    "inScopeFiles": 26,
     "pinnedStart": null,
-    "priorFloor": null,
-    "qualifyingCommits": 1,
+    "priorFloor": "fallen",
+    "qualifyingCommits": 2,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-04-10T16:34:06.000Z",
+    "since": "2026-04-10T17:12:55.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",

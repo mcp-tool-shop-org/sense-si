@@ -17,14 +17,39 @@
     }
   ],
   "changes": {
-    "first": true
+    "fileCounts": {
+      "added": 0,
+      "changed": 1,
+      "moved": 0,
+      "parts": 1,
+      "removed": 0
+    },
+    "items": [
+      {
+        "kind": "door",
+        "sentence": "CI's push trigger now also names `main`.",
+        "subjects": [
+          ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "kind": "counts",
+        "sentence": "1 file changed content, across 1 part.",
+        "subjects": []
+      }
+    ],
+    "since": {
+      "commit": "52198bbe6099468cc3319ae2b35f275916164b7f",
+      "generatedAt": "2026-10-07T17:11:20.025Z"
+    },
+    "unchanged": false
   },
   "changesTogether": [],
   "changesTogetherNote": [
     "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "52198bbe6099468cc3319ae2b35f275916164b7f",
+  "commit": "e2b61390b2e80f615b5f7f95515d686848e08578",
   "defaultBranch": "main",
   "derived": "5 parts, mostly Python (8 files). Work enters through 1 door; the busiest is CI, which reaches 2 parts.",
   "doors": [
@@ -59,7 +84,7 @@
       "stages": [],
       "triggers": [
         "on a pull request",
-        "on a push touching 3 paths",
+        "on a push to main touching 3 paths",
         "or by hand"
       ]
     }
@@ -70,9 +95,9 @@
   "edges": [],
   "engine": "1.24.0",
   "generated": [],
-  "generatedAt": "2026-10-07T17:11:20.025Z",
+  "generatedAt": "2026-10-07T17:17:39.834Z",
   "limits": [
-    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 20 source files reach 10 revisions."
+    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
   ],
   "mainDoor": ".github/workflows/ci.yml",
   "partLabels": {
