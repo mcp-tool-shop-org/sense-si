@@ -4,7 +4,7 @@ sense-si is the Python home for the seeing and hearing instruments. It is not a 
 
 Two instruments, and one juror that can read what they write:
 
-- **Eyes** (`ai-eyes`) measures a claim about pixels. The package is in `packages/eyes`, named `ai-eyes`, matching `ai-ears`. The import is `ai_eyes_mcp`. The primary console script is `ai-eyes`. `ai-eyes-mcp` stays as a second entry point only until the Claude Code MCP config is switched to `ai-eyes`, and is removed in a later pull request. The payloads stay as they are.
+- **Eyes** (`ai-eyes`) measures a claim about pixels. The package is in `packages/eyes`, named `ai-eyes`, matching `ai-ears`. The import is `ai_eyes_mcp`. The console script is `ai-eyes`. The payloads stay as they are.
 - **Ears** (`ai-ears`) turns a take into a hearing record: timing, pitch, a listener's transcript, and optional review marks. Every number names the instrument that produced it.
 - **Decisions** is TypeSafe Jev, pinned. It answers a typed question over a record and returns probabilities. It does not hear, it does not see, and it does not pass or fail a take.
 

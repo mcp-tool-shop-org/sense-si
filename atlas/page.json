@@ -10,6 +10,27 @@
       "writers": [
         "tools/phrase_calibration.py"
       ]
+    },
+    {
+      "place": "docs/calibration/corp.svg",
+      "untrackedInputs": true,
+      "writers": [
+        "tools/phrase_calibration.py"
+      ]
+    },
+    {
+      "place": "docs/calibration/phrases.json",
+      "untrackedInputs": true,
+      "writers": [
+        "tools/phrase_calibration.py"
+      ]
+    },
+    {
+      "place": "docs/calibration/summary.json",
+      "untrackedInputs": true,
+      "writers": [
+        "tools/phrase_calibration.py"
+      ]
     }
   ],
   "breaks": [
@@ -35,7 +56,7 @@
       "partLabel": "ears"
     },
     {
-      "doors": 3,
+      "doors": 2,
       "importedBy": [],
       "importedByTests": [],
       "kind": "part",
@@ -56,82 +77,37 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 5,
-      "changed": 11,
+      "added": 3,
+      "changed": 8,
       "moved": 0,
-      "parts": 5,
+      "parts": 4,
       "removed": 0
     },
     "items": [
       {
-        "kind": "cycle",
-        "sentence": "ears now imports tools, which closes the cycle ears → tools → ears.",
+        "kind": "door",
+        "sentence": "ai-eyes-mcp (packages/eyes/pyproject.toml) is no longer a command.",
         "subjects": [
-          "ears",
-          "tools"
-        ]
-      },
-      {
-        "kind": "cycle",
-        "sentence": "tools now imports decisions, which closes the cycle tools → decisions → tools.",
-        "subjects": [
-          "tools",
-          "decisions"
-        ]
-      },
-      {
-        "kind": "cycle",
-        "sentence": "tools now imports ears, which closes the cycle tools → ears → tools.",
-        "subjects": [
-          "tools",
-          "ears"
+          "packages/eyes/pyproject.toml"
         ]
       },
       {
         "kind": "landing",
-        "sentence": "docs/calibration.md is now written by tools/phrase_calibration.py.",
+        "sentence": "docs/calibration/ is now read by tools/phrase_calibration.py.",
         "subjects": [
-          "docs/calibration.md",
+          "docs/calibration/",
           "tools/phrase_calibration.py"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "docs/calibration/corp.svg is now written by tools/phrase_calibration.py.",
-        "subjects": [
-          "docs/calibration/corp.svg",
-          "tools/phrase_calibration.py"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "docs/calibration/phrases.json is now written by tools/phrase_calibration.py.",
-        "subjects": [
-          "docs/calibration/phrases.json",
-          "tools/phrase_calibration.py"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "And 4 more new writers and readers of places.",
-        "subjects": []
-      },
-      {
-        "kind": "origin",
-        "sentence": "docs was authored and is now mixed.",
-        "subjects": [
-          "docs"
         ]
       },
       {
         "kind": "counts",
-        "sentence": "5 files added and 11 changed content, across 5 parts.",
+        "sentence": "3 files added and 8 changed content, across 4 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "503d57acb4f1b53f69337c86afda5e58b3c71531",
-      "generatedAt": "2026-10-07T18:46:15.145Z"
+      "commit": "e4e89f53aaa86793b84e0669a32572c0221d083a",
+      "generatedAt": "2026-10-07T19:47:51.798Z"
     },
     "unchanged": false
   },
@@ -157,9 +133,9 @@
     "Window: 180 days; a pair counts from 3 shared commits, since 2 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "e4e89f53aaa86793b84e0669a32572c0221d083a",
+  "commit": "def7716f28e82d395a4975aeed47e765886fc2a5",
   "defaultBranch": "main",
-  "derived": "7 parts, mostly Python (24 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes and ai-eyes-mcp.",
+  "derived": "7 parts, mostly Python (24 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 2 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes.",
   "doors": [
     {
       "checks": [],
@@ -235,32 +211,6 @@
       "sends": [],
       "stages": [],
       "triggers": []
-    },
-    {
-      "checks": [],
-      "checksCount": 0,
-      "checksMore": 0,
-      "file": "packages/eyes/pyproject.toml",
-      "id": "packages/eyes/pyproject.toml#ai-eyes-mcp",
-      "kind": "command",
-      "landings": [],
-      "name": "ai-eyes-mcp",
-      "pushes": false,
-      "reach": [
-        {
-          "boundary": "eyes",
-          "depth": 0,
-          "files": 3
-        }
-      ],
-      "runs": [
-        "packages/eyes/src/ai_eyes_mcp/server.py"
-      ],
-      "runsCount": 1,
-      "runsMore": 0,
-      "sends": [],
-      "stages": [],
-      "triggers": []
     }
   ],
   "duplicates": [],
@@ -295,10 +245,9 @@
   ],
   "engine": "1.24.0",
   "generated": [],
-  "generatedAt": "2026-10-07T19:47:51.798Z",
+  "generatedAt": "2026-10-07T20:00:40.655Z",
   "limits": [
     "4 reads use paths built at run time and are not named here.",
-    "3 writes go to places this repository does not track, so they are not listed as generated.",
     "1 write and 3 reads go to a path their caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
@@ -332,10 +281,29 @@
     "tools": 2
   },
   "unnamedWrites": 0,
-  "unread": [],
+  "unread": [
+    {
+      "place": "docs/calibration/corp.svg",
+      "writers": [
+        "tools/phrase_calibration.py"
+      ]
+    },
+    {
+      "place": "docs/calibration/phrases.json",
+      "writers": [
+        "tools/phrase_calibration.py"
+      ]
+    },
+    {
+      "place": "docs/calibration/summary.json",
+      "writers": [
+        "tools/phrase_calibration.py"
+      ]
+    }
+  ],
   "unreadFiles": 0,
   "unreadNote": [],
   "untested": [],
   "untestedNote": [],
-  "written": 1
+  "written": 4
 }

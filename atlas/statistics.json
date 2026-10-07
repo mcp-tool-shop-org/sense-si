@@ -70,7 +70,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "ears",
-      "qualifyingSourceCommits": 5,
+      "qualifyingSourceCommits": 6,
       "rebaseline": null
     },
     {
@@ -179,8 +179,8 @@
         "path": "README.ja.md"
       },
       {
-        "commits": 15,
-        "lines": 224,
+        "commits": 16,
+        "lines": 226,
         "path": "README.md"
       },
       {
@@ -199,8 +199,8 @@
         "path": "SHIP_GATE.md"
       },
       {
-        "commits": 13,
-        "lines": 424,
+        "commits": 15,
+        "lines": 506,
         "path": "atlas/README.md"
       },
       {
@@ -209,18 +209,18 @@
         "path": "atlas/boundaries.yaml"
       },
       {
-        "commits": 13,
-        "lines": 1294,
+        "commits": 15,
+        "lines": 1564,
         "path": "atlas/page.json"
       },
       {
-        "commits": 13,
-        "lines": 47315,
+        "commits": 15,
+        "lines": 48099,
         "path": "atlas/statistics.json"
       },
       {
-        "commits": 13,
-        "lines": 7011,
+        "commits": 15,
+        "lines": 7851,
         "path": "atlas/structure.json"
       },
       {
@@ -234,8 +234,8 @@
         "path": "docs/README.md"
       },
       {
-        "commits": 4,
-        "lines": 55,
+        "commits": 5,
+        "lines": 57,
         "path": "docs/adapter.md"
       },
       {
@@ -249,13 +249,28 @@
         "path": "docs/architecture.svg"
       },
       {
-        "commits": 2,
-        "lines": 70,
+        "commits": 6,
+        "lines": 168,
         "path": "docs/calibration.md"
       },
       {
-        "commits": 7,
-        "lines": 71,
+        "commits": 2,
+        "lines": 16,
+        "path": "docs/calibration/corp.svg"
+      },
+      {
+        "commits": 2,
+        "lines": 2992,
+        "path": "docs/calibration/phrases.json"
+      },
+      {
+        "commits": 2,
+        "lines": 118,
+        "path": "docs/calibration/summary.json"
+      },
+      {
+        "commits": 11,
+        "lines": 85,
         "path": "docs/contract.md"
       },
       {
@@ -294,13 +309,13 @@
         "path": "packages/decisions/src/decisions/__init__.py"
       },
       {
-        "commits": 2,
-        "lines": 342,
+        "commits": 3,
+        "lines": 352,
         "path": "packages/decisions/src/decisions/client.py"
       },
       {
-        "commits": 4,
-        "lines": 617,
+        "commits": 5,
+        "lines": 646,
         "path": "packages/decisions/tests/test_client.py"
       },
       {
@@ -319,13 +334,13 @@
         "path": "packages/ears/src/ai_ears/__init__.py"
       },
       {
-        "commits": 1,
-        "lines": 198,
+        "commits": 3,
+        "lines": 212,
         "path": "packages/ears/src/ai_ears/questions.py"
       },
       {
-        "commits": 4,
-        "lines": 506,
+        "commits": 5,
+        "lines": 516,
         "path": "packages/ears/src/ai_ears/record.py"
       },
       {
@@ -359,8 +374,8 @@
         "path": "packages/ears/tests/fixtures/verify-energy.json"
       },
       {
-        "commits": 1,
-        "lines": 171,
+        "commits": 2,
+        "lines": 342,
         "path": "packages/ears/tests/test_calibration_rule.py"
       },
       {
@@ -369,8 +384,8 @@
         "path": "packages/ears/tests/test_questions.py"
       },
       {
-        "commits": 6,
-        "lines": 670,
+        "commits": 7,
+        "lines": 696,
         "path": "packages/ears/tests/test_record.py"
       },
       {
@@ -424,8 +439,8 @@
         "path": "packages/eyes/README.ja.md"
       },
       {
-        "commits": 3,
-        "lines": 668,
+        "commits": 4,
+        "lines": 672,
         "path": "packages/eyes/README.md"
       },
       {
@@ -499,8 +514,8 @@
         "path": "packages/eyes/docs/honest-judgment.md"
       },
       {
-        "commits": 3,
-        "lines": 96,
+        "commits": 4,
+        "lines": 97,
         "path": "packages/eyes/docs/install-and-validate.md"
       },
       {
@@ -514,8 +529,8 @@
         "path": "packages/eyes/docs/tools.md"
       },
       {
-        "commits": 3,
-        "lines": 108,
+        "commits": 4,
+        "lines": 109,
         "path": "packages/eyes/pyproject.toml"
       },
       {
@@ -544,8 +559,8 @@
         "path": "packages/eyes/site/src/content.config.ts"
       },
       {
-        "commits": 2,
-        "lines": 170,
+        "commits": 3,
+        "lines": 176,
         "path": "packages/eyes/site/src/content/docs/handbook/getting-started.md"
       },
       {
@@ -939,8 +954,8 @@
         "path": "tools/coverage_bar.py"
       },
       {
-        "commits": 2,
-        "lines": 1093,
+        "commits": 3,
+        "lines": 2184,
         "path": "tools/phrase_calibration.py"
       },
       {
@@ -954,51 +969,51 @@
     "level": "low",
     "reason": "fewer than 25 source files reach 10 revisions in the window"
   },
-  "generatedAt": "2026-10-07T19:47:51.798Z",
+  "generatedAt": "2026-10-07T20:00:40.655Z",
   "generatedFrom": {
-    "commit": "e4e89f53aaa86793b84e0669a32572c0221d083a"
+    "commit": "def7716f28e82d395a4975aeed47e765886fc2a5"
   },
   "pairs": [
     {
       "a": "atlas/README.md",
       "b": "atlas/page.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/statistics.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/structure.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/statistics.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/structure.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/statistics.json",
       "b": "atlas/structure.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
@@ -1010,7 +1025,7 @@
     }
   ],
   "parameters": {
-    "appliedChangesetLimit": 26.5,
+    "appliedChangesetLimit": 27.25,
     "changeset": 50,
     "changesetFraction": 0.25,
     "cohesionDrop": 0.2,
@@ -1019,16 +1034,16 @@
     "floor": "fallen",
     "floorHeld": false,
     "floorTrigger": "revision-depth",
-    "headDate": "2026-10-07T15:47:25-04:00",
-    "inScopeFiles": 106,
+    "headDate": "2026-10-07T16:00:25-04:00",
+    "inScopeFiles": 109,
     "pinnedStart": null,
     "priorFloor": "fallen",
-    "qualifyingCommits": 62,
+    "qualifyingCommits": 66,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-04-10T19:47:25.000Z",
+    "since": "2026-04-10T20:00:25.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",

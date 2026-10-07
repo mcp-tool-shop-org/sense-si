@@ -214,11 +214,23 @@
           "path": "docs/adapter.md"
         },
         {
-          "hash": "7fc6c7d1fefd893b2e4b7e289147b97978e4982ca6002118ab669f7d6392d26b",
+          "hash": "42476fd4c8c7a13d2db2d263efa69ef17112a8eaccd18d4eba81b5de9b977f4e",
           "path": "docs/calibration.md"
         },
         {
-          "hash": "b0825ac3e784e226335efe72e6a196d25442b389c189c83c5f788ca4ac3c4621",
+          "hash": "0801d4a6137239e907642ba659b3215d5057df6d24577f8919b9e6198ad45580",
+          "path": "docs/calibration/corp.svg"
+        },
+        {
+          "hash": "7087baf51c3b6a37377370f78c17397bcb97feb848aef231e52bdff6db7d5523",
+          "path": "docs/calibration/phrases.json"
+        },
+        {
+          "hash": "678cc91308837fe8160b1070fd4b3538b3ab4df21476f1f7a6e812dd30862bb2",
+          "path": "docs/calibration/summary.json"
+        },
+        {
+          "hash": "6818de824b2f8c850ccccc1e45263320a3ce4d01fdabc92c8c02105f34b93655",
           "path": "docs/contract.md"
         }
       ],
@@ -262,32 +274,27 @@
             {
               "in": "load_question_result",
               "kind": "raise",
-              "line": 69
+              "line": 72
             },
             {
               "in": "_check_instructions",
               "kind": "raise",
-              "line": 90
+              "line": 93
             },
             {
               "in": "_check_instructions",
               "kind": "raise",
-              "line": 92
+              "line": 95
             },
             {
               "in": "_check_pin",
               "kind": "raise",
-              "line": 97
+              "line": 100
             },
             {
               "in": "_probabilities",
               "kind": "raise",
-              "line": 102
-            },
-            {
-              "in": "_probabilities",
-              "kind": "raise",
-              "line": 106
+              "line": 105
             },
             {
               "in": "_probabilities",
@@ -295,42 +302,47 @@
               "line": 109
             },
             {
-              "in": "which_take",
+              "in": "_probabilities",
               "kind": "raise",
-              "line": 124
+              "line": 112
             },
             {
               "in": "which_take",
               "kind": "raise",
-              "line": 128
+              "line": 127
             },
             {
               "in": "which_take",
               "kind": "raise",
-              "line": 130
+              "line": 131
             },
             {
               "in": "which_take",
               "kind": "raise",
-              "line": 147
+              "line": 133
+            },
+            {
+              "in": "which_take",
+              "kind": "raise",
+              "line": 150
             },
             {
               "in": "phrase_clean",
               "kind": "raise",
-              "line": 175
+              "line": 178
             },
             {
               "in": "phrase_clean",
               "kind": "raise",
-              "line": 177
+              "line": 180
             },
             {
               "in": "phrase_clean",
               "kind": "raise",
-              "line": 188
+              "line": 191
             }
           ],
-          "hash": "9e641f995ea94c4579aa62caa026c3f1e715ae81257783e347ef8c24df3c5505",
+          "hash": "419d4a2ef1cecc5539f98252150b98943e07b1ab4a168aa33f7d3add992d364c",
           "importsFiles": [
             "packages/decisions/src/decisions/__init__.py",
             "packages/ears/src/ai_ears/record.py"
@@ -604,7 +616,7 @@
           "path": "packages/eyes/README.ja.md"
         },
         {
-          "hash": "af22352a378a001278a63a8b119711d03fc8bf75b664d6b78c409a030f424133",
+          "hash": "4258835644ac74c68e8d85483a2a41404ed0a05e0c6e585e443ffeced9e0e145",
           "path": "packages/eyes/README.md"
         },
         {
@@ -664,7 +676,7 @@
           "path": "packages/eyes/docs/honest-judgment.md"
         },
         {
-          "hash": "b6071232d6e558dbcc63fecf8cc434082a3e751002e4e0fa0ea89ab19fd2d3bf",
+          "hash": "d064c99c625ed87f641e746bf8fb23a3cb2d7c788a0e3087ce6fb783aeccfb83",
           "path": "packages/eyes/docs/install-and-validate.md"
         },
         {
@@ -676,7 +688,7 @@
           "path": "packages/eyes/docs/tools.md"
         },
         {
-          "hash": "150819f3114678ca986330c0733c97ba4a19139433db501807de2be96dce4d5b",
+          "hash": "a361643eb32cd8f5c52cc05d2fe631ad3c0503bde810626eb972e319297490de",
           "path": "packages/eyes/pyproject.toml"
         },
         {
@@ -701,7 +713,7 @@
           "path": "packages/eyes/site/src/content.config.ts"
         },
         {
-          "hash": "36b89144d96d8e3ab2a01951d7a657561f58270c99a87781dac9f0fca89d97f6",
+          "hash": "5ac20016ecc9879c65933d97182c91f77f1e6c921292291226fa65db7a244c19",
           "path": "packages/eyes/site/src/content/docs/handbook/getting-started.md"
         },
         {
@@ -1514,7 +1526,7 @@
           "path": "LICENSE"
         },
         {
-          "hash": "e6ad9902e6b66ca470f5abea1748d0edcfe210d04ed609cd4621a5525627c323",
+          "hash": "16dfc3df5295a68a341ef6e182d77da88ede20a07fef5b5f776bd8775c98b9fb",
           "path": "README.md"
         },
         {
@@ -1998,48 +2010,6 @@
       "triggers": [],
       "uses": [],
       "usesWorkflowToken": false
-    },
-    {
-      "checksCount": 0,
-      "commands": [],
-      "elsewhere": [],
-      "file": "packages/eyes/pyproject.toml",
-      "kind": "command",
-      "landings": [],
-      "mentions": [],
-      "name": "ai-eyes-mcp",
-      "permissions": [],
-      "pushes": false,
-      "reach": [
-        {
-          "boundary": "eyes",
-          "depth": 0,
-          "files": 3
-        }
-      ],
-      "readers": [],
-      "runs": [
-        {
-          "path": "packages/eyes/src/ai_eyes_mcp/server.py",
-          "runKind": "executes"
-        }
-      ],
-      "runsCount": 1,
-      "secrets": [],
-      "sends": {
-        "deploysPages": false,
-        "dispatchesTo": [],
-        "opensIssues": false,
-        "opensIssuesOnFailure": false,
-        "opensPullRequests": false,
-        "publishes": false,
-        "publishesTo": [],
-        "releases": false
-      },
-      "stages": [],
-      "triggers": [],
-      "uses": [],
-      "usesWorkflowToken": false
     }
   ],
   "edges": [
@@ -2073,8 +2043,8 @@
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "e4e89f53aaa86793b84e0669a32572c0221d083a",
-    "tracked": 101
+    "commit": "def7716f28e82d395a4975aeed47e765886fc2a5",
+    "tracked": 104
   },
   "landings": [
     {
@@ -2198,6 +2168,17 @@
       "readers": [
         {
           "by": "tools/phrase_calibration.py",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "docs/calibration",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "tools/phrase_calibration.py",
           "call": "read_text",
           "confidence": "ast"
         }
@@ -2218,7 +2199,6 @@
     {
       "readers": [],
       "target": "docs/calibration/corp.svg",
-      "tracked": false,
       "writers": [
         {
           "by": "tools/phrase_calibration.py",
@@ -2233,7 +2213,6 @@
     {
       "readers": [],
       "target": "docs/calibration/phrases.json",
-      "tracked": false,
       "writers": [
         {
           "by": "tools/phrase_calibration.py",
@@ -2248,7 +2227,6 @@
     {
       "readers": [],
       "target": "docs/calibration/summary.json",
-      "tracked": false,
       "writers": [
         {
           "by": "tools/phrase_calibration.py",

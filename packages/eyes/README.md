@@ -61,7 +61,7 @@ pip install -e .
 ai-eyes  # starts STDIO server
 ```
 
-`ai-eyes-mcp` remains a second entry point until the Claude Code MCP config uses `ai-eyes`. Or run as a module: `python -m ai_eyes_mcp`
+Or run as a module: `python -m ai_eyes_mcp`
 
 ### Claude Code config
 
@@ -146,7 +146,7 @@ inference logic. `server.py` never touches torch directly; it delegates
 everything to the engine. This means you can `from ai_eyes_mcp.engine import
 SigLIPEngine` and use it in any Python script without pulling in FastMCP.
 
-ai-eyes-mcp evaluates images and nothing else. It has no opinion about what
+ai-eyes evaluates images and nothing else. It has no opinion about what
 you do with the number — cataloguing, sprite pipelines, CI gates on generated
 assets — that belongs to the consumer.
 
