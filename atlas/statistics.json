@@ -1,0 +1,244 @@
+{
+  "authorship": {
+    "parts": [],
+    "places": []
+  },
+  "boundaries": [
+    {
+      "breakage": {
+        "coChangesOnly": [],
+        "collapsed": false,
+        "confidence": "low",
+        "importsAndCoChanges": [],
+        "importsOnly": []
+      },
+      "cohesion": null,
+      "cohesionDropped": false,
+      "confidence": "low",
+      "highWater": null,
+      "name": ".github",
+      "qualifyingSourceCommits": 0,
+      "rebaseline": null
+    },
+    {
+      "breakage": {
+        "coChangesOnly": [],
+        "collapsed": false,
+        "confidence": "low",
+        "importsAndCoChanges": [],
+        "importsOnly": [
+          "ears"
+        ]
+      },
+      "cohesion": null,
+      "cohesionDropped": false,
+      "confidence": "low",
+      "highWater": null,
+      "name": "decisions",
+      "qualifyingSourceCommits": 0,
+      "rebaseline": null
+    },
+    {
+      "breakage": {
+        "coChangesOnly": [],
+        "collapsed": false,
+        "confidence": "low",
+        "importsAndCoChanges": [],
+        "importsOnly": []
+      },
+      "cohesion": null,
+      "cohesionDropped": false,
+      "confidence": "low",
+      "highWater": null,
+      "name": "docs",
+      "qualifyingSourceCommits": 0,
+      "rebaseline": null
+    },
+    {
+      "breakage": {
+        "coChangesOnly": [],
+        "collapsed": false,
+        "confidence": "low",
+        "importsAndCoChanges": [],
+        "importsOnly": []
+      },
+      "cohesion": null,
+      "cohesionDropped": false,
+      "confidence": "low",
+      "highWater": null,
+      "name": "ears",
+      "qualifyingSourceCommits": 0,
+      "rebaseline": null
+    },
+    {
+      "breakage": {
+        "coChangesOnly": [],
+        "collapsed": false,
+        "confidence": "low",
+        "importsAndCoChanges": [],
+        "importsOnly": []
+      },
+      "cohesion": null,
+      "cohesionDropped": false,
+      "confidence": "low",
+      "highWater": null,
+      "name": "root",
+      "qualifyingSourceCommits": 0,
+      "rebaseline": null
+    }
+  ],
+  "churn": {
+    "definition": "commits is how many commits in the window touch the file, including merges and commits dropped from coupling. lines is added plus deleted in those commits.",
+    "files": [
+      {
+        "commits": 1,
+        "lines": 6,
+        "path": ".gitignore"
+      },
+      {
+        "commits": 2,
+        "lines": 42,
+        "path": "LICENSE"
+      },
+      {
+        "commits": 1,
+        "lines": 30,
+        "path": "README.md"
+      },
+      {
+        "commits": 1,
+        "lines": 41,
+        "path": "docs/adapter.md"
+      },
+      {
+        "commits": 1,
+        "lines": 59,
+        "path": "docs/contract.md"
+      },
+      {
+        "commits": 1,
+        "lines": 15,
+        "path": "packages/decisions/pyproject.toml"
+      },
+      {
+        "commits": 1,
+        "lines": 37,
+        "path": "packages/decisions/src/decisions/__init__.py"
+      },
+      {
+        "commits": 1,
+        "lines": 332,
+        "path": "packages/decisions/src/decisions/client.py"
+      },
+      {
+        "commits": 1,
+        "lines": 172,
+        "path": "packages/decisions/tests/test_client.py"
+      },
+      {
+        "commits": 1,
+        "lines": 19,
+        "path": "packages/ears/pyproject.toml"
+      },
+      {
+        "commits": 1,
+        "lines": 6,
+        "path": "packages/ears/src/ai_ears/__init__.py"
+      },
+      {
+        "commits": 1,
+        "lines": 198,
+        "path": "packages/ears/src/ai_ears/questions.py"
+      },
+      {
+        "commits": 1,
+        "lines": 452,
+        "path": "packages/ears/src/ai_ears/record.py"
+      },
+      {
+        "commits": 1,
+        "lines": 24,
+        "path": "packages/ears/tests/fixtures/phrase-scores.json"
+      },
+      {
+        "commits": 1,
+        "lines": 74,
+        "path": "packages/ears/tests/fixtures/pitch.json"
+      },
+      {
+        "commits": 1,
+        "lines": 149,
+        "path": "packages/ears/tests/fixtures/receipt.json"
+      },
+      {
+        "commits": 1,
+        "lines": 86,
+        "path": "packages/ears/tests/fixtures/verify-energy.json"
+      },
+      {
+        "commits": 1,
+        "lines": 183,
+        "path": "packages/ears/tests/test_questions.py"
+      },
+      {
+        "commits": 1,
+        "lines": 166,
+        "path": "packages/ears/tests/test_record.py"
+      },
+      {
+        "commits": 1,
+        "lines": 10,
+        "path": "pyproject.toml"
+      }
+    ]
+  },
+  "confidence": {
+    "level": "low",
+    "reason": "fewer than 30 qualifying commits in the window, and fewer than 20 source files reach 10 revisions"
+  },
+  "generatedAt": "2026-10-07T17:11:20.025Z",
+  "generatedFrom": {
+    "commit": "52198bbe6099468cc3319ae2b35f275916164b7f"
+  },
+  "pairs": [],
+  "parameters": {
+    "appliedChangesetLimit": 5.25,
+    "changeset": 50,
+    "changesetFraction": 0.25,
+    "cohesionDrop": 0.2,
+    "couplingPopulation": "source",
+    "fallenShared": 3,
+    "floor": "fallen",
+    "floorHeld": false,
+    "floorTrigger": "both",
+    "headDate": "2026-10-07T12:34:06-04:00",
+    "inScopeFiles": 21,
+    "pinnedStart": null,
+    "priorFloor": null,
+    "qualifyingCommits": 1,
+    "qualifyingMinimum": 30,
+    "revisions": 5,
+    "shared": 10,
+    "sharedFloorUsed": 3,
+    "since": "2026-04-10T16:34:06.000Z",
+    "sourceExtensions": [
+      ".js",
+      ".mjs",
+      ".cjs",
+      ".jsx",
+      ".ts",
+      ".tsx",
+      ".mts",
+      ".cts",
+      ".py",
+      ".rs",
+      ".gd"
+    ],
+    "sourceFileReach": 20,
+    "sourceFileRise": 25,
+    "sourceFilesReachingStrongFloor": 0,
+    "strength": 0.5,
+    "windowDays": 180
+  },
+  "strengthDefinition": "strength is the shared qualifying commits divided by either. either is the number of qualifying commits that touch either file."
+}

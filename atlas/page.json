@@ -1,0 +1,109 @@
+{
+  "authored": [
+    ".github/",
+    "docs/",
+    "root"
+  ],
+  "breaks": [
+    {
+      "doors": 1,
+      "importedBy": [
+        "ears"
+      ],
+      "importedByTests": [],
+      "kind": "part",
+      "name": "decisions",
+      "partLabel": "decisions"
+    }
+  ],
+  "changes": {
+    "first": true
+  },
+  "changesTogether": [],
+  "changesTogetherNote": [
+    "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
+  ],
+  "changesTogetherWithTests": 0,
+  "commit": "52198bbe6099468cc3319ae2b35f275916164b7f",
+  "defaultBranch": "main",
+  "derived": "5 parts, mostly Python (8 files). Work enters through 1 door; the busiest is CI, which reaches 2 parts.",
+  "doors": [
+    {
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
+      "file": ".github/workflows/ci.yml",
+      "id": ".github/workflows/ci.yml",
+      "landings": [],
+      "name": "CI",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "decisions",
+          "depth": 0,
+          "files": 3
+        },
+        {
+          "boundary": "ears",
+          "depth": 0,
+          "files": 4
+        }
+      ],
+      "runs": [
+        "packages/decisions/tests/",
+        "packages/ears/tests/"
+      ],
+      "runsCount": 2,
+      "runsMore": 0,
+      "sends": [],
+      "stages": [],
+      "triggers": [
+        "on a pull request",
+        "on a push touching 3 paths",
+        "or by hand"
+      ]
+    }
+  ],
+  "duplicates": [],
+  "duplicatesLead": null,
+  "duplicatesNote": [],
+  "edges": [],
+  "engine": "1.24.0",
+  "generated": [],
+  "generatedAt": "2026-10-07T17:11:20.025Z",
+  "limits": [
+    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 20 source files reach 10 revisions."
+  ],
+  "mainDoor": ".github/workflows/ci.yml",
+  "partLabels": {
+    ".github": ".github",
+    "decisions": "decisions",
+    "docs": "docs",
+    "ears": "ears",
+    "root": "the repository root"
+  },
+  "parts": 5,
+  "readers": [],
+  "repo": "mcp-tool-shop-org/sense-si",
+  "sequences": [],
+  "startDoor": ".github/workflows/ci.yml",
+  "startHere": [
+    ".github/workflows/ci.yml",
+    "packages/decisions/src/decisions/__init__.py",
+    "packages/decisions/src/decisions/client.py"
+  ],
+  "summary": null,
+  "summaryFrom": null,
+  "testFiles": 7,
+  "testedBy": {
+    "decisions": 2,
+    "ears": 2
+  },
+  "unnamedWrites": 0,
+  "unread": [],
+  "unreadFiles": 0,
+  "unreadNote": [],
+  "untested": [],
+  "untestedNote": [],
+  "written": 0
+}
