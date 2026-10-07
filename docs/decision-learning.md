@@ -236,6 +236,29 @@ evidence. What comes next is new labels: a blind re-mark from about
 2026-10-21, and marks on more mixes once the review moves into the cockpit.
 Not a new model.
 
+The warp-only folds already scored say how many more marked mixes a gap
+of this size needs before the interval can exclude zero. On the six warp
+mixes the 41-feature tree's fold gap against the base rate is -0.0528,
+and the interval includes
+zero. The check sets the true gap at -0.05 and asks when that same
+leave-one-mix-out interval would exclude zero. The two padded mixes stay
+in the six and are not redrawn, because they carry no marks. Each added
+mix is drawn with replacement from the four marked warp folds, and those
+four gaps are shifted so they average -0.05. The six observed gaps are
+shifted the same way. The interval is the Nadeau–Bengio correction used
+in the tables. The test/train ratio is recomputed from the drawn sizes,
+16 or 20 phrases. Four thousand resamples, seed `20261007`. The upper end
+is below zero in half of the resamples at 15 more marked mixes, and in
+four out of five at 22 more. With the six folds' spread held fixed and
+the mean held at -0.05, the upper end crosses zero at 17 more mixes. A
+study drawn only from the marked folds, pads not carried forward, reaches
+four out of five at 25 more than the four already marked. Along this
+curve the 0.02 bar and the interval move together, so the interval is
+what the count is for. Twenty-two more marked warp mixes is the figure
+for the re-mark and the cockpit rounds. The re-mark is an intra-rater
+ceiling on phrases already marked. The cockpit review is where further
+mixes get marks. The figure is not a claim that the gap is real.
+
 ## Result
 
 <!-- result -->
