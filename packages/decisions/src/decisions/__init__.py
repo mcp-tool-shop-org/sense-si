@@ -1,4 +1,4 @@
-"""Pinned client for TypeSafe Jev on OpenRouter's Decisions API."""
+"""Local Kev engine, and an optional pinned client for TypeSafe Jev."""
 
 from decisions.client import (
     PINNED_DATE,
@@ -17,6 +17,17 @@ from decisions.client import (
     create_decisions_client,
     validate_answer,
 )
+from decisions.kev import (
+    KEV_JUDGMENT,
+    KEV_MODEL,
+    KEV_REVISION,
+    KEV_UNANSWERED_BAND,
+    apply_memory_cap,
+    create_kev_client,
+    fit_lomo,
+    resolve_memory_fraction,
+    serve_capped,
+)
 
 __all__ = [
     "PINNED_DATE",
@@ -34,4 +45,13 @@ __all__ = [
     "ScoreQuestion",
     "create_decisions_client",
     "validate_answer",
+    "KEV_JUDGMENT",
+    "KEV_MODEL",
+    "KEV_REVISION",
+    "KEV_UNANSWERED_BAND",
+    "apply_memory_cap",
+    "create_kev_client",
+    "fit_lomo",
+    "resolve_memory_fraction",
+    "serve_capped",
 ]

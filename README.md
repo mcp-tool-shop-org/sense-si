@@ -6,7 +6,7 @@ Two instruments, and one juror that can read what they write:
 
 - **Eyes** (`ai-eyes`) measures a claim about pixels. The package is in `packages/eyes`, named `ai-eyes`, matching `ai-ears`. The import is `ai_eyes_mcp`. The console script is `ai-eyes`. The payloads stay as they are.
 - **Ears** (`ai-ears`) turns a take into a hearing record: timing, pitch, a listener's transcript, and optional review marks. Every number names the instrument that produced it.
-- **Decisions** is TypeSafe Jev, pinned. It answers a typed question over a record and returns probabilities. It does not hear, it does not see, and it does not pass or fail a take.
+- **Decisions** answers a typed question over a record and returns probabilities. The local engine is Kev-4B, pinned by revision. Hosted Jev stays an optional comparison. Decisions does not hear, does not see, and does not pass or fail a take.
 
 Jam keeps its own gates. A probability is something a person can read next to those gates. It is not a gate.
 
@@ -15,7 +15,7 @@ OpenRouter is not enabled here. The client exists so a test can fake the transpo
 ## Layout
 
 ```
-packages/decisions/     pinned Jev client
+packages/decisions/     local Kev engine and optional pinned Jev client
 packages/ears/          hearing record and the two questions
 packages/eyes/          seeing instrument, SigLIP2
 docs/contract.md        what the packages are allowed to decide

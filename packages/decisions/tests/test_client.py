@@ -14,6 +14,7 @@ from decisions import (
     validate_answer,
 )
 from decisions.client import FetchResponse
+from decisions.kev import KEV_MODEL
 
 
 def _response(status: int, body: str, ok: bool | None = None) -> FetchResponse:
@@ -77,7 +78,10 @@ def test_posts_the_pin_and_stamps_the_date_on_the_answer():
     assert result.input_tokens == 1200
 
 
-@pytest.mark.parametrize("model", ["jev-router", "typesafe/jev-router", PINNED_DATE, "typesafe/jev-1.13 ", ""])
+@pytest.mark.parametrize(
+    "model",
+    ["jev-router", "typesafe/jev-router", PINNED_DATE, "typesafe/jev-1.13 ", "", KEV_MODEL],
+)
 def test_refuses_anything_but_the_pin_before_the_request(model):
     calls = {"n": 0}
 

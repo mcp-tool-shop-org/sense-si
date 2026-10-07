@@ -6,6 +6,9 @@ import re
 from dataclasses import dataclass
 
 from decisions import (
+    KEV_MODEL,
+    KEV_REVISION,
+    KEV_UNANSWERED_BAND,
     PINNED_DATE,
     PINNED_MODEL,
     ChoiceAnswer,
@@ -95,9 +98,23 @@ def _check_instructions(instructions: str) -> None:
         raise EarsError("the question asks Jev to pass or fail")
 
 
-def _check_pin(result: DecisionResult) -> None:
-    if result.model != PINNED_MODEL or result.dated != PINNED_DATE:
-        raise EarsError("decision result is not the pinned Jev")
+def _check_pin(result: DecisionResult) -> str:
+    if result.model == PINNED_MODEL and result.dated == PINNED_DATE:
+        return "jev"
+    if result.model == KEV_MODEL and result.dated == KEV_REVISION:
+        return "kev"
+    raise EarsError("decision result is not a pinned engine")
+
+
+def _answered_band(
+    engine: str, band: tuple[float, float] | None
+) -> tuple[tuple[float, float], bool]:
+    """Jev uses its band. Kev has no adopted cut, so the question stays unanswered."""
+    if engine == "kev":
+        if band is not None:
+            raise EarsError("a Kev threshold is fitted on Kev's own folds")
+        return KEV_UNANSWERED_BAND, True
+    return (DEFAULT_BAND if band is None else band), False
 
 
 def _probabilities(raw: dict, expected: set[str]) -> dict[str, float]:
@@ -119,7 +136,7 @@ def which_take(
     *,
     instructions: str,
     client,
-    band: tuple[float, float] = DEFAULT_BAND,
+    band: tuple[float, float] | None = None,
 ) -> QuestionResult:
     """Ask which take. Return a probability per take, and no winner."""
     _check_instructions(instructions)
@@ -144,20 +161,21 @@ def which_take(
         },
     )
     result = client(request)
-    _check_pin(result)
+    engine = _check_pin(result)
+    used, unanswered = _answered_band(engine, band)
     answer = result.answers["which_take"]
     if not isinstance(answer, ChoiceAnswer) or not answer.probabilities:
         raise EarsError("which_take answer has no probabilities")
     probabilities = _probabilities(dict(answer.probabilities), set(ids))
     confidence = answer.confidence
-    uncertain = confidence is None or _in_band(confidence, band)
+    uncertain = True if unanswered else (confidence is None or _in_band(confidence, used))
     return QuestionResult(
         question="which_take",
         model=result.model,
         dated=result.dated,
         probabilities=probabilities,
         uncertain=uncertain,
-        band=band,
+        band=used,
         confidence=confidence,
         cost=result.cost,
     )
@@ -170,7 +188,7 @@ def phrase_clean(
     true: str,
     false: str,
     client,
-    band: tuple[float, float] = DEFAULT_BAND,
+    band: tuple[float, float] | None = None,
 ) -> QuestionResult:
     """Ask whether the caller's criterion holds. Return P(yes), not a gate."""
     _check_instructions(instructions)
@@ -185,17 +203,19 @@ def phrase_clean(
         },
     )
     result = client(request)
-    _check_pin(result)
+    engine = _check_pin(result)
+    used, unanswered = _answered_band(engine, band)
     answer = result.answers["phrase_clean"]
     if not isinstance(answer, NoulAnswer):
         raise EarsError("phrase_clean answer is not a probability")
     probability = answer.noul
+    uncertain = True if unanswered else _in_band(probability, used)
     return QuestionResult(
         question="phrase_clean",
         model=result.model,
         dated=result.dated,
         probabilities={"yes": probability},
-        uncertain=_in_band(probability, band),
-        band=band,
+        uncertain=uncertain,
+        band=used,
         cost=result.cost,
     )

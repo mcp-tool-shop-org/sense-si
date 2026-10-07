@@ -1,7 +1,7 @@
 [project]
 name = "sense-si-decisions"
 version = "0.0.0"
-description = "Pinned Jev client. Probabilities in, no pass or fail out."
+description = "Local Kev-4B engine and an optional pinned Jev client. Probabilities in, no pass or fail out."
 requires-python = ">=3.10"
 
 [tool.hatch.build.targets.wheel]
