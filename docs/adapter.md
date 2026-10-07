@@ -8,9 +8,11 @@ The fixtures under `packages/ears/tests/fixtures/` are cuts from `phrase16w2/rec
 
 `receipt.json` is a placed vocal, from `vocal_clock.py verify`. `verify-energy.json` is a raw take, in `<run>/take-NN/`. Neither file is named `vocal-clock.receipt.json`.
 
-Each table row's `err_ms` is the timing value. `method` `rise` is recorded as `rise_onset`. Any other method is kept as its own instrument id. `t_score`, `t_vowel`, `dip_db`, and `peak` are kept.
+Each table row's `err_ms` is the timing value. `method` `rise` is recorded as `rise_onset`. A missing `method` is still the rise detector. Any other method is kept as its own instrument id. `t_score`, `t_vowel`, `dip_db`, and `peak` are kept.
 
-`aligner_err_ms` is the HubertFA reading, already corrected for the offset measured on that run. `checks.aligner_cross_check.offset_ms` and `measured_from` are stored with it. A raw energy file has no `aligner_err_ms`, and the adapter does not invent one. `stt_err_ms` is not an aligner reading and is not read.
+A row whose `err_ms` is null is undated. The detector found no vowel onset. That is a measurement state, the same kind of fact as `untrackable` and `unvoiced` on a pitch row. The value is null. The row's `reason` (for example `no-rise-in-window`) is kept as `state_reason`, and `t_score` stays. The fixture is one such row cut from `take-01/verify-energy.json` in the amazing-grace-new-britain run. A placed `receipt.json` row of the same shape is cut beside it.
+
+`aligner_err_ms` is the HubertFA reading, already corrected for the offset measured on that run. `checks.aligner_cross_check.offset_ms` and `measured_from` are stored with it. It is kept on an undated row when the receipt has it. That is the case the aligner is for. A raw energy file has no `aligner_err_ms`, and the adapter does not invent one. `stt_err_ms` is not an aligner reading and is not read.
 
 The row's `cross_check` value (rescued, both_off, unconfirmed, disputed) is jam's interpretation of the two instruments. It is kept under `jam_interpretation`. It is not a measurement and it is not a gate.
 

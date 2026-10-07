@@ -1,0 +1,29 @@
+{
+  "table": [
+    {
+      "id": "v55",
+      "lyric": "lieved",
+      "t_score": 82.5,
+      "method": null,
+      "t_vowel": null,
+      "peak": 0.14281909496166775,
+      "reason": "no-rise-in-window",
+      "dip_db": null,
+      "err_ms": null,
+      "pass": false
+    }
+  ],
+  "detector": {
+    "band_hz": [
+      400.0,
+      3000.0
+    ],
+    "rise_fraction": 0.5,
+    "env_win_s": 0.008,
+    "env_hop_s": 0.0005,
+    "slope_min_db": 3.0
+  },
+  "artifacts": {
+    "vocal_sha256": "40690ed81a539676599bd0930817fccf345bc7e5399bbef24e3169bc205f63f1"
+  }
+}

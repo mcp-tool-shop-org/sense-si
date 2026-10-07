@@ -108,9 +108,56 @@ def test_raw_take_has_no_aligner_reading():
     row = state["timing"][0]
     assert row["value"] == -178.63
     assert row["observations"]["dip_db"] == 26.1
+    assert "measurement_state" not in row
+    assert "state_reason" not in row["observations"]
     assert "cross_check" not in row
     assert "hubertfa" not in json.dumps(state["timing"])
     assert row["incomplete"] is False
+
+
+def test_a_null_onset_is_undated_and_the_aligner_stays_on_the_receipt():
+    raw = _load("undated-verify-energy.json")
+    assert raw["table"][0]["err_ms"] is None
+    assert raw["table"][0]["reason"] == "no-rise-in-window"
+    state = from_jam_take(take_id="take-01", phrase_id="0", timing=raw).to_state()
+    row = state["timing"][0]
+    assert row["measurement_state"] == "undated"
+    assert row["value"] is None
+    assert row["instrument"] == "rise_onset"
+    assert row["incomplete"] is False
+    assert "band_hz" in row["revision"]
+    assert row["observations"]["t_score"] == 82.5
+    assert row["observations"]["state_reason"] == "no-rise-in-window"
+    assert row["observations"]["peak"] == pytest.approx(0.14281909496166775)
+    assert "t_vowel" not in row["observations"]
+    assert "dip_db" not in row["observations"]
+    assert "cross_check" not in row
+    assert "pass" not in {key.casefold() for key in _keys(state)}
+
+    placed = from_jam_take(
+        take_id="take-01",
+        phrase_id="0",
+        timing=_load("undated-receipt.json"),
+    ).to_state()
+    kept = placed["timing"][0]
+    assert kept["measurement_state"] == "undated"
+    assert kept["value"] is None
+    assert kept["observations"]["state_reason"] == "no-rise-in-window"
+    assert kept["cross_check"]["instrument"] == "hubertfa"
+    assert kept["cross_check"]["value"] == -277.4
+    assert kept["cross_check"]["incomplete"] is True
+    assert kept["cross_check"]["offset_ms"] == -14.3
+    assert kept["cross_check"]["measured_from"] == 107
+    assert kept["jam_interpretation"] == "both_off"
+
+    blank = from_jam_take(
+        take_id="t",
+        phrase_id="0",
+        timing=_row(err_ms=None, reason=4),
+    ).to_state()["timing"][0]
+    assert blank["measurement_state"] == "undated"
+    assert blank["value"] is None
+    assert "state_reason" not in blank.get("observations", {})
 
 
 def test_tracker_name_is_read_from_the_receipt():

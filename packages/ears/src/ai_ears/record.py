@@ -71,7 +71,7 @@ class CrossCheck:
 
 @dataclass(frozen=True)
 class Measure:
-    value: float
+    value: float | None
     unit: str
     instrument: str
     revision: str
@@ -244,6 +244,7 @@ def _timing_rows(receipt: dict) -> tuple[Measure, ...]:
     for row in receipt.get("table") or []:
         if "err_ms" not in row:
             raise EarsError(f"clock row {row.get('id')!r} has no err_ms")
+        # A missing method still means the rise detector looked and found no onset.
         method = str(row.get("method") or "rise")
         instrument = "rise_onset" if method == "rise" else method
         cross = None
@@ -259,16 +260,31 @@ def _timing_rows(receipt: dict) -> tuple[Measure, ...]:
             )
         token = row.get("cross_check")
         interpretation = token if isinstance(token, str) and token in JAM_INTERPRETATIONS else None
+        err = row["err_ms"]
+        state = None
+        reason = ""
+        if err is None:
+            state = "undated"
+            raw_reason = row.get("reason")
+            if isinstance(raw_reason, str) and raw_reason:
+                reason = raw_reason
+            value = None
+        else:
+            value = float(err)
+        observations = list(_obs(row, ("lyric", "t_score", "t_vowel", "dip_db", "peak")))
+        if reason:
+            observations.append(("state_reason", reason))
         rows.append(
             Measure(
-                value=float(row["err_ms"]),
+                value=value,
                 unit="ms",
                 instrument=instrument,
                 revision=revision,
                 incomplete=incomplete,
                 label=str(row.get("id") or ""),
                 cross_check=cross,
-                observations=_obs(row, ("lyric", "t_score", "t_vowel", "dip_db", "peak")),
+                observations=tuple(observations),
+                measurement_state=state,
                 jam_interpretation=interpretation,
             )
         )

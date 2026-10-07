@@ -1,0 +1,37 @@
+{
+  "table": [
+    {
+      "id": "v48",
+      "lyric": "ap",
+      "t_score": 74.16666666666667,
+      "method": null,
+      "t_vowel": null,
+      "peak": 0.25457218039001,
+      "reason": "no-rise-in-window",
+      "dip_db": null,
+      "err_ms": null,
+      "pass": false,
+      "aligner_err_ms": -277.4,
+      "cross_check": "both_off"
+    }
+  ],
+  "detector": {
+    "band_hz": [
+      400.0,
+      3000.0
+    ],
+    "rise_fraction": 0.5,
+    "env_win_s": 0.008,
+    "env_hop_s": 0.0005,
+    "slope_min_db": 3.0
+  },
+  "checks": {
+    "aligner_cross_check": {
+      "offset_ms": -14.3,
+      "measured_from": 107
+    }
+  },
+  "artifacts": {
+    "vocal_sha256": "f90a933d9c8839ab37736d12dbf5364c8200df1d8211c32633b7932698ed66ba"
+  }
+}
