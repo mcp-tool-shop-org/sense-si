@@ -16,6 +16,10 @@ boundaries:
     globs:
       - packages/ears/**
     role: code
+  - name: eyes
+    globs:
+      - packages/eyes/**
+    role: code
   - name: root
     globs:
       - "*"

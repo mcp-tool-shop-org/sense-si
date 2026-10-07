@@ -6,12 +6,21 @@ requires-python = ">=3.10"
 readme = "README.md"
 
 [tool.pytest.ini_options]
-testpaths = ["packages/decisions/tests", "packages/ears/tests"]
-pythonpath = ["packages/decisions/src", "packages/ears/src"]
+testpaths = ["packages/decisions/tests", "packages/ears/tests", "packages/eyes/tests"]
+pythonpath = [
+    "packages/decisions/src",
+    "packages/ears/src",
+    "packages/eyes/src",
+    # Eyes tests import `tests.conftest` with the package root on the path.
+    "packages/eyes",
+]
+markers = [
+    "dogfood: requires the SigLIP2 weights and a GPU, and is not part of CI",
+]
 
 [tool.coverage.run]
 branch = true
-source = ["ai_ears", "decisions"]
+source = ["ai_ears", "decisions", "ai_eyes_mcp"]
 
 [tool.coverage.report]
 precision = 2

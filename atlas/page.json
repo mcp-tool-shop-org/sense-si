@@ -16,6 +16,14 @@
       "partLabel": "decisions"
     },
     {
+      "doors": 3,
+      "importedBy": [],
+      "importedByTests": [],
+      "kind": "part",
+      "name": "eyes",
+      "partLabel": "eyes"
+    },
+    {
       "doors": 1,
       "importedBy": [],
       "importedByTests": [
@@ -28,33 +36,113 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 0,
-      "changed": 1,
+      "added": 72,
+      "changed": 4,
       "moved": 0,
-      "parts": 1,
+      "parts": 4,
       "removed": 0
     },
     "items": [
       {
+        "kind": "door",
+        "sentence": "CI now also runs packages/eyes/tests/.",
+        "subjects": [
+          ".github/workflows/ci.yml",
+          "packages/eyes/tests/"
+        ]
+      },
+      {
+        "kind": "door",
+        "sentence": "ai-eyes (packages/eyes/pyproject.toml) is a new command. It runs packages/eyes/src/ai_eyes_mcp/server.py.",
+        "subjects": [
+          "packages/eyes/pyproject.toml",
+          "packages/eyes/src/ai_eyes_mcp/server.py"
+        ]
+      },
+      {
+        "kind": "door",
+        "sentence": "ai-eyes-mcp (packages/eyes/pyproject.toml) is a new command. It runs packages/eyes/src/ai_eyes_mcp/server.py.",
+        "subjects": [
+          "packages/eyes/pyproject.toml",
+          "packages/eyes/src/ai_eyes_mcp/server.py"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": ".github/ is now read by packages/eyes/atlas/page.json.",
+        "subjects": [
+          ".github/",
+          "packages/eyes/atlas/page.json"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": ".github/workflows/ci.yml is now read by packages/eyes/atlas/page.json, packages/eyes/atlas/statistics.json and packages/eyes/atlas/structure.json.",
+        "subjects": [
+          ".github/workflows/ci.yml",
+          "packages/eyes/atlas/page.json",
+          "packages/eyes/atlas/statistics.json",
+          "packages/eyes/atlas/structure.json"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": ".gitignore is now read by packages/eyes/atlas/statistics.json and packages/eyes/atlas/structure.json.",
+        "subjects": [
+          ".gitignore",
+          "packages/eyes/atlas/statistics.json",
+          "packages/eyes/atlas/structure.json"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "And 22 more new writers and readers of places.",
+        "subjects": []
+      },
+      {
+        "kind": "part",
+        "sentence": "eyes is a new part, drawn from `packages/eyes/**`.",
+        "subjects": [
+          "eyes"
+        ]
+      },
+      {
         "kind": "counts",
-        "sentence": "Nothing structural changed since 2026-10-07; 1 file changed content.",
+        "sentence": "72 files added and 4 changed content, across 4 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "14b3ef777935f7b390c00338160786561a9d139e",
-      "generatedAt": "2026-10-07T17:47:42.343Z"
+      "commit": "5ad4c9677ea7192ce02075fbaf928b1d73a3f485",
+      "generatedAt": "2026-10-07T17:56:25.779Z"
     },
-    "unchanged": true
+    "unchanged": false
   },
-  "changesTogether": [],
+  "changesTogether": [
+    {
+      "a": "src/ai_eyes_mcp/server.py",
+      "b": "tests/test_server_ci.py",
+      "either": 14,
+      "partLabels": [
+        null,
+        null
+      ],
+      "parts": [
+        null,
+        null
+      ],
+      "relation": "unassigned",
+      "shared": 7
+    }
+  ],
   "changesTogetherNote": [
-    "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
+    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
+    "Window: 180 days; a pair counts from 3 shared commits, since 2 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "5ad4c9677ea7192ce02075fbaf928b1d73a3f485",
+  "commit": "503d57acb4f1b53f69337c86afda5e58b3c71531",
   "defaultBranch": "main",
-  "derived": "6 parts, mostly Python (10 files). Work enters through 1 door; the busiest is CI, which reaches 3 parts.",
+  "derived": "7 parts, mostly Python (22 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes and ai-eyes-mcp.",
   "doors": [
     {
       "checks": [],
@@ -77,6 +165,11 @@
           "files": 4
         },
         {
+          "boundary": "eyes",
+          "depth": 0,
+          "files": 11
+        },
+        {
           "boundary": "tools",
           "depth": 0,
           "files": 1
@@ -85,10 +178,11 @@
       "runs": [
         "tools/coverage_bar.py",
         "packages/decisions/tests/",
-        "packages/ears/tests/"
+        "packages/ears/tests/",
+        "packages/eyes/tests/"
       ],
-      "runsCount": 3,
-      "runsMore": 0,
+      "runsCount": 4,
+      "runsMore": 8,
       "sends": [
         "uploads coverage to Codecov"
       ],
@@ -98,6 +192,58 @@
         "on a push to main touching 5 paths",
         "or by hand"
       ]
+    },
+    {
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
+      "file": "packages/eyes/pyproject.toml",
+      "id": "packages/eyes/pyproject.toml#ai-eyes",
+      "kind": "command",
+      "landings": [],
+      "name": "ai-eyes",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "eyes",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "runs": [
+        "packages/eyes/src/ai_eyes_mcp/server.py"
+      ],
+      "runsCount": 1,
+      "runsMore": 0,
+      "sends": [],
+      "stages": [],
+      "triggers": []
+    },
+    {
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
+      "file": "packages/eyes/pyproject.toml",
+      "id": "packages/eyes/pyproject.toml#ai-eyes-mcp",
+      "kind": "command",
+      "landings": [],
+      "name": "ai-eyes-mcp",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "eyes",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "runs": [
+        "packages/eyes/src/ai_eyes_mcp/server.py"
+      ],
+      "runsCount": 1,
+      "runsMore": 0,
+      "sends": [],
+      "stages": [],
+      "triggers": []
     }
   ],
   "duplicates": [],
@@ -112,10 +258,10 @@
   ],
   "engine": "1.24.0",
   "generated": [],
-  "generatedAt": "2026-10-07T17:56:25.779Z",
+  "generatedAt": "2026-10-07T18:46:15.145Z",
   "limits": [
     "1 read goes to a path its caller passes, not to this repository.",
-    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
+    "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/ci.yml",
   "partLabels": {
@@ -123,25 +269,27 @@
     "decisions": "decisions",
     "docs": "docs",
     "ears": "ears",
+    "eyes": "eyes",
     "root": "the repository root",
     "tools": "tools"
   },
-  "parts": 6,
+  "parts": 7,
   "readers": [],
   "repo": "mcp-tool-shop-org/sense-si",
   "sequences": [],
-  "startDoor": ".github/workflows/ci.yml",
+  "startDoor": "packages/eyes/pyproject.toml#ai-eyes",
   "startHere": [
-    ".github/workflows/ci.yml",
-    "packages/decisions/src/decisions/__init__.py",
-    "packages/decisions/src/decisions/client.py"
+    "packages/eyes/src/ai_eyes_mcp/server.py",
+    "packages/eyes/src/ai_eyes_mcp/engine.py"
   ],
+  "startReason": "This path follows ai-eyes (a command people run) from its entry, since CI runs only tests and scripts that import no code here.",
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 8,
+  "testFiles": 27,
   "testedBy": {
     "decisions": 2,
     "ears": 2,
+    "eyes": 8,
     "tools": 1
   },
   "unnamedWrites": 0,

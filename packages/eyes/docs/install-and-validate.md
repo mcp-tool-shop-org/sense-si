@@ -11,8 +11,9 @@ Requires Python ≥3.10 and the declared deps (`torch`, `transformers`, `fastmcp
 ## Run
 
 ```
-ai-eyes-mcp            # installed entry point
-python -m ai_eyes_mcp  # equivalent
+ai-eyes                 # installed entry point
+ai-eyes-mcp             # second entry point, until the Claude Code config uses ai-eyes
+python -m ai_eyes_mcp   # equivalent
 ```
 
 It's a STDIO MCP server. Add it to your MCP client config with `command` = the venv's python and `args` = `["-m", "ai_eyes_mcp"]`.

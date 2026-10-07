@@ -7,12 +7,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mcp-tool-shop-org/ai-eyes-mcp/actions/workflows/ci.yml"><img src="https://github.com/mcp-tool-shop-org/ai-eyes-mcp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/mcp-tool-shop-org/sense-si/actions/workflows/ci.yml"><img src="https://github.com/mcp-tool-shop-org/sense-si/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python 3.10+">
 </p>
 
-# ai-eyes-mcp
+# ai-eyes
 
 **Version:** 1.2.0
 
@@ -58,10 +58,10 @@ describes, ai-eyes measures.**
 
 ```bash
 pip install -e .
-ai-eyes-mcp  # starts STDIO server
+ai-eyes  # starts STDIO server
 ```
 
-Or run as a module: `python -m ai_eyes_mcp`
+`ai-eyes-mcp` remains a second entry point until the Claude Code MCP config uses `ai-eyes`. Or run as a module: `python -m ai_eyes_mcp`
 
 ### Claude Code config
 
@@ -69,7 +69,7 @@ Or run as a module: `python -m ai_eyes_mcp`
 {
   "mcpServers": {
     "ai-eyes": {
-      "command": "ai-eyes-mcp",
+      "command": "ai-eyes",
       "env": {
         "AI_EYES_MODEL_DIR": "/path/to/model/cache"
       }
