@@ -170,3 +170,211 @@ def test_score_must_be_numeric():
     assert answer.score == 1.8
     with pytest.raises(DecisionsError, match="numeric"):
         validate_answer(question, {"type": "score"}, "x")
+
+
+def test_questions_wire_the_shape_the_api_expects():
+    assert NoulQuestion(instructions="x").to_wire() == {"type": "noul", "instructions": "x"}
+    one_sided = NoulQuestion(instructions="x", false="no").to_wire()
+    assert one_sided["criteria"] == {"true": None, "false": "no"}
+    assert ScoreQuestion(instructions="how?", criteria=("low", "high")).to_wire() == {
+        "type": "score",
+        "instructions": "how?",
+        "criteria": ["low", "high"],
+    }
+
+
+def test_answers_that_are_not_objects_or_not_probabilities_are_refused():
+    with pytest.raises(DecisionsError, match="missing"):
+        validate_answer(NOUL["moves"], None, "moves")
+    with pytest.raises(DecisionsError, match="noul"):
+        validate_answer(NOUL["moves"], {"noul": True}, "moves")
+    question = ScoreQuestion(instructions="how much?", criteria=("low", "high"))
+    with pytest.raises(DecisionsError, match="numeric"):
+        validate_answer(question, {"score": True}, "x")
+    with pytest.raises(DecisionsError, match="numeric"):
+        validate_answer(question, {"score": float("inf")}, "x")
+    score = validate_answer(
+        question,
+        {"score": 1, "confidence": "high", "legend": ["low"], "probabilities": [1]},
+        "x",
+    )
+    assert score.confidence is None
+    assert score.legend is None
+    assert score.probabilities is None
+    choice = ChoiceQuestion(instructions="which?", criteria={"a": "A"})
+    parsed = validate_answer(choice, {"choice": "a", "confidence": True, "probabilities": "no"}, "x")
+    assert parsed.choice == "a"
+    assert parsed.confidence is None
+    assert parsed.probabilities is None
+
+
+def test_a_refused_date_never_calls():
+    calls = {"n": 0}
+
+    def fetch(url, init):
+        calls["n"] += 1
+        raise AssertionError("fetch")
+
+    with pytest.raises(DecisionsError, match="date stamp"):
+        _client(fetch)(DecisionRequest(state="s", questions=NOUL, dated="nope"))
+    assert calls["n"] == 0
+
+
+@pytest.mark.parametrize(
+    ("status", "hint"),
+    [(402, "credits exhausted"), (413, "state too large"), (400, "not retried")],
+)
+def test_client_errors_are_not_retried(status, hint):
+    calls = {"n": 0}
+
+    def fetch(url, init):
+        calls["n"] += 1
+        return _response(status, "nope")
+
+    with pytest.raises(DecisionsError, match=f"HTTP {status}") as caught:
+        _client(fetch)(DecisionRequest(state="s", questions=NOUL))
+    assert hint in caught.value.hint
+    assert caught.value.status == status
+    assert calls["n"] == 1
+
+
+def test_retries_stop_when_the_budget_is_spent():
+    calls = {"n": 0}
+
+    def fetch(url, init):
+        calls["n"] += 1
+        return _response(429, "later")
+
+    with pytest.raises(DecisionsError, match="HTTP 429") as caught:
+        _client(fetch, retries=0)(DecisionRequest(state="s", questions=NOUL))
+    assert calls["n"] == 1
+    assert "retried" in caught.value.hint
+
+
+def test_a_dead_transport_or_a_bad_body_is_not_turned_into_an_answer():
+    def boom(url, init):
+        raise OSError("down")
+
+    with pytest.raises(DecisionsError, match="cannot reach"):
+        _client(boom, retries=0)(DecisionRequest(state="s", questions=NOUL))
+
+    def garbage(url, init):
+        return _response(200, "not-json")
+
+    with pytest.raises(DecisionsError, match="non-JSON"):
+        _client(garbage, retries=0)(DecisionRequest(state="s", questions=NOUL))
+
+    def array(url, init):
+        return _response(200, "[]")
+
+    with pytest.raises(DecisionsError, match="non-object"):
+        _client(array, retries=0)(DecisionRequest(state="s", questions=NOUL))
+
+    def answers(url, init):
+        return _response(200, json.dumps({"answers": ["nope"]}))
+
+    with pytest.raises(DecisionsError, match="missing"):
+        _client(answers, retries=0)(DecisionRequest(state="s", questions=NOUL))
+
+
+def test_usage_that_is_not_a_number_is_left_blank():
+    def fetch(url, init):
+        raw = json.dumps({"answers": {"moves": {"noul": 0.2}}, "usage": {"cost": True, "input_tokens": True}})
+        return _response(200, raw)
+
+    result = _client(fetch)(DecisionRequest(state="s", questions=NOUL))
+    assert result.answers["moves"].noul == 0.2
+    assert result.cost is None
+    assert result.input_tokens is None
+
+
+def test_the_default_transport_reads_a_response(monkeypatch):
+    class Response:
+        status = 200
+
+        def read(self):
+            return json.dumps({"answers": {"moves": {"noul": 0.3}}}).encode()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def urlopen(request, timeout):
+        assert request.full_url == "https://example.test/decisions"
+        assert timeout == 5
+        assert request.data
+        return Response()
+
+    monkeypatch.setattr("decisions.client.urllib.request.urlopen", urlopen)
+    client = create_decisions_client(
+        api_key="sk-or-TEST",
+        base_url="https://example.test",
+        retries=0,
+        attempt_timeout_s=5,
+    )
+    result = client(DecisionRequest(state="s", questions=NOUL))
+    assert result.answers["moves"].noul == 0.3
+
+
+def test_the_default_transport_reports_an_http_error(monkeypatch):
+    import io
+    import urllib.error
+
+    def urlopen(request, timeout):
+        raise urllib.error.HTTPError(
+            "https://example.test/decisions",
+            402,
+            "pay",
+            hdrs=None,
+            fp=io.BytesIO(b"broke"),
+        )
+
+    monkeypatch.setattr("decisions.client.urllib.request.urlopen", urlopen)
+    client = create_decisions_client(
+        api_key="sk-or-TEST",
+        base_url="https://example.test",
+        retries=0,
+        sleep=lambda _seconds: None,
+    )
+    with pytest.raises(DecisionsError, match="HTTP 402") as caught:
+        client(DecisionRequest(state="s", questions=NOUL))
+    assert "credits" in caught.value.hint
+
+
+def test_the_default_transport_reports_an_unreachable_host(monkeypatch):
+    import urllib.error
+
+    def urlopen(request, timeout):
+        raise urllib.error.URLError("timed out")
+
+    monkeypatch.setattr("decisions.client.urllib.request.urlopen", urlopen)
+    client = create_decisions_client(
+        api_key="sk-or-TEST",
+        base_url="https://example.test",
+        retries=0,
+        sleep=lambda _seconds: None,
+    )
+    with pytest.raises(DecisionsError, match="cannot reach"):
+        client(DecisionRequest(state="s", questions=NOUL))
+
+
+def test_omitted_sleep_pauses_between_retries(monkeypatch):
+    import time
+
+    slept = []
+    monkeypatch.setattr(time, "sleep", lambda seconds: slept.append(seconds))
+    calls = {"n": 0}
+
+    def fetch(url, init):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return _response(503, "nope")
+        raw = json.dumps({"answers": {"moves": {"noul": 0.4}}})
+        return _response(200, raw)
+
+    client = create_decisions_client(api_key="sk-or-TEST", fetch_impl=fetch, retries=1)
+    result = client(DecisionRequest(state="s", questions=NOUL))
+    assert result.answers["moves"].noul == 0.4
+    assert slept == [1.0]

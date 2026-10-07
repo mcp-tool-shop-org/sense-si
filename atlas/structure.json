@@ -9,7 +9,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "cf5ae6f409145651ed7d8f96b25c0dc115bdcc1f53bf9132cbb5902d5b928d1b",
+          "hash": "2a57b0d1a24d88c3f43f1ac898ca0ba097f3dd335d4d3df13218b3416fb1a04d",
           "path": ".github/workflows/ci.yml"
         }
       ],
@@ -145,24 +145,45 @@
         },
         {
           "exports": [
+            "test_a_dead_transport_or_a_bad_body_is_not_turned_into_an_answer",
+            "test_a_refused_date_never_calls",
+            "test_answers_that_are_not_objects_or_not_probabilities_are_refused",
             "test_choice_must_be_one_of_the_options",
+            "test_client_errors_are_not_retried",
             "test_empty_key_builds_nothing",
             "test_import_does_not_require_a_key",
+            "test_omitted_sleep_pauses_between_retries",
             "test_posts_the_pin_and_stamps_the_date_on_the_answer",
+            "test_questions_wire_the_shape_the_api_expects",
             "test_refuses_a_request_with_no_questions_before_calling",
             "test_refuses_a_router_that_comes_back_on_the_answer",
             "test_refuses_anything_but_the_pin_before_the_request",
             "test_rejects_a_malformed_answer_instead_of_guessing",
             "test_retries_429_and_5xx_but_not_other_4xx",
-            "test_score_must_be_numeric"
+            "test_retries_stop_when_the_budget_is_spent",
+            "test_score_must_be_numeric",
+            "test_the_default_transport_reads_a_response",
+            "test_the_default_transport_reports_an_http_error",
+            "test_the_default_transport_reports_an_unreachable_host",
+            "test_usage_that_is_not_a_number_is_left_blank"
           ],
-          "hash": "bc99e86c18e22b998d97d0684dd5b0dc46c85a7da1e52b1369eadb7dd9aaaf59",
+          "hash": "61e8b78c6e9ec4a2e0923e9213742a311112f68cf7e57a5023c0fd1c58946a64",
           "importsFiles": [
             "packages/decisions/src/decisions/__init__.py",
             "packages/decisions/src/decisions/client.py"
           ],
           "path": "packages/decisions/tests/test_client.py",
           "testFramework": "pytest"
+        },
+        {
+          "exports": [
+            "test_a_partial_line_counts_as_uncovered"
+          ],
+          "hash": "ce51a0cdd226766d63d68a775999ed32ed20bb7dd0f86d5721de578a16661954",
+          "importsFiles": [
+            "tools/coverage_bar.py"
+          ],
+          "path": "packages/decisions/tests/test_coverage_bar.py"
         }
       ],
       "globs": [
@@ -427,14 +448,19 @@
         {
           "exports": [
             "test_a_gate_word_in_the_question_never_calls",
+            "test_a_result_without_a_cost_omits_it_and_a_loaded_confidence_is_kept",
             "test_band_edges_are_uncertain",
+            "test_empty_instructions_never_call",
             "test_load_rejects_pass_and_fail_and_a_winner",
             "test_missing_confidence_is_too_close_to_call",
+            "test_phrase_clean_refuses_blank_criteria_and_a_choice_answer",
             "test_phrase_clean_reports_p_yes_and_the_band",
+            "test_which_take_refuses_a_set_that_is_not_one_phrase",
+            "test_which_take_refuses_an_unpinned_or_shapeless_answer",
             "test_which_take_returns_probabilities_and_no_winner",
             "test_which_take_through_the_real_client_never_leaves_the_machine"
           ],
-          "hash": "313e14590ee15fa47a2346012ad996db490c8238f44bdb44870f93437ceba819",
+          "hash": "514575f652371b9d6bc5d0103f9f7a4b0c5f794ebb9e15483069c834d09e3baf",
           "importsFiles": [
             "packages/decisions/src/decisions/__init__.py",
             "packages/decisions/src/decisions/client.py",
@@ -446,16 +472,23 @@
         },
         {
           "exports": [
+            "test_a_record_needs_both_ids",
+            "test_an_empty_table_and_a_blank_hash_leave_no_provenance",
             "test_gate_keys_are_rejected_on_a_result_shaped_object",
             "test_listener_transcript_must_stay_advisory",
+            "test_phrase_scores_and_marks_that_are_the_wrong_shape_are_refused",
+            "test_phrase_scores_keep_a_string_note_and_skip_empty_values",
+            "test_pitch_states_and_a_different_vocal_hash_are_kept",
             "test_placed_receipt_keeps_measurements_and_drops_the_gate",
             "test_raw_take_has_no_aligner_reading",
+            "test_receipts_that_are_not_measurements_are_refused",
             "test_review_mark_keeps_the_level",
+            "test_skipped_observations_and_a_non_rise_method_stay_measurements",
             "test_swift_fields_are_not_a_cross_check",
             "test_take_id_cannot_be_a_gate_word",
             "test_tracker_name_is_read_from_the_receipt"
           ],
-          "hash": "08789e35f05660bed2500a2bd135a6b222f54852cb312f520d49a5f776cd46b8",
+          "hash": "8e877880ad0c669db795c76e89f1454751d4496397e39c65b602c6c423c5b68c",
           "importsFiles": [
             "packages/ears/src/ai_ears/record.py"
           ],
@@ -485,7 +518,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "4575fc0176b34a0c8bdc5ee6d90facf934b1352daa0b27cac18581cb049b3bef",
+          "hash": "242f2918e842458e993c07bf29254d878df874144223dd1101d94244c50baf08",
           "path": ".gitignore"
         },
         {
@@ -497,7 +530,11 @@
           "path": "README.md"
         },
         {
-          "hash": "b44c0d4c24125f8d602f4e9bc6440e0976ec36cf9f7ef8911ac5ac9171e0e52f",
+          "hash": "fbebd5f3d08e8028d7c1209480928ac2c5cb99cbdf034462f0c41c7105debbdd",
+          "path": "codecov.yml"
+        },
+        {
+          "hash": "2a14941311ab3fd0acc58c94a70c04dfbc2772ef0a797a4090109914d5144888",
           "path": "pyproject.toml"
         }
       ],
@@ -509,6 +546,50 @@
       "origin": "authored",
       "role": "config",
       "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "entry": "main",
+          "entryRule": 1,
+          "exports": [
+            "line_counts",
+            "main",
+            "percent"
+          ],
+          "hash": "82ddf51c6b859e079f22577c180800001bf501c3dad30be4fb6726d10f19e25f",
+          "path": "tools/coverage_bar.py",
+          "sequences": []
+        }
+      ],
+      "globs": [
+        "tools/**"
+      ],
+      "importConfidence": "full",
+      "name": "tools",
+      "origin": "authored",
+      "outsidePlaces": [
+        {
+          "reads": 1,
+          "where": [
+            "caller"
+          ],
+          "writes": 0
+        }
+      ],
+      "outsideReads": 1,
+      "role": "code",
+      "testRunners": [
+        "pytest"
+      ],
+      "testedBy": 1,
       "unresolvedSites": 0
     }
   ],
@@ -611,19 +692,25 @@
       "mentions": [],
       "name": "CI",
       "permissions": [
-        "contents:read"
+        "contents:read",
+        "id-token:write"
       ],
       "pushes": false,
       "reach": [
         {
           "boundary": "decisions",
           "depth": 0,
-          "files": 3
+          "files": 4
         },
         {
           "boundary": "ears",
           "depth": 0,
           "files": 4
+        },
+        {
+          "boundary": "tools",
+          "depth": 0,
+          "files": 1
         }
       ],
       "readers": [],
@@ -643,9 +730,14 @@
           "path": "packages/ears/tests/",
           "runKind": "executes",
           "via": "pytest pyproject.toml"
+        },
+        {
+          "job": "pytest",
+          "path": "tools/coverage_bar.py",
+          "runKind": "executes"
         }
       ],
-      "runsCount": 2,
+      "runsCount": 3,
       "secrets": [],
       "sends": {
         "deploysPages": false,
@@ -661,7 +753,8 @@
       "tests": [
         {
           "config": "pyproject.toml",
-          "files": 3,
+          "coverage": true,
+          "files": 4,
           "job": "pytest",
           "runner": "pytest",
           "step": "pytest"
@@ -678,8 +771,10 @@
           "event": "push",
           "paths": [
             ".github/workflows/**",
+            "codecov.yml",
             "packages/**",
-            "pyproject.toml"
+            "pyproject.toml",
+            "tools/**"
           ]
         },
         {
@@ -689,12 +784,19 @@
       "uses": [
         "actions/checkout",
         "actions/setup-node",
-        "actions/setup-python"
+        "actions/setup-python",
+        "codecov/codecov-action"
       ],
       "usesWorkflowToken": false
     }
   ],
   "edges": [
+    {
+      "from": "decisions",
+      "fromTests": true,
+      "kind": "file",
+      "to": "tools"
+    },
     {
       "from": "ears",
       "kind": "file",
@@ -703,8 +805,8 @@
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "e2b61390b2e80f615b5f7f95515d686848e08578",
-    "tracked": 21
+    "commit": "14b3ef777935f7b390c00338160786561a9d139e",
+    "tracked": 24
   },
   "landings": [
     {
@@ -787,6 +889,6 @@
   "overlaps": [],
   "submodules": [],
   "symlinks": [],
-  "testFiles": 7,
+  "testFiles": 8,
   "unassigned": []
 }

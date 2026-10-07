@@ -1,23 +1,27 @@
 # sense-si: how it works
 
-Mapped at 2026-10-07 from commit e2b6139 by Atlas 1.24.0.
+Mapped at 2026-10-07 from commit 14b3ef7 by Atlas 1.24.0.
 
 ## What this is
 
-5 parts, mostly Python (8 files). Work enters through 1 door; the busiest is CI, which reaches 2 parts.
+6 parts, mostly Python (10 files). Work enters through 1 door; the busiest is CI, which reaches 3 parts.
 
-## What changed since 2026-10-07 (52198bb)
+## What changed since 2026-10-07 (e2b6139)
 
-- CI's push trigger now also names `main`.
-- 1 file changed content, across 1 part.
+- decisions now imports tools.
+- CI's push trigger now also names `codecov.yml` and `tools/**`.
+- CI now also runs tools/coverage_bar.py.
+- tools is a new part, drawn from `tools/**`.
+- 3 files added and 6 changed content, across 5 parts.
 
 ## What comes in
 
-1. **CI.** On a pull request; on a push to main touching 3 paths; or by hand. Runs packages/decisions/tests/ and packages/ears/tests/.
+1. **CI.** On a pull request; on a push to main touching 5 paths; or by hand. Runs tools/coverage_bar.py, packages/decisions/tests/ and packages/ears/tests/.
 
 ## What happens through CI
 
-1. The workflow runs packages/decisions/tests/ in decisions and packages/ears/tests/ in ears.
+1. The workflow runs packages/decisions/tests/ in decisions, packages/ears/tests/ in ears and tools/coverage_bar.py in tools.
+2. It uploads coverage to Codecov.
 
 ## Who reads the results
 
@@ -26,6 +30,7 @@ CI writes nothing this map can see.
 ## What breaks what
 
 - **decisions** is imported by 1 part (ears) and sits on the path of 1 door.
+- **tools** is imported only from tests, by 1 part (decisions), and sits on the path of 1 door.
 
 ## What tends to change together
 
@@ -61,6 +66,7 @@ Read those in order to follow one pull request end to end.
 
 ## What this map cannot see
 
+- 1 read goes to a path its caller passes, not to this repository.
 - Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions.
 
 Regenerate with `npx --yes @dogfood-lab/atlas map`.

@@ -8,3 +8,11 @@ readme = "README.md"
 [tool.pytest.ini_options]
 testpaths = ["packages/decisions/tests", "packages/ears/tests"]
 pythonpath = ["packages/decisions/src", "packages/ears/src"]
+
+[tool.coverage.run]
+branch = true
+source = ["ai_ears", "decisions"]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true

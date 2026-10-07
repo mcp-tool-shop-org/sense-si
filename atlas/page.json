@@ -14,33 +14,66 @@
       "kind": "part",
       "name": "decisions",
       "partLabel": "decisions"
+    },
+    {
+      "doors": 1,
+      "importedBy": [],
+      "importedByTests": [
+        "decisions"
+      ],
+      "kind": "part",
+      "name": "tools",
+      "partLabel": "tools"
     }
   ],
   "changes": {
     "fileCounts": {
-      "added": 0,
-      "changed": 1,
+      "added": 3,
+      "changed": 6,
       "moved": 0,
-      "parts": 1,
+      "parts": 5,
       "removed": 0
     },
     "items": [
       {
+        "kind": "import-added",
+        "sentence": "decisions now imports tools.",
+        "subjects": [
+          "decisions",
+          "tools"
+        ]
+      },
+      {
         "kind": "door",
-        "sentence": "CI's push trigger now also names `main`.",
+        "sentence": "CI's push trigger now also names `codecov.yml` and `tools/**`.",
         "subjects": [
           ".github/workflows/ci.yml"
         ]
       },
       {
+        "kind": "door",
+        "sentence": "CI now also runs tools/coverage_bar.py.",
+        "subjects": [
+          ".github/workflows/ci.yml",
+          "tools/coverage_bar.py"
+        ]
+      },
+      {
+        "kind": "part",
+        "sentence": "tools is a new part, drawn from `tools/**`.",
+        "subjects": [
+          "tools"
+        ]
+      },
+      {
         "kind": "counts",
-        "sentence": "1 file changed content, across 1 part.",
+        "sentence": "3 files added and 6 changed content, across 5 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "52198bbe6099468cc3319ae2b35f275916164b7f",
-      "generatedAt": "2026-10-07T17:11:20.025Z"
+      "commit": "e2b61390b2e80f615b5f7f95515d686848e08578",
+      "generatedAt": "2026-10-07T17:17:39.834Z"
     },
     "unchanged": false
   },
@@ -49,9 +82,9 @@
     "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "e2b61390b2e80f615b5f7f95515d686848e08578",
+  "commit": "14b3ef777935f7b390c00338160786561a9d139e",
   "defaultBranch": "main",
-  "derived": "5 parts, mostly Python (8 files). Work enters through 1 door; the busiest is CI, which reaches 2 parts.",
+  "derived": "6 parts, mostly Python (10 files). Work enters through 1 door; the busiest is CI, which reaches 3 parts.",
   "doors": [
     {
       "checks": [],
@@ -66,25 +99,33 @@
         {
           "boundary": "decisions",
           "depth": 0,
-          "files": 3
+          "files": 4
         },
         {
           "boundary": "ears",
           "depth": 0,
           "files": 4
+        },
+        {
+          "boundary": "tools",
+          "depth": 0,
+          "files": 1
         }
       ],
       "runs": [
+        "tools/coverage_bar.py",
         "packages/decisions/tests/",
         "packages/ears/tests/"
       ],
-      "runsCount": 2,
+      "runsCount": 3,
       "runsMore": 0,
-      "sends": [],
+      "sends": [
+        "uploads coverage to Codecov"
+      ],
       "stages": [],
       "triggers": [
         "on a pull request",
-        "on a push to main touching 3 paths",
+        "on a push to main touching 5 paths",
         "or by hand"
       ]
     }
@@ -92,11 +133,18 @@
   "duplicates": [],
   "duplicatesLead": null,
   "duplicatesNote": [],
-  "edges": [],
+  "edges": [
+    {
+      "from": "decisions",
+      "fromTests": true,
+      "to": "tools"
+    }
+  ],
   "engine": "1.24.0",
   "generated": [],
-  "generatedAt": "2026-10-07T17:17:39.834Z",
+  "generatedAt": "2026-10-07T17:47:42.343Z",
   "limits": [
+    "1 read goes to a path its caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
   ],
   "mainDoor": ".github/workflows/ci.yml",
@@ -105,9 +153,10 @@
     "decisions": "decisions",
     "docs": "docs",
     "ears": "ears",
-    "root": "the repository root"
+    "root": "the repository root",
+    "tools": "tools"
   },
-  "parts": 5,
+  "parts": 6,
   "readers": [],
   "repo": "mcp-tool-shop-org/sense-si",
   "sequences": [],
@@ -119,10 +168,11 @@
   ],
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 7,
+  "testFiles": 8,
   "testedBy": {
     "decisions": 2,
-    "ears": 2
+    "ears": 2,
+    "tools": 1
   },
   "unnamedWrites": 0,
   "unread": [],
