@@ -117,6 +117,13 @@ UNGROUPED_TREE = (
 # Compared with logistic on every feature, including the evidence family.
 # Every other extended row is compared with logistic on the twenty-two
 # receipt features. Locked before the grouped rerun.
+# The only cut-placement mix. Secondary analysis leaves it out of both sides.
+# Declared before that analysis was scored. The primary table keeps it.
+CUT_PLACEMENT_MIX = "amazing-grace-new-britain:phrase16"
+DISPLAY_NAMES = {
+    "gbdt": "shallow tree, 22 receipt features",
+    "gbdt-all": "shallow tree, 41 features",
+}
 EVIDENCE_COMPARED = frozenset(
     {
         "logistic-timing-pitch",
@@ -1103,10 +1110,56 @@ def _attach_versus(result: dict, receipt_folds, evidence_folds, items: list[dict
     result["versus_logistic"] = _versus(folds, receipt_folds, "logistic", items)
 
 
-def run_models(items: list[dict]) -> dict:
-    """Leave-one-mix-out on every phrase. The random 20 is not a test."""
+def warp_items(items: list[dict]) -> list[dict]:
+    """Warp-placement mixes only. The cut-placement mix is not a member."""
+    return [item for item in items if mix_name(item) != CUT_PLACEMENT_MIX]
+
+
+def _pooled_gap(tree: dict, base: dict) -> float | None:
+    """Phrase-weighted Brier, tree minus base rate. Not the fold mean."""
+    tree_brier = tree.get("brier")
+    base_brier = base.get("brier")
+    if isinstance(tree_brier, bool) or isinstance(base_brier, bool):
+        return None
+    if not isinstance(tree_brier, (int, float)) or not isinstance(base_brier, (int, float)):
+        return None
+    return float(tree_brier) - float(base_brier)
+
+
+def _attach_base(fitted: list[dict], items: list[dict]) -> None:
+    """41-feature tree minus the base rate. Same bar. Declared before the interval."""
+    base = next((row for row in fitted if row["name"] == "base-rate" and row.get("status") == "ok"), None)
+    tree = next((row for row in fitted if row["name"] == "gbdt-all" and row.get("status") == "ok"), None)
+    if base is None or tree is None:
+        return
+    compared = _versus(tree["fold_brier"], base["fold_brier"], "base-rate", items)
+    if compared is None:
+        return
+    pooled = _pooled_gap(tree, base)
+    if pooled is not None:
+        compared["pooled"] = pooled
+    tree["versus_base"] = compared
+
+
+def _stamp_pooled(models: list[dict] | None) -> None:
+    """Fill the pooled gap from stored Briers. Does not refit."""
+    if not models:
+        return
+    base = next((row for row in models if row.get("name") == "base-rate" and row.get("status") == "ok"), None)
+    tree = next((row for row in models if row.get("name") == "gbdt-all" and row.get("status") == "ok"), None)
+    if base is None or tree is None:
+        return
+    versus = tree.get("versus_base")
+    if not isinstance(versus, dict):
+        return
+    pooled = _pooled_gap(tree, base)
+    if pooled is not None:
+        versus["pooled"] = pooled
+
+
+def _fit_table(items: list[dict]) -> dict:
+    """Leave-one-mix-out for one set of phrases."""
     everyone = list(range(len(items)))
-    shot = [index for index, item in enumerate(items) if item["future_test"]]
     specs = (
         ("base-rate", "base-rate", "extended", FEATURE_NAMES, "features", "prevalence"),
         ("logistic", "logistic", "extended", FEATURE_NAMES, "features", "receipt"),
@@ -1143,6 +1196,7 @@ def run_models(items: list[dict]) -> dict:
     )
     for result in fitted:
         _attach_versus(result, receipt_folds, evidence_folds, items)
+    _attach_base(fitted, items)
     labels = [item["label_extended"] for item in items]
     probs = [item["p_yes_full_0"] for item in items]
     jev_folds, jev_logs, within = fixed_grouped_scores(probs, labels, items)
@@ -1164,9 +1218,23 @@ def run_models(items: list[dict]) -> dict:
     return {
         "n_scored": len(everyone),
         "n_mixes": len(leave_one_mix_out(items)),
-        "shot_pool_n": len(shot),
         "models": fitted,
         "jev": jev,
+    }
+
+
+def run_models(items: list[dict]) -> dict:
+    """Primary leave-one-mix-out, then the declared warp-placement secondary."""
+    shot = [index for index, item in enumerate(items) if item["future_test"]]
+    primary = _fit_table(items)
+    secondary = _fit_table(warp_items(items))
+    return {
+        "n_scored": primary["n_scored"],
+        "n_mixes": primary["n_mixes"],
+        "shot_pool_n": len(shot),
+        "models": primary["models"],
+        "jev": primary["jev"],
+        "warp": secondary,
         "holdout": [],
         "labels": _label_movement(items),
         "mix_probe": {
@@ -1397,17 +1465,50 @@ def _receipt_folds(study: dict) -> list[float] | None:
     return None
 
 
+def _versus_bits(label: str, versus: dict | None) -> str:
+    if not versus:
+        return ""
+    return (
+        f" Minus {label}: {_fmt(versus.get('mean'))} "
+        f"({_fmt(versus.get('low'))} to {_fmt(versus.get('high'))}), {_claim(versus)}."
+    )
+
+
+def _base_bits(versus: dict | None) -> str:
+    """Pooled gap beside the fold interval. A pooled gap past 0.02 is not a claim."""
+    if not versus:
+        return ""
+    pooled = versus.get("pooled")
+    gap = ""
+    if isinstance(pooled, (int, float)) and not isinstance(pooled, bool):
+        mark = "past 0.02" if abs(float(pooled)) >= RESOLVE_BRIER else "under 0.02"
+        gap = f"pooled {_fmt(float(pooled))}, {mark}. "
+    low = versus.get("low")
+    high = versus.get("high")
+    claim = _claim(versus)
+    crosses = (
+        isinstance(low, (int, float))
+        and isinstance(high, (int, float))
+        and not isinstance(low, bool)
+        and not isinstance(high, bool)
+        and float(low) < 0.0 < float(high)
+    )
+    if claim == "not resolvable" and crosses:
+        claim = "the interval includes zero, so it is not claimed"
+    return (
+        f" Minus base-rate: {gap}"
+        f"Fold mean {_fmt(versus.get('mean'))} "
+        f"({_fmt(low)} to {_fmt(high)}), {claim}."
+    )
+
+
 def _score_line(name: str, result: dict) -> str:
+    shown = DISPLAY_NAMES.get(name, name)
     if result.get("status") != "ok":
-        return f"{name}: not run ({result.get('reason', 'missing')})."
+        return f"{shown}: not run ({result.get('reason', 'missing')})."
     versus = result.get("versus_logistic")
-    extra = ""
-    if versus:
-        ref = versus.get("reference", "logistic")
-        extra = (
-            f" Minus {ref}: {_fmt(versus.get('mean'))} "
-            f"({_fmt(versus.get('low'))} to {_fmt(versus.get('high'))}), {_claim(versus)}."
-        )
+    extra = _versus_bits(versus.get("reference", "logistic"), versus) if versus else ""
+    extra += _base_bits(result.get("versus_base"))
     within = result.get("within") or []
     within_bits = ""
     if within:
@@ -1417,7 +1518,7 @@ def _score_line(name: str, result: dict) -> str:
     if isinstance(count, int) and count > 0:
         features = f" Features: {count}."
     return (
-        f"{name}: pooled Brier {_fmt(result.get('brier'))}, "
+        f"{shown}: pooled Brier {_fmt(result.get('brier'))}, "
         f"within-mix mean {_fmt(result.get('within_brier'))}, "
         f"log loss {_fmt(result.get('log_loss'))}.{features}{extra}{within_bits}"
     )
@@ -1472,7 +1573,10 @@ def render_result(items: list[dict], study: dict, cells: dict) -> str:
         "",
         f"Leave-one-mix-out on {len(items)} phrases. Each mix is the test fold once, "
         "and training never sees that mix. Pooled Brier scores every phrase once. "
-        "Within-mix Brier is the score on that mix, and the within-mix mean is unweighted. "
+        "Within-mix Brier is the score on that mix. The within-mix mean is the unweighted "
+        "mean of those scores, and a mix whose phrases are all one class stays in it. "
+        "Brier is defined on a single class. AUC is not computed for that mean. "
+        "The padded mixes carry no marks, so a within-mix AUC is undefined. "
         "A Brier gap under 0.02 is not resolvable. The Nadeau–Bengio interval has to clear zero as well. "
         "The test/train ratio is the mean of the per-fold ratios.",
         UNGROUPED_TREE,
@@ -1480,6 +1584,20 @@ def render_result(items: list[dict], study: dict, cells: dict) -> str:
     ]
     for result in study["models"] + [study["jev"]]:
         lines.append(_score_line(str(result.get("name", result.get("model"))), result))
+    warp = study.get("warp")
+    if warp:
+        lines.extend(
+            [
+                "",
+                "Secondary analysis, warp-placement mixes only. "
+                f"{CUT_PLACEMENT_MIX} stays in the primary table and is left out of this one. "
+                f"Leave-one-mix-out on {warp['n_scored']} phrases, {warp['n_mixes']} mixes. "
+                "The same claim bar applies.",
+                "",
+            ]
+        )
+        for result in warp["models"] + [warp["jev"]]:
+            lines.append(_score_line(str(result.get("name", result.get("model"))), result))
     probes = study.get("mix_probe") or {}
     if probes:
         lines.extend(["", _probe_line("receipt features", probes.get("receipt")), _probe_line("all features", probes.get("all"))])
@@ -1557,6 +1675,9 @@ def render_result(items: list[dict], study: dict, cells: dict) -> str:
             "The next labels are not drawn by uncertainty sampling. "
             "About 30% of each later round is random. "
             "The random 20 is not held out of a later training set.",
+            "The phrase-clean decision layer stays insufficient evidence. "
+            "What comes next is new labels: a blind re-mark from about 2026-10-21, "
+            "and marks on more mixes once the review moves into the cockpit. Not a new model.",
         ]
     )
     return "\n".join(lines)
@@ -1589,8 +1710,27 @@ def _forbid(text: str) -> None:
             raise RuntimeError("a report file contains a local path or a key marker")
 
 
+def _public_model(result: dict) -> dict:
+    return {key: value for key, value in result.items() if key != "oof"}
+
+
+def _public_table(table: dict | None) -> dict | None:
+    if not table:
+        return None
+    return {
+        "n_scored": table["n_scored"],
+        "n_mixes": table["n_mixes"],
+        "models": [_public_model(result) for result in table["models"]],
+        "jev": _public_model(table["jev"]),
+    }
+
+
 def write_report(items: list[dict], study: dict) -> None:
     cells = _cache()
+    _stamp_pooled(study.get("models"))
+    warp = study.get("warp")
+    if isinstance(warp, dict):
+        _stamp_pooled(warp.get("models"))
     summary = {
         "model": PINNED_MODEL,
         "dated": PINNED_DATE,
@@ -1609,6 +1749,7 @@ def write_report(items: list[dict], study: dict) -> None:
         "jev": study["jev"],
         "holdout": study.get("holdout", []),
         "mix_probe": study.get("mix_probe"),
+        "warp": _public_table(study.get("warp")),
         "cells": [cell_name(kind, shots) for kind, shots in CELLS],
         "serialisation": serialisation_table(items, cells, _receipt_folds(study)),
     }

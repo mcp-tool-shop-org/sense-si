@@ -44,7 +44,10 @@ fold once. Training never sees that mix. The test mix is not chosen after
 looking at which mix has the most marks. Pooled Brier is the mean squared
 error of those held-out probabilities, one number per phrase. Within-mix
 Brier is the score on that mix. The within-mix mean is the unweighted mean
-across mixes. Log loss is reported beside the pooled score.
+of those Brier scores, and a mix whose phrases are all one class stays in it.
+Brier is defined on a single class. AUC is not computed for that mean. Both
+padded mixes carry no marks, so a within-mix AUC is undefined there. Log loss
+is reported beside the pooled score.
 
 A random 20, drawn with seed `20261008` as a plain shuffle and then the first
 20 indices in sorted order, is the shot pool for this serialisation sweep. It
@@ -58,11 +61,32 @@ those twenty-two. `logistic-all` is those twenty-two plus the evidence family,
 and it is compared with the receipt logistic. The cumulative evidence rows,
 and the tree and TabPFN that see every feature, are compared with `logistic-all`.
 
-The interval is the Nadeau–Bengio correction. With one difference per mix,
-`s^2` is their sample variance on 6 degrees of freedom. The corrected variance
-of the mean is `(1 / 7 + r) * s^2`, where `r` is the mean of the per-fold
-`n_test / n_train` ratios. Four mixes have 16 phrases, so that fold's ratio is
-16/108. Three mixes have 20 phrases, so that fold's ratio is 20/104. The 95%
+The shallow tree is two rows. One uses the twenty-two receipt features. That
+is the tree behind the ungrouped difference. The other uses all 41 features.
+The 41-feature tree is also compared with the base rate. The difference is
+tree minus base rate. The same 0.02 bar applies. A pooled gap past 0.02 is
+not a claim unless the corrected interval excludes zero.
+
+### Warp-placement secondary
+
+Declared before those scores were computed. The primary table stays
+leave-one-mix-out on all seven mixes. `amazing-grace-new-britain:phrase16`
+is the only cut-placement mix, and it stays in the primary table.
+
+The secondary analysis removes that mix from training and from test.
+Leave-one-mix-out then runs on the six warp-placement mixes, 108 phrases.
+Three of those mixes have 16 phrases, so a fold's ratio is 16/92. Three have
+20 phrases, so a fold's ratio is 20/88. The corrected interval uses those six
+differences and 5 degrees of freedom. The models and the claim bar are the
+same. The tree's fold seed is `20261007 + 70001` plus the fold index in
+first-seen order among the six.
+
+On the primary seven mixes, the interval is the Nadeau–Bengio correction.
+With one difference per mix, `s^2` is their sample variance on 6 degrees of
+freedom. The corrected variance of the mean is `(1 / 7 + r) * s^2`, where
+`r` is the mean of the per-fold `n_test / n_train` ratios. Four mixes have 16
+phrases, so that fold's ratio is 16/108. Three mixes have 20 phrases, so that
+fold's ratio is 20/104. The 95%
 interval uses the Student t 0.975 quantile. A win is claimed only when the
 absolute mean difference is at least 0.02 and that interval excludes zero.
 Otherwise the numbers are reported and no winner is named. The same rule is
@@ -207,7 +231,10 @@ this page adds.
 No uncertainty sampling on this set. It is a cold start. Later rounds are
 about 20 phrases, diversity-led, with about 30% of each round drawn at random.
 The random 20 is not held out of that training. It only stayed out of this
-sweep's shot pool.
+sweep's shot pool. The phrase-clean decision layer stays insufficient
+evidence. What comes next is new labels: a blind re-mark from about
+2026-10-21, and marks on more mixes once the review moves into the cockpit.
+Not a new model.
 
 ## Result
 
@@ -221,7 +248,7 @@ Jev full record, 0 shots, extended labels, Brier 0.3341. The same probabilities 
 Extended minus strict: -0.0523 (-0.0798 to -0.0272). That difference clears 0.02.
 Dropping the edge phrases moves Brier by -0.1460 (-0.1811 to -0.1113). That difference clears 0.02. Dropping them is a sensitivity check. The defects sit at phrase edges, where joins and segment boundaries fall. It is not a cleaned label.
 
-Leave-one-mix-out on 124 phrases. Each mix is the test fold once, and training never sees that mix. Pooled Brier scores every phrase once. Within-mix Brier is the score on that mix, and the within-mix mean is unweighted. A Brier gap under 0.02 is not resolvable. The Nadeau–Bengio interval has to clear zero as well. The test/train ratio is the mean of the per-fold ratios.
+Leave-one-mix-out on 124 phrases. Each mix is the test fold once, and training never sees that mix. Pooled Brier scores every phrase once. Within-mix Brier is the score on that mix. The within-mix mean is the unweighted mean of those scores, and a mix whose phrases are all one class stays in it. Brier is defined on a single class. AUC is not computed for that mean. The padded mixes carry no marks, so a within-mix AUC is undefined. A Brier gap under 0.02 is not resolvable. The Nadeau–Bengio interval has to clear zero as well. The test/train ratio is the mean of the per-fold ratios.
 Ungrouped repeated cross-validation on the 104, shallow tree minus logistic, was -0.0719 (-0.1298 to -0.0141). Unclaimed: possible mix leakage.
 
 base-rate: pooled Brier 0.2777, within-mix mean 0.2785, log loss 0.7513. Minus logistic: -0.2291 (-0.5080 to 0.0499), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.4236, amazing-grace-new-britain:phrase16w 0.2470, amazing-grace-new-britain:phrase16w2 0.2470, amazing-grace-new-britain:pad16 0.2230, america-the-beautiful-materna:phrase16w 0.3285, america-the-beautiful-materna:phrase16w2 0.2402, america-the-beautiful-materna:pad16 0.2405.
@@ -234,13 +261,33 @@ logistic-timing-pitch: pooled Brier 0.4379, within-mix mean 0.4486, log loss 2.4
 logistic-plus-joins: pooled Brier 0.3964, within-mix mean 0.4071, log loss 2.2965. Features: 15. Minus logistic-all: 0.0848 (-0.0485 to 0.2180), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.9375, amazing-grace-new-britain:phrase16w 0.2844, amazing-grace-new-britain:phrase16w2 0.3037, amazing-grace-new-britain:pad16 0.4350, america-the-beautiful-materna:phrase16w 0.3634, america-the-beautiful-materna:phrase16w2 0.2821, america-the-beautiful-materna:pad16 0.2439.
 logistic-plus-segment: pooled Brier 0.3276, within-mix mean 0.3394, log loss 2.0637. Features: 23. Minus logistic-all: 0.0171 (-0.0623 to 0.0964), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.9375, amazing-grace-new-britain:phrase16w 0.1950, amazing-grace-new-britain:phrase16w2 0.3307, amazing-grace-new-britain:pad16 0.2598, america-the-beautiful-materna:phrase16w 0.2794, america-the-beautiful-materna:phrase16w2 0.1900, america-the-beautiful-materna:pad16 0.1836.
 logistic-plus-measures: pooled Brier 0.2831, within-mix mean 0.2968, log loss 1.3952. Features: 32. Minus logistic-all: -0.0256 (-0.0902 to 0.0390), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.9358, amazing-grace-new-britain:phrase16w 0.1985, amazing-grace-new-britain:phrase16w2 0.2833, amazing-grace-new-britain:pad16 0.1915, america-the-beautiful-materna:phrase16w 0.1658, america-the-beautiful-materna:phrase16w2 0.1688, america-the-beautiful-materna:pad16 0.1335.
-gbdt: pooled Brier 0.3288, within-mix mean 0.3429, log loss 1.0586. Features: 22. Minus logistic: -0.1647 (-0.4352 to 0.1057), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.8839, amazing-grace-new-britain:phrase16w 0.2340, amazing-grace-new-britain:phrase16w2 0.2460, amazing-grace-new-britain:pad16 0.4452, america-the-beautiful-materna:phrase16w 0.2407, america-the-beautiful-materna:phrase16w2 0.2577, america-the-beautiful-materna:pad16 0.0926.
-gbdt-all: pooled Brier 0.2542, within-mix mean 0.2608, log loss 0.7171. Features: 41. Minus logistic-all: -0.0616 (-0.2864 to 0.1633), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.5386, amazing-grace-new-britain:phrase16w 0.2330, amazing-grace-new-britain:phrase16w2 0.2752, amazing-grace-new-britain:pad16 0.2023, america-the-beautiful-materna:phrase16w 0.2511, america-the-beautiful-materna:phrase16w2 0.2070, america-the-beautiful-materna:pad16 0.1185.
+shallow tree, 22 receipt features: pooled Brier 0.3288, within-mix mean 0.3429, log loss 1.0586. Features: 22. Minus logistic: -0.1647 (-0.4352 to 0.1057), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.8839, amazing-grace-new-britain:phrase16w 0.2340, amazing-grace-new-britain:phrase16w2 0.2460, amazing-grace-new-britain:pad16 0.4452, america-the-beautiful-materna:phrase16w 0.2407, america-the-beautiful-materna:phrase16w2 0.2577, america-the-beautiful-materna:pad16 0.0926.
+shallow tree, 41 features: pooled Brier 0.2542, within-mix mean 0.2608, log loss 0.7171. Features: 41. Minus logistic-all: -0.0616 (-0.2864 to 0.1633), not resolvable. Minus base-rate: pooled -0.0235, past 0.02. Fold mean -0.0177 (-0.1209 to 0.0854), the interval includes zero, so it is not claimed. Within mix: amazing-grace-new-britain:phrase16 0.5386, amazing-grace-new-britain:phrase16w 0.2330, amazing-grace-new-britain:phrase16w2 0.2752, amazing-grace-new-britain:pad16 0.2023, america-the-beautiful-materna:phrase16w 0.2511, america-the-beautiful-materna:phrase16w2 0.2070, america-the-beautiful-materna:pad16 0.1185.
 tabpfn: not run (fit).
 tabpfn-all: not run (fit).
 featllm: pooled Brier 0.2812, within-mix mean 0.2837, log loss 0.7773. Features: 9. Minus logistic: -0.2239 (-0.4922 to 0.0444), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.4761, amazing-grace-new-britain:phrase16w 0.2335, amazing-grace-new-britain:phrase16w2 0.2903, amazing-grace-new-britain:pad16 0.2142, america-the-beautiful-materna:phrase16w 0.3197, america-the-beautiful-materna:phrase16w2 0.2273, america-the-beautiful-materna:pad16 0.2250.
 logistic-strict: pooled Brier 0.3978, within-mix mean 0.4037, log loss 2.3675. Features: 22. Within mix: amazing-grace-new-britain:phrase16 0.8750, amazing-grace-new-britain:phrase16w 0.2485, amazing-grace-new-britain:phrase16w2 0.2481, amazing-grace-new-britain:pad16 0.4231, america-the-beautiful-materna:phrase16w 0.2307, america-the-beautiful-materna:phrase16w2 0.1907, america-the-beautiful-materna:pad16 0.6095.
 jev-full-0: pooled Brier 0.3341, within-mix mean 0.3310, log loss 0.8834. Minus logistic: -0.1766 (-0.5935 to 0.2403), not resolvable. Within mix: amazing-grace-new-britain:phrase16 0.0981, amazing-grace-new-britain:phrase16w 0.3298, amazing-grace-new-britain:phrase16w2 0.3356, amazing-grace-new-britain:pad16 0.4651, america-the-beautiful-materna:phrase16w 0.2132, america-the-beautiful-materna:phrase16w2 0.3506, america-the-beautiful-materna:pad16 0.5246.
+
+Secondary analysis, warp-placement mixes only. amazing-grace-new-britain:phrase16 stays in the primary table and is left out of this one. Leave-one-mix-out on 108 phrases, 6 mixes. The same claim bar applies.
+
+base-rate: pooled Brier 0.2531, within-mix mean 0.2503, log loss 0.7068. Minus logistic: 0.0343 (-0.0964 to 0.1651), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2610, amazing-grace-new-britain:phrase16w2 0.2610, amazing-grace-new-britain:pad16 0.1531, america-the-beautiful-materna:phrase16w 0.4125, america-the-beautiful-materna:phrase16w2 0.2467, america-the-beautiful-materna:pad16 0.1674.
+logistic: pooled Brier 0.2141, within-mix mean 0.2160, log loss 0.6158. Features: 22. Within mix: amazing-grace-new-britain:phrase16w 0.2405, amazing-grace-new-britain:phrase16w2 0.3047, amazing-grace-new-britain:pad16 0.1529, america-the-beautiful-materna:phrase16w 0.3107, america-the-beautiful-materna:phrase16w2 0.2870, america-the-beautiful-materna:pad16 0.0000.
+logistic-all: pooled Brier 0.1936, within-mix mean 0.1959, log loss 0.7941. Features: 41. Minus logistic: -0.0200 (-0.0541 to 0.0140), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2219, amazing-grace-new-britain:phrase16w2 0.3110, amazing-grace-new-britain:pad16 0.1183, america-the-beautiful-materna:phrase16w 0.2900, america-the-beautiful-materna:phrase16w2 0.2342, america-the-beautiful-materna:pad16 0.0000.
+logistic-timing: pooled Brier 0.2590, within-mix mean 0.2574, log loss 0.7230. Features: 5. Minus logistic: 0.0414 (-0.0884 to 0.1713), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2472, amazing-grace-new-britain:phrase16w2 0.2793, amazing-grace-new-britain:pad16 0.2020, america-the-beautiful-materna:phrase16w 0.4161, america-the-beautiful-materna:phrase16w2 0.2327, america-the-beautiful-materna:pad16 0.1669.
+logistic-pitch: pooled Brier 0.2105, within-mix mean 0.2105, log loss 0.5906. Features: 8. Minus logistic: -0.0054 (-0.0511 to 0.0402), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2486, amazing-grace-new-britain:phrase16w2 0.2871, amazing-grace-new-britain:pad16 0.0975, america-the-beautiful-materna:phrase16w 0.3427, america-the-beautiful-materna:phrase16w2 0.2873, america-the-beautiful-materna:pad16 0.0000.
+logistic-transcript: pooled Brier 0.2726, within-mix mean 0.2712, log loss 0.7596. Features: 9. Minus logistic: 0.0553 (-0.0842 to 0.1948), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2948, amazing-grace-new-britain:phrase16w2 0.3038, amazing-grace-new-britain:pad16 0.1784, america-the-beautiful-materna:phrase16w 0.4160, america-the-beautiful-materna:phrase16w2 0.2325, america-the-beautiful-materna:pad16 0.2020.
+logistic-timing-pitch: pooled Brier 0.2185, within-mix mean 0.2205, log loss 0.6157. Features: 13. Minus logistic-all: 0.0246 (-0.0152 to 0.0643), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2218, amazing-grace-new-britain:phrase16w2 0.3182, amazing-grace-new-britain:pad16 0.1761, america-the-beautiful-materna:phrase16w 0.3253, america-the-beautiful-materna:phrase16w2 0.2816, america-the-beautiful-materna:pad16 0.0000.
+logistic-plus-joins: pooled Brier 0.2262, within-mix mean 0.2279, log loss 0.6432. Features: 15. Minus logistic-all: 0.0319 (-0.0194 to 0.0833), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2192, amazing-grace-new-britain:phrase16w2 0.3216, amazing-grace-new-britain:pad16 0.1876, america-the-beautiful-materna:phrase16w 0.3537, america-the-beautiful-materna:phrase16w2 0.2849, america-the-beautiful-materna:pad16 0.0000.
+logistic-plus-segment: pooled Brier 0.1968, within-mix mean 0.2018, log loss 0.6063. Features: 23. Minus logistic-all: 0.0059 (-0.0587 to 0.0706), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.1985, amazing-grace-new-britain:phrase16w2 0.3689, amazing-grace-new-britain:pad16 0.1730, america-the-beautiful-materna:phrase16w 0.2789, america-the-beautiful-materna:phrase16w2 0.1917, america-the-beautiful-materna:pad16 0.0000.
+logistic-plus-measures: pooled Brier 0.1913, within-mix mean 0.1934, log loss 0.7624. Features: 32. Minus logistic-all: -0.0025 (-0.0088 to 0.0038), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2159, amazing-grace-new-britain:phrase16w2 0.3056, amazing-grace-new-britain:pad16 0.1165, america-the-beautiful-materna:phrase16w 0.2941, america-the-beautiful-materna:phrase16w2 0.2284, america-the-beautiful-materna:pad16 0.0000.
+shallow tree, 22 receipt features: pooled Brier 0.1962, within-mix mean 0.1993, log loss 0.5831. Features: 22. Minus logistic: -0.0167 (-0.0876 to 0.0542), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2245, amazing-grace-new-britain:phrase16w2 0.2486, amazing-grace-new-britain:pad16 0.2083, america-the-beautiful-materna:phrase16w 0.2457, america-the-beautiful-materna:phrase16w2 0.2537, america-the-beautiful-materna:pad16 0.0147.
+shallow tree, 41 features: pooled Brier 0.1939, within-mix mean 0.1975, log loss 0.5824. Features: 41. Minus logistic-all: 0.0016 (-0.0686 to 0.0718), not resolvable. Minus base-rate: pooled -0.0592, past 0.02. Fold mean -0.0528 (-0.1784 to 0.0729), the interval includes zero, so it is not claimed. Within mix: amazing-grace-new-britain:phrase16w 0.2416, amazing-grace-new-britain:phrase16w2 0.2774, amazing-grace-new-britain:pad16 0.1727, america-the-beautiful-materna:phrase16w 0.2326, america-the-beautiful-materna:phrase16w2 0.2155, america-the-beautiful-materna:pad16 0.0455.
+tabpfn: not run (fit).
+tabpfn-all: not run (fit).
+featllm: pooled Brier 0.2545, within-mix mean 0.2533, log loss 0.7388. Features: 9. Minus logistic: 0.0373 (-0.0918 to 0.1664), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.2781, amazing-grace-new-britain:phrase16w2 0.3026, amazing-grace-new-britain:pad16 0.1464, america-the-beautiful-materna:phrase16w 0.3966, america-the-beautiful-materna:phrase16w2 0.2233, america-the-beautiful-materna:pad16 0.1727.
+logistic-strict: pooled Brier 0.1486, within-mix mean 0.1519, log loss 0.4254. Features: 22. Within mix: amazing-grace-new-britain:phrase16w 0.1546, amazing-grace-new-britain:phrase16w2 0.2598, amazing-grace-new-britain:pad16 0.1280, america-the-beautiful-materna:phrase16w 0.1709, america-the-beautiful-materna:phrase16w2 0.1978, america-the-beautiful-materna:pad16 0.0000.
+jev-full-0: pooled Brier 0.3690, within-mix mean 0.3698, log loss 0.9606. Minus logistic: 0.1539 (-0.1967 to 0.5044), not resolvable. Within mix: amazing-grace-new-britain:phrase16w 0.3298, amazing-grace-new-britain:phrase16w2 0.3356, amazing-grace-new-britain:pad16 0.4651, america-the-beautiful-materna:phrase16w 0.2132, america-the-beautiful-materna:phrase16w2 0.3506, america-the-beautiful-materna:pad16 0.5246.
 
 Mix probe, receipt features: accuracy 0.4766, majority 0.1613, macro recall 0.4850. The same tree names the mix. The pooled score is a mix detector.
 Mix probe, all features: accuracy 0.7226, majority 0.1613, macro recall 0.7170. The same tree names the mix. The pooled score is a mix detector.
@@ -264,5 +311,6 @@ full-16 is not attempted: sixteen full records do not fit the state cap.
 The local models read phrase-evidence.json (schema ai-jam-sessions/phrase-evidence/v1, revision 1). This sweep's Jev states do not include that block.
 Jev is a tested negative. Hosted Jev and local OpenJev, on these 124 records, neither beat the base rate once calibrated: Brier 0.252 and 0.251 against 0.242. Within-mix AUC is 0.57 for hosted Jev and 0.59 for OpenJev. The serialisation cells are the spend record. They are not a reason to continue. The evidence-family rows are the grouped comparison.
 The next labels are not drawn by uncertainty sampling. About 30% of each later round is random. The random 20 is not held out of a later training set.
+The phrase-clean decision layer stays insufficient evidence. What comes next is new labels: a blind re-mark from about 2026-10-21, and marks on more mixes once the review moves into the cockpit. Not a new model.
 
 <!-- /result -->

@@ -241,6 +241,8 @@ def test_zero_spend_does_not_claim_a_call_and_an_edge_drop_can_be_unresolvable()
     assert "Join features are not in these receipts" not in text
     assert "stay out of training" not in text
     assert "tested negative" in text
+    assert "all one class stays" in text
+    assert "insufficient evidence" in text
     shift = study.edge_shift([0.0, 0.0, 1.0], ["certain", "certain", "edge"], 1)
     assert abs(shift["mean"] - (1.0 / 3.0)) < 1e-12
     assert shift["resolvable"] is False
@@ -349,3 +351,61 @@ def test_full_state_omits_evidence_and_pruned_keeps_the_receipt_features():
     assert "joins" not in pruned["features"]
     assert study.state_ok(full, "full")
     assert study.state_ok(pruned, "pruned")
+
+
+def test_warp_items_drop_only_the_cut_placement_mix():
+    items = [
+        {"song": "amazing-grace-new-britain", "mix": "phrase16"},
+        {"song": "amazing-grace-new-britain", "mix": "pad16"},
+        {"song": "america-the-beautiful-materna", "mix": "pad16"},
+    ]
+    kept = study.warp_items(items)
+    assert study.CUT_PLACEMENT_MIX == "amazing-grace-new-britain:phrase16"
+    assert [study.mix_name(item) for item in kept] == [
+        "amazing-grace-new-britain:pad16",
+        "america-the-beautiful-materna:pad16",
+    ]
+    line = study._score_line(
+        "gbdt-all",
+        {
+            "status": "ok",
+            "brier": 0.2542,
+            "within_brier": 0.2608,
+            "log_loss": 0.7,
+            "n_features": 41,
+            "versus_base": {
+                "reference": "base-rate",
+                "pooled": -0.0235,
+                "mean": -0.0177,
+                "low": -0.1209,
+                "high": 0.0854,
+                "resolvable": False,
+            },
+        },
+    )
+    assert "shallow tree, 41 features" in line
+    assert "pooled -0.0235, past 0.02" in line
+    assert "Fold mean -0.0177 (-0.1209 to 0.0854)" in line
+    assert "the interval includes zero, so it is not claimed" in line
+    claimed = study._score_line(
+        "gbdt-all",
+        {
+            "status": "ok",
+            "brier": 0.20,
+            "within_brier": 0.20,
+            "log_loss": 0.5,
+            "n_features": 41,
+            "versus_base": {
+                "reference": "base-rate",
+                "pooled": -0.04,
+                "mean": -0.04,
+                "low": -0.06,
+                "high": -0.02,
+                "resolvable": True,
+            },
+        },
+    )
+    assert "the corrected interval clears 0.02" in claimed
+    assert "not claimed" not in claimed
+    receipt = study._score_line("gbdt", {"status": "not-run", "reason": "fit"})
+    assert receipt.startswith("shallow tree, 22 receipt features")
