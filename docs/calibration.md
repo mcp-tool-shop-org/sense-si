@@ -1,7 +1,7 @@
 # Phrase calibration
 
 One capped study of the question "is this phrase clean?" The uncertain band in
-`phrase_clean` is still the placeholder 0.35–0.65. This page does not change it.
+`phrase_clean` stays 0.35–0.65. This page does not change the tuple. The contract records why it stays.
 
 The README still says a live call waits on a separate yes. This study is that
 yes: `typesafe/jev-1.13`, stamp `jev-1.13-20260917`, cap $0.25, key from the
