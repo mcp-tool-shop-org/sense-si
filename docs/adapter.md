@@ -24,7 +24,7 @@ Dropped, because they are the gate: `verdict`, row `pass`, and the `checks` entr
 
 `pitch.json` names its tracker. Top-level `tracker` is the instrument id. The checked file says `pyin`. The adapter does not hard-code that name.
 
-`cents_median` is the note value. `voiced_fraction` and `cents_sd` are kept. `global_offset_cents` and `scatter_sd_cents` are kept on the take. `vocal_sha256` and `onsets_from` are kept as provenance.
+`cents_median` is the note value. A null median on an `unvoiced` or `untrackable` row stays null, with that measurement state. Any other null median is an error. `voiced_fraction` and `cents_sd` are kept. `global_offset_cents` and `scatter_sd_cents` are kept on the take. `vocal_sha256` and `onsets_from` are kept as provenance.
 
 `status` values `untrackable` and `unvoiced` are a measurement state, with the row's `reason` beside them. `PASS`, `WARN`, and `FAIL` are dropped. Also dropped: `global_pass`, `global_fail_cents`, `scatter_warn`, and `per_note`.
 

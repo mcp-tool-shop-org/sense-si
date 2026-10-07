@@ -28,7 +28,7 @@ Vowel-onset offset in milliseconds against the score clock. A row whose `err_ms`
 
 ### Pitch
 
-The receipt's top-level `tracker` is the instrument id. On the files this adapter was checked against, that value is `pyin`. Cents against the score are the median of the steady middle of the note. `voiced_fraction` and `cents_sd` stay on the note. `global_offset_cents` and `scatter_sd_cents` stay on the take. `untrackable` and `unvoiced` stay as a measurement state, because they say no pitch could be measured. PASS, WARN, and FAIL do not.
+The receipt's top-level `tracker` is the instrument id. On the files this adapter was checked against, that value is `pyin`. Cents against the score are the median of the steady middle of the note. `voiced_fraction` and `cents_sd` stay on the note. `global_offset_cents` and `scatter_sd_cents` stay on the take. `untrackable` and `unvoiced` stay as a measurement state, because they say no pitch could be measured. A null median on those rows stays null. PASS, WARN, and FAIL do not.
 
 The pitch receipt does not pin a tracker build, so those numbers are flagged incomplete. `vocal_sha256` and `onsets_from` stay as provenance. They tie the reading to the audio and to the timing receipt. They are not a tracker revision.
 

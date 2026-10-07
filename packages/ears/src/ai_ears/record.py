@@ -314,9 +314,17 @@ def _pitch_rows(receipt: dict) -> tuple[tuple[Measure, ...], TakeTuning]:
         observations = list(_obs(row, ("lyric", "voiced_fraction", "cents_sd")))
         if reason:
             observations.append(("state_reason", reason))
+        median = row["cents_median"]
+        # Unvoiced or untrackable can come back with no median. That is the state, not a zero.
+        if median is None and state in PITCH_STATES:
+            value = None
+        elif median is None:
+            raise EarsError(f"pitch row {row.get('id')!r} has no numeric cents_median")
+        else:
+            value = float(median)
         rows.append(
             Measure(
-                value=float(row["cents_median"]),
+                value=value,
                 unit="cents",
                 instrument=instrument,
                 revision="",
