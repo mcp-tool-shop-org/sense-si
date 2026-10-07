@@ -12,7 +12,6 @@ Requires Python ≥3.10 and the declared deps (`torch`, `transformers`, `fastmcp
 
 ```
 ai-eyes                 # installed entry point
-ai-eyes-mcp             # second entry point, until the Claude Code config uses ai-eyes
 python -m ai_eyes_mcp   # equivalent
 ```
 

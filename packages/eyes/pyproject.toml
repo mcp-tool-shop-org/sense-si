@@ -28,7 +28,6 @@ dev = ["pytest>=8.0", "pytest-cov>=5.0", "build", "hatchling"]
 
 [project.scripts]
 ai-eyes = "ai_eyes_mcp.server:main"
-ai-eyes-mcp = "ai_eyes_mcp.server:main"
 
 [project.urls]
 Repository = "https://github.com/mcp-tool-shop-org/sense-si"

@@ -19,8 +19,8 @@ not the assembled model — a figure worth having right when you size a card.
 ## Install
 
 ```bash
-git clone https://github.com/mcp-tool-shop-org/ai-eyes-mcp
-cd ai-eyes-mcp
+git clone https://github.com/mcp-tool-shop-org/sense-si
+cd sense-si/packages/eyes
 pip install -e .
 ```
 
@@ -30,7 +30,7 @@ pip install -e .
 {
   "mcpServers": {
     "ai-eyes": {
-      "command": "ai-eyes-mcp",
+      "command": "ai-eyes",
       "env": { "AI_EYES_MODEL_DIR": "/path/to/model/cache" }
     }
   }
