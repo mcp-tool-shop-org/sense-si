@@ -526,7 +526,7 @@
           "path": "LICENSE"
         },
         {
-          "hash": "a12b82686ee74c97f8577e067b815555566ae3358b830ebc14d4619a3a030c0f",
+          "hash": "42a0c3753c72e5021dd3983b34808cd8e26d92d4dadc74bc681d8dc31dc97a46",
           "path": "README.md"
         },
         {
@@ -805,7 +805,7 @@
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "14b3ef777935f7b390c00338160786561a9d139e",
+    "commit": "5ad4c9677ea7192ce02075fbaf928b1d73a3f485",
     "tracked": 24
   },
   "landings": [

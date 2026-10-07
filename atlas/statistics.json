@@ -109,13 +109,13 @@
     "definition": "commits is how many commits in the window touch the file, including merges and commits dropped from coupling. lines is added plus deleted in those commits.",
     "files": [
       {
-        "commits": 4,
-        "lines": 140,
+        "commits": 6,
+        "lines": 184,
         "path": ".github/workflows/ci.yml"
       },
       {
-        "commits": 1,
-        "lines": 6,
+        "commits": 3,
+        "lines": 12,
         "path": ".gitignore"
       },
       {
@@ -129,29 +129,34 @@
         "path": "README.md"
       },
       {
-        "commits": 4,
-        "lines": 152,
+        "commits": 6,
+        "lines": 192,
         "path": "atlas/README.md"
       },
       {
-        "commits": 2,
-        "lines": 44,
+        "commits": 4,
+        "lines": 52,
         "path": "atlas/boundaries.yaml"
       },
       {
-        "commits": 4,
-        "lines": 288,
+        "commits": 6,
+        "lines": 464,
         "path": "atlas/page.json"
       },
       {
-        "commits": 4,
-        "lines": 584,
+        "commits": 6,
+        "lines": 688,
         "path": "atlas/statistics.json"
       },
       {
-        "commits": 4,
-        "lines": 1592,
+        "commits": 6,
+        "lines": 1860,
         "path": "atlas/structure.json"
+      },
+      {
+        "commits": 2,
+        "lines": 16,
+        "path": "codecov.yml"
       },
       {
         "commits": 1,
@@ -179,9 +184,14 @@
         "path": "packages/decisions/src/decisions/client.py"
       },
       {
-        "commits": 1,
-        "lines": 172,
+        "commits": 3,
+        "lines": 588,
         "path": "packages/decisions/tests/test_client.py"
+      },
+      {
+        "commits": 2,
+        "lines": 66,
+        "path": "packages/decisions/tests/test_coverage_bar.py"
       },
       {
         "commits": 1,
@@ -224,19 +234,24 @@
         "path": "packages/ears/tests/fixtures/verify-energy.json"
       },
       {
-        "commits": 1,
-        "lines": 183,
+        "commits": 3,
+        "lines": 403,
         "path": "packages/ears/tests/test_questions.py"
       },
       {
-        "commits": 1,
-        "lines": 166,
+        "commits": 3,
+        "lines": 550,
         "path": "packages/ears/tests/test_record.py"
       },
       {
-        "commits": 1,
-        "lines": 10,
+        "commits": 3,
+        "lines": 26,
         "path": "pyproject.toml"
+      },
+      {
+        "commits": 2,
+        "lines": 114,
+        "path": "tools/coverage_bar.py"
       }
     ]
   },
@@ -244,9 +259,9 @@
     "level": "low",
     "reason": "fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions"
   },
-  "generatedAt": "2026-10-07T17:47:42.343Z",
+  "generatedAt": "2026-10-07T17:56:25.779Z",
   "generatedFrom": {
-    "commit": "14b3ef777935f7b390c00338160786561a9d139e"
+    "commit": "5ad4c9677ea7192ce02075fbaf928b1d73a3f485"
   },
   "pairs": [],
   "parameters": {
@@ -259,7 +274,7 @@
     "floor": "fallen",
     "floorHeld": false,
     "floorTrigger": "both",
-    "headDate": "2026-10-07T10:19:02-07:00",
+    "headDate": "2026-10-07T10:50:19-07:00",
     "inScopeFiles": 29,
     "pinnedStart": null,
     "priorFloor": "fallen",
@@ -268,7 +283,7 @@
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-04-10T17:19:02.000Z",
+    "since": "2026-04-10T17:50:19.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",
