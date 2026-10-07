@@ -181,3 +181,113 @@ def test_which_take_through_the_real_client_never_leaves_the_machine():
     assert result.uncertain is True
     assert "choice" not in result.to_dict()
     assert result.probabilities == {"take-a": 0.55, "take-b": 0.45}
+
+
+def _pair():
+    return [_take("take-a", cents=0, ms=0), _take("take-b", cents=1, ms=1)]
+
+
+def _result(answer, model=PINNED_MODEL, dated=PINNED_DATE, cost=0.0):
+    def client(request):
+        return DecisionResult(model=model, dated=dated, answers={"which_take": answer, "phrase_clean": answer}, cost=cost)
+
+    return client
+
+
+def test_empty_instructions_never_call():
+    def client(request):
+        raise AssertionError("called")
+
+    with pytest.raises(EarsError, match="empty"):
+        which_take(_pair(), instructions="  ", client=client)
+    with pytest.raises(EarsError, match="empty"):
+        phrase_clean(_take("take-a", cents=0, ms=0), instructions="", true="yes", false="no", client=client)
+
+
+def test_which_take_refuses_a_set_that_is_not_one_phrase():
+    def client(request):
+        raise AssertionError("called")
+
+    with pytest.raises(EarsError, match="at least two"):
+        which_take([_take("take-a", cents=0, ms=0)], instructions=INSTRUCTIONS, client=client)
+    with pytest.raises(EarsError, match="unique"):
+        which_take(
+            [_take("take-a", cents=0, ms=0), _take("take-a", cents=1, ms=1)],
+            instructions=INSTRUCTIONS,
+            client=client,
+        )
+    other = HearingRecord(take_id="take-b", phrase_id="other", pitch=(), timing=())
+    with pytest.raises(EarsError, match="one phrase"):
+        which_take([_take("take-a", cents=0, ms=0), other], instructions=INSTRUCTIONS, client=client)
+
+
+def test_which_take_refuses_an_unpinned_or_shapeless_answer():
+    records = _pair()
+    probs = {"take-a": 0.6, "take-b": 0.4}
+    with pytest.raises(EarsError, match="pinned"):
+        which_take(records, instructions=INSTRUCTIONS, client=_result(ChoiceAnswer(choice="take-a", probabilities=probs), model="other"))
+    with pytest.raises(EarsError, match="pinned"):
+        which_take(records, instructions=INSTRUCTIONS, client=_result(ChoiceAnswer(choice="take-a", probabilities=probs), dated="nope"))
+    with pytest.raises(EarsError, match="no probabilities"):
+        which_take(records, instructions=INSTRUCTIONS, client=_result(ChoiceAnswer(choice="take-a")))
+    with pytest.raises(EarsError, match="no probabilities"):
+        which_take(records, instructions=INSTRUCTIONS, client=_result(NoulAnswer(noul=0.4)))
+    with pytest.raises(EarsError, match="do not match"):
+        which_take(
+            records,
+            instructions=INSTRUCTIONS,
+            client=_result(ChoiceAnswer(choice="take-a", probabilities={"take-a": 1.0})),
+        )
+    with pytest.raises(EarsError, match="not a number"):
+        which_take(
+            records,
+            instructions=INSTRUCTIONS,
+            client=_result(ChoiceAnswer(choice="take-a", probabilities={"take-a": True, "take-b": 0.2})),
+        )
+    with pytest.raises(EarsError, match="outside"):
+        which_take(
+            records,
+            instructions=INSTRUCTIONS,
+            client=_result(ChoiceAnswer(choice="take-a", probabilities={"take-a": 1.2, "take-b": 0.0})),
+        )
+    with pytest.raises(EarsError, match="pass or fail"):
+        which_take(records, instructions="the take passed", client=_result(NoulAnswer(noul=0.1)))
+
+
+def test_phrase_clean_refuses_blank_criteria_and_a_choice_answer():
+    record = _take("take-a", cents=0, ms=0)
+    client = _stub(NoulAnswer(noul=0.1))
+    with pytest.raises(EarsError, match="true and false"):
+        phrase_clean(record, instructions=CLEAN, true="  ", false="no", client=client)
+    with pytest.raises(EarsError, match="true and false"):
+        phrase_clean(record, instructions=CLEAN, true="yes", false="", client=client)
+    with pytest.raises(EarsError, match="must differ"):
+        phrase_clean(record, instructions=CLEAN, true="same", false=" same ", client=client)
+    with pytest.raises(EarsError, match="not a probability"):
+        phrase_clean(record, instructions=CLEAN, true="yes", false="no", client=_result(ChoiceAnswer(choice="yes")))
+    with pytest.raises(EarsError, match="pinned"):
+        phrase_clean(
+            record,
+            instructions=CLEAN,
+            true="yes",
+            false="no",
+            client=_result(NoulAnswer(noul=0.2), dated="nope"),
+        )
+
+
+def test_a_result_without_a_cost_omits_it_and_a_loaded_confidence_is_kept():
+    record = _take("take-a", cents=0, ms=0)
+
+    def client(request):
+        return DecisionResult(
+            model=PINNED_MODEL,
+            dated=PINNED_DATE,
+            answers={"phrase_clean": NoulAnswer(noul=0.1)},
+            cost=None,
+        )
+
+    body = phrase_clean(record, instructions=CLEAN, true="yes", false="no", client=client).to_dict()
+    assert "cost" not in body
+    assert "confidence" not in body
+    loaded = load_question_result({**body, "confidence": 0.9})
+    assert loaded.confidence == 0.9

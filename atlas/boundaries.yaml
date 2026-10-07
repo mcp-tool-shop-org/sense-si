@@ -20,3 +20,7 @@ boundaries:
     globs:
       - "*"
     role: config
+  - name: tools
+    globs:
+      - tools/**
+    role: code
