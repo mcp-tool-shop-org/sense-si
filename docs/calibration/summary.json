@@ -1,0 +1,59 @@
+{
+  "model": "typesafe/jev-1.13",
+  "dated": "jev-1.13-20260917",
+  "n": 124,
+  "n_clean": 73,
+  "n_not_clean": 51,
+  "n_inner": 87,
+  "n_outer": 37,
+  "brier_raw_inner": {
+    "point": 0.3303563218390805,
+    "low": 0.2824545114942529,
+    "high": 0.37595594827586215
+  },
+  "brier_temperature_inner": {
+    "point": 0.2517951794774373,
+    "low": 0.24930674817463078,
+    "high": 0.2543821662685436
+  },
+  "brier_raw_outer": {
+    "point": 0.3428135135135136,
+    "low": 0.26816358108108107,
+    "high": 0.4161698648648649
+  },
+  "brier_temperature_outer": {
+    "point": 0.2522740506606461,
+    "low": 0.24800691558768168,
+    "high": 0.25646205569328556
+  },
+  "corp_outside": 33,
+  "corp_n": 87,
+  "edge_diagnostic": null,
+  "no_interior_replicates": 1000,
+  "bootstrap": 1000,
+  "outer_answered": 0,
+  "outer_correct": 0,
+  "outer_accuracy": null,
+  "outer_accuracy_lower": null,
+  "decision": {
+    "adopted": false,
+    "reasons": [
+      "no-interior-fraction",
+      "edge-width",
+      "selective-accuracy",
+      "selective-accuracy-interval"
+    ],
+    "low": null,
+    "high": null,
+    "keep": [
+      0.35,
+      0.65
+    ]
+  },
+  "cost_usd": 0.021653,
+  "calls": 124,
+  "placeholder_band": [
+    0.35,
+    0.65
+  ]
+}

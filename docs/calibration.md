@@ -61,6 +61,19 @@ fires, the data does not support a band yet, and 0.35–0.65 stays.
 
 <!-- result -->
 
-Not run.
+Model `typesafe/jev-1.13`, stamp `jev-1.13-20260917`. 124 calls, $0.0217 of the $0.25 cap.
+
+Phrases: 124. Clean: 73. Not clean: 51. Inner 87, outer holdout 37.
+
+Inner out-of-fold Brier, raw P(yes): 0.3304 (bootstrap 0.2825 to 0.3760).
+Inner out-of-fold Brier, temperature-scaled: 0.2518 (bootstrap 0.2493 to 0.2544).
+CORP diagram: docs/calibration/corp.svg. 33 of 87 inner phrases sit outside the 95% consistency band.
+
+No interior band showed up often enough to quote an edge.
+Outer phrases answered by the diagnostic band: 0. Accuracy n/a, 95% lower bound n/a.
+
+The data does not support a band yet. The placeholder 0.35–0.65 stays. The gates that fired: more than 5% of the inner resamples had no interior band; a 95% interval on a band edge is wider than 0.10; outer accuracy is under 90%, or the outer band answered nothing; the outer 95% lower bound on accuracy is under 90%.
+
+Binned ECE is not reported. Isotonic regression is the CORP diagram only.
 
 <!-- /result -->
