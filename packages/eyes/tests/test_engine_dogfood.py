@@ -795,8 +795,9 @@ class TestEnvVarOverride:
         Spawns a fresh Python process with the invalid env var and checks
         that the module imports cleanly with the correct fallback value.
         """
-        env = os.environ.copy()
-        env["AI_EYES_DEFAULT_THRESHOLD"] = "banana"
+        from tests.conftest import subprocess_env
+
+        env = subprocess_env({"AI_EYES_DEFAULT_THRESHOLD": "banana"})
 
         result = subprocess.run(
             [

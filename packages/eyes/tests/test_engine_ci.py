@@ -350,8 +350,9 @@ import sys
 
 
 def _engine_subprocess(code: str, env_extra: dict, timeout: int = 60) -> subprocess.CompletedProcess:
-    env = os.environ.copy()
-    env.update(env_extra)
+    from tests.conftest import subprocess_env
+
+    env = subprocess_env(env_extra)
     # Isolate from the parent process's already-imported engine defaults.
     env.pop("AI_EYES_EAGER_LOAD", None)
     return subprocess.run(

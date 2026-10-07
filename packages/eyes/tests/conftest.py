@@ -22,6 +22,22 @@ import pytest
 from ai_eyes_mcp.engine import SigLIPEngine
 
 
+def subprocess_env(extra: dict | None = None) -> dict:
+    """Env for a fresh interpreter.
+
+    pytest's pythonpath does not cross a process boundary, and this suite is
+    not installed before it runs. The child still has to be able to import
+    ai_eyes_mcp.
+    """
+    env = os.environ.copy()
+    if extra:
+        env.update(extra)
+    src = str(Path(__file__).resolve().parents[1] / "src")
+    previous = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = src if not previous else src + os.pathsep + previous
+    return env
+
+
 def assert_identical_scores(loop, stacked):
     """F-W5-TESTS-001: stacked must match the per-image loop exactly, not closely."""
     assert len(loop) == len(stacked), f"len loop={len(loop)} stacked={len(stacked)}"

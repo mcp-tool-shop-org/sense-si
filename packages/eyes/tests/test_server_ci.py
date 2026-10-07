@@ -160,10 +160,15 @@ def test_load_failure_does_not_forward_raw_exception(monkeypatch):
 
 def test_eager_server_import_does_not_leak_traceback():
     """W1-COORD-007: EAGER_LOAD failure at import must not dump site-packages frames."""
-    env = os.environ.copy()
-    env["AI_EYES_EAGER_LOAD"] = "1"
-    env["AI_EYES_MODEL_ID"] = "definitely/not-a-real-model-xyz"
-    env["HF_HUB_OFFLINE"] = "1"
+    from tests.conftest import subprocess_env
+
+    env = subprocess_env(
+        {
+            "AI_EYES_EAGER_LOAD": "1",
+            "AI_EYES_MODEL_ID": "definitely/not-a-real-model-xyz",
+            "HF_HUB_OFFLINE": "1",
+        }
+    )
     r = subprocess.run(
         [sys.executable, "-c", "from ai_eyes_mcp.server import mcp"],
         env=env,

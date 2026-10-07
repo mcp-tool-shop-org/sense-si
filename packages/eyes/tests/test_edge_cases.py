@@ -329,8 +329,9 @@ class TestProactiveHardening:
     # --- AI_EYES_LOG_LEVEL: configurable verbosity (closes a SHIP_GATE gap) ---
 
     def test_log_level_env_configures_logger(self):
-        env = os.environ.copy()
-        env["AI_EYES_LOG_LEVEL"] = "DEBUG"
+        from tests.conftest import subprocess_env
+
+        env = subprocess_env({"AI_EYES_LOG_LEVEL": "DEBUG"})
         r = subprocess.run(
             [sys.executable, "-c",
              "import ai_eyes_mcp.server, logging; "
@@ -345,9 +346,11 @@ class TestProactiveHardening:
     def test_eager_load_surfaces_failure_at_construction(self):
         """AI_EYES_EAGER_LOAD makes a broken model/cache fail at construction
         (server start), not on the first tool call."""
-        env = os.environ.copy()
-        env["AI_EYES_EAGER_LOAD"] = "1"
-        env["HF_HUB_OFFLINE"] = "1"  # fail fast, no network
+        from tests.conftest import subprocess_env
+
+        env = subprocess_env(
+            {"AI_EYES_EAGER_LOAD": "1", "HF_HUB_OFFLINE": "1"}
+        )
         r = subprocess.run(
             [sys.executable, "-c",
              "from ai_eyes_mcp.engine import SigLIPEngine; "
