@@ -1,22 +1,22 @@
 # sense-si: how it works
 
-Mapped at 2026-10-07 from commit 503d57a by Atlas 1.24.0.
+Mapped at 2026-10-07 from commit e4e89f5 by Atlas 1.24.0.
 
 ## What this is
 
-7 parts, mostly Python (22 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes and ai-eyes-mcp.
+7 parts, mostly Python (24 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 3 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes and ai-eyes-mcp.
 
-## What changed since 2026-10-07 (5ad4c96)
+## What changed since 2026-10-07 (503d57a)
 
-- CI now also runs packages/eyes/tests/.
-- ai-eyes (packages/eyes/pyproject.toml) is a new command. It runs packages/eyes/src/ai_eyes_mcp/server.py.
-- ai-eyes-mcp (packages/eyes/pyproject.toml) is a new command. It runs packages/eyes/src/ai_eyes_mcp/server.py.
-- .github/ is now read by packages/eyes/atlas/page.json.
-- .github/workflows/ci.yml is now read by packages/eyes/atlas/page.json, packages/eyes/atlas/statistics.json and packages/eyes/atlas/structure.json.
-- .gitignore is now read by packages/eyes/atlas/statistics.json and packages/eyes/atlas/structure.json.
-- And 22 more new writers and readers of places.
-- eyes is a new part, drawn from `packages/eyes/**`.
-- 72 files added and 4 changed content, across 4 parts.
+- ears now imports tools, which closes the cycle ears → tools → ears.
+- tools now imports decisions, which closes the cycle tools → decisions → tools.
+- tools now imports ears, which closes the cycle tools → ears → tools.
+- docs/calibration.md is now written by tools/phrase_calibration.py.
+- docs/calibration/corp.svg is now written by tools/phrase_calibration.py.
+- docs/calibration/phrases.json is now written by tools/phrase_calibration.py.
+- And 4 more new writers and readers of places.
+- docs was authored and is now mixed.
+- 5 files added and 11 changed content, across 5 parts.
 
 ## What comes in
 
@@ -41,9 +41,10 @@ CI writes nothing this map can see.
 
 ## What breaks what
 
-- **decisions** is imported by 1 part (ears) and sits on the path of 1 door.
+- **decisions** is imported by 2 parts (ears, tools) and sits on the path of 1 door.
+- **ears** is imported by 1 part (tools) and sits on the path of 1 door.
 - **eyes** is imported by no other part and sits on the path of 3 doors.
-- **tools** is imported only from tests, by 1 part (decisions), and sits on the path of 1 door.
+- **tools** is imported only from tests, by 2 parts (decisions, ears), and sits on the path of 1 door.
 
 ## What tends to change together
 
@@ -59,7 +60,7 @@ Every code part is imported by at least one test.
 
 ## Written but never read
 
-No place this map can see is written, so none goes unread.
+Every written place has a reader.
 
 ## Helpers that look duplicated
 
@@ -67,11 +68,13 @@ No two parts export a helper that looks alike.
 
 ## Generated, never hand-edited
 
-Nothing in this repository writes to a tracked place this map can see.
+Every tracked place code writes here is edited by people too; see Hand-authored.
 
 ## Hand-authored
 
-People write .github/, docs/ and the repository root. Nothing in this repository writes to them.
+People write .github/ and the repository root. Nothing in this repository writes to them.
+
+- **docs/calibration.md** is written by tools/phrase_calibration.py from inputs this repository does not keep, and by people.
 
 ## Where to start
 
@@ -81,7 +84,9 @@ Read those in order to follow one run of ai-eyes end to end. This path follows a
 
 ## What this map cannot see
 
-- 1 read goes to a path its caller passes, not to this repository.
+- 4 reads use paths built at run time and are not named here.
+- 3 writes go to places this repository does not track, so they are not listed as generated.
+- 1 write and 3 reads go to a path their caller passes, not to this repository.
 - Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window.
 
 Regenerate with `npx --yes @dogfood-lab/atlas map`.

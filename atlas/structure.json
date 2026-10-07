@@ -52,12 +52,7 @@
             {
               "in": "require_pinned",
               "kind": "raise",
-              "line": 138
-            },
-            {
-              "in": "validate_answer",
-              "kind": "raise",
-              "line": 154
+              "line": 142
             },
             {
               "in": "validate_answer",
@@ -67,86 +62,92 @@
             {
               "in": "validate_answer",
               "kind": "raise",
-              "line": 164
+              "line": 162
             },
             {
               "in": "validate_answer",
               "kind": "raise",
-              "line": 174
+              "line": 168
+            },
+            {
+              "in": "validate_answer",
+              "kind": "raise",
+              "line": 178
             },
             {
               "in": "_default_fetch",
               "kind": "except",
-              "line": 197
+              "line": 201
             },
             {
               "in": "_default_fetch",
               "kind": "except",
-              "line": 200
+              "line": 204
             },
             {
               "in": "_default_fetch",
               "kind": "raise",
-              "line": 201
+              "line": 205
             },
             {
               "in": "create_decisions_client",
               "kind": "raise",
-              "line": 216
+              "line": 220
             },
             {
               "in": "client",
               "kind": "raise",
-              "line": 227
+              "line": 231
             },
             {
               "in": "client",
               "kind": "raise",
-              "line": 232
+              "line": 236
             },
             {
               "in": "client",
               "kind": "raise",
-              "line": 281
-            },
-            {
-              "in": "client",
-              "kind": "except",
-              "line": 283
-            },
-            {
-              "in": "client",
-              "kind": "raise",
-              "line": 284
-            },
-            {
-              "in": "client",
-              "kind": "except",
               "line": 285
             },
             {
               "in": "client",
               "kind": "except",
-              "line": 294
+              "line": 287
             },
             {
               "in": "client",
               "kind": "raise",
-              "line": 310
+              "line": 288
+            },
+            {
+              "in": "client",
+              "kind": "except",
+              "line": 289
+            },
+            {
+              "in": "client",
+              "kind": "except",
+              "line": 298
             },
             {
               "in": "client",
               "kind": "raise",
-              "line": 330
+              "line": 314
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 334
             }
           ],
-          "hash": "e820f00eb3966a7e57aadbad66c4160024ae3ee72747b638bd578e1cd5fa7bfb",
+          "hash": "45fe6cf3cbd670d657599ee54c8f6c01e33487e4ae3536a1f1fca399b6bcb0c3",
           "path": "packages/decisions/src/decisions/client.py"
         },
         {
           "exports": [
             "test_a_dead_transport_or_a_bad_body_is_not_turned_into_an_answer",
             "test_a_refused_date_never_calls",
+            "test_accepts_the_dated_snapshot_when_the_answer_echoes_it",
             "test_answers_that_are_not_objects_or_not_probabilities_are_refused",
             "test_choice_must_be_one_of_the_options",
             "test_client_errors_are_not_retried",
@@ -155,6 +156,7 @@
             "test_omitted_sleep_pauses_between_retries",
             "test_posts_the_pin_and_stamps_the_date_on_the_answer",
             "test_questions_wire_the_shape_the_api_expects",
+            "test_refuses_a_different_snapshot_on_the_answer",
             "test_refuses_a_request_with_no_questions_before_calling",
             "test_refuses_a_router_that_comes_back_on_the_answer",
             "test_refuses_anything_but_the_pin_before_the_request",
@@ -167,7 +169,7 @@
             "test_the_default_transport_reports_an_unreachable_host",
             "test_usage_that_is_not_a_number_is_left_blank"
           ],
-          "hash": "61e8b78c6e9ec4a2e0923e9213742a311112f68cf7e57a5023c0fd1c58946a64",
+          "hash": "fb3beccafa08f169d558445a2dd0a87f7d150d86db715dc3c263385ef66de001",
           "importsFiles": [
             "packages/decisions/src/decisions/__init__.py",
             "packages/decisions/src/decisions/client.py"
@@ -196,7 +198,7 @@
       "testRunners": [
         "pytest"
       ],
-      "testedBy": 2,
+      "testedBy": 3,
       "unresolvedSites": 0
     },
     {
@@ -208,11 +210,15 @@
       "externals": 0,
       "files": [
         {
-          "hash": "8c86d0854ad93cc764eecb35a8f231e2a75ad962e9145333b02a4371c9ec9ccb",
+          "hash": "860b1e737de05912129ca0ade039ae766296253c00f72c845c3cf4c5ca50a496",
           "path": "docs/adapter.md"
         },
         {
-          "hash": "9c87a5055b98cf9ac59844f4409bec1349d58edb22883e96a6160054de7df36f",
+          "hash": "7fc6c7d1fefd893b2e4b7e289147b97978e4982ca6002118ab669f7d6392d26b",
+          "path": "docs/calibration.md"
+        },
+        {
+          "hash": "b0825ac3e784e226335efe72e6a196d25442b389c189c83c5f788ca4ac3c4621",
           "path": "docs/contract.md"
         }
       ],
@@ -221,7 +227,7 @@
       ],
       "importConfidence": "full",
       "name": "docs",
-      "origin": "authored",
+      "origin": "mixed",
       "role": "docs",
       "testedBy": 0,
       "unresolvedSites": 0
@@ -373,60 +379,65 @@
             {
               "in": "_pitch_rows",
               "kind": "raise",
-              "line": 280
+              "line": 296
             },
             {
               "in": "_pitch_rows",
               "kind": "raise",
-              "line": 286
+              "line": 302
+            },
+            {
+              "in": "_pitch_rows",
+              "kind": "raise",
+              "line": 322
             },
             {
               "in": "transcript_from_scores",
               "kind": "raise",
-              "line": 336
+              "line": 360
             },
             {
               "in": "transcript_from_scores",
               "kind": "except",
-              "line": 339
+              "line": 363
             },
             {
               "in": "transcript_from_scores",
               "kind": "raise",
-              "line": 340
+              "line": 364
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 368
+              "line": 392
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 380
+              "line": 404
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 382
+              "line": 406
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 386
+              "line": 410
             },
             {
               "in": "from_jam_take",
               "kind": "raise",
-              "line": 419
+              "line": 443
             },
             {
               "in": "from_jam_take",
               "kind": "raise",
-              "line": 425
+              "line": 449
             }
           ],
-          "hash": "083741f4159a2a547882cb62a4f9c984264f00007c507a02a3b85c2721efbcfb",
+          "hash": "ad3836e240ac02847c34559bc5dfaa34b69693481bedcfc4b75a53da19dd39c7",
           "path": "packages/ears/src/ai_ears/record.py"
         },
         {
@@ -442,8 +453,38 @@
           "path": "packages/ears/tests/fixtures/receipt.json"
         },
         {
+          "hash": "345a3be48c8ad599121dc2399a3eeb42199216bad378ce68f96a2c2cc7339a6f",
+          "path": "packages/ears/tests/fixtures/undated-receipt.json"
+        },
+        {
+          "hash": "433f148e4614b35a4e6dcdda85aefab191f6c236e5421578a879192a23b99a75",
+          "path": "packages/ears/tests/fixtures/undated-verify-energy.json"
+        },
+        {
           "hash": "d519e7eb491131126024b631919e43c5c2d59b5e533b45bd27742e724a3691b1",
           "path": "packages/ears/tests/fixtures/verify-energy.json"
+        },
+        {
+          "exports": [
+            "test_a_built_phrase_carries_no_marks",
+            "test_clopper_matches_the_zero_error_form_and_a_two_trial_case",
+            "test_decide_adopts_only_when_every_gate_passes",
+            "test_errors_at_low_confidence_open_an_interior_band",
+            "test_full_coverage_is_not_an_interior_band_and_a_small_sample_certifies_nothing",
+            "test_mark_window_is_closed_at_both_ends",
+            "test_outer_split_is_stratified_and_leaves_the_inner_set",
+            "test_pav_pools_a_reversal_and_keeps_an_increase",
+            "test_question_text_has_no_gate_word",
+            "test_slice_keeps_a_boundary_row_and_an_overlapping_note",
+            "test_study_on_a_perfect_sample_does_not_invent_an_interior_band",
+            "test_temperature_sharpens_an_underconfident_probability_and_leaves_a_coin_flip",
+            "test_zero_errors_need_a_large_sample_at_the_locked_confidence"
+          ],
+          "hash": "e1259f4e1d7e6941dac1edda73425e2271638cb82cbc3c0baf8ea5769512ef80",
+          "importsFiles": [
+            "tools/phrase_calibration.py"
+          ],
+          "path": "packages/ears/tests/test_calibration_rule.py"
         },
         {
           "exports": [
@@ -472,8 +513,11 @@
         },
         {
           "exports": [
+            "test_a_null_median_without_a_pitch_state_is_refused",
+            "test_a_null_onset_is_undated_and_the_aligner_stays_on_the_receipt",
             "test_a_record_needs_both_ids",
             "test_an_empty_table_and_a_blank_hash_leave_no_provenance",
+            "test_an_unvoiced_row_with_no_median_stays_unvoiced",
             "test_gate_keys_are_rejected_on_a_result_shaped_object",
             "test_listener_transcript_must_stay_advisory",
             "test_phrase_scores_and_marks_that_are_the_wrong_shape_are_refused",
@@ -488,7 +532,7 @@
             "test_take_id_cannot_be_a_gate_word",
             "test_tracker_name_is_read_from_the_receipt"
           ],
-          "hash": "8e877880ad0c669db795c76e89f1454751d4496397e39c65b602c6c423c5b68c",
+          "hash": "322a125699e698ba5a0aa5910a33985d020170c93eab9d34e0c4b3d95d208232",
           "importsFiles": [
             "packages/ears/src/ai_ears/record.py"
           ],
@@ -506,7 +550,7 @@
       "testRunners": [
         "pytest"
       ],
-      "testedBy": 2,
+      "testedBy": 3,
       "unresolvedSites": 0
     },
     {
@@ -1250,9 +1294,10 @@
             "photo_bus",
             "photo_cheetah",
             "photo_lion",
-            "photo_tower"
+            "photo_tower",
+            "subprocess_env"
           ],
-          "hash": "d428ca3435ca49fd996ff9b6b69db80f99f2a1af706dcf0266426f24b54976e1",
+          "hash": "13b0782ae266da58df233fde63e6d4b487d7f5e0209d671771f97ef0b3fd5f7a",
           "importsFiles": [
             "packages/eyes/src/ai_eyes_mcp/engine.py"
           ],
@@ -1290,10 +1335,11 @@
           "testFramework": "pytest"
         },
         {
-          "hash": "901642c198c4c3481ce4f4360ccdd36e402fb1d7c064344915632ca2b67fbe30",
+          "hash": "6e74d5d669952a21b863b937c5080f9971c80ebf042f7c8baa5c4fdcdc3a5f6d",
           "importsFiles": [
             "packages/eyes/src/ai_eyes_mcp/engine.py",
-            "packages/eyes/src/ai_eyes_mcp/server.py"
+            "packages/eyes/src/ai_eyes_mcp/server.py",
+            "packages/eyes/tests/conftest.py"
           ],
           "path": "packages/eyes/tests/test_edge_cases.py",
           "testFramework": "pytest"
@@ -1329,7 +1375,7 @@
             "test_verify_tiny_margin_does_not_display_as_zero",
             "test_vram_mb_is_load_delta_not_current_process_allocation"
           ],
-          "hash": "40d1440c4723372b92593731aeef2d9e1233ed970ccc78473cd5876d6b040e50",
+          "hash": "12cfb1dc06b0808225118cd0bf5621b1d1eed3d8a783e72c64dc9b2640d61a29",
           "importsFiles": [
             "packages/eyes/src/ai_eyes_mcp/engine.py",
             "packages/eyes/tests/conftest.py"
@@ -1338,7 +1384,7 @@
           "testFramework": "pytest"
         },
         {
-          "hash": "161bcd50f882f1089163456375827d0c254fd58f8022ae107467cc7c94a6f235",
+          "hash": "118c908e4c85071468cc9eeb516fae8fd7f7d0ef05e8374283d0802b1e44a284",
           "importsFiles": [
             "packages/eyes/src/ai_eyes_mcp/engine.py",
             "packages/eyes/tests/conftest.py"
@@ -1410,11 +1456,12 @@
             "test_load_failure_does_not_forward_raw_exception",
             "test_verify_exposes_truncated_flag"
           ],
-          "hash": "3ad4fc40bc8824c8eab3da0efd7745a1f365deb2d120606db42f16e5ee84f44b",
+          "hash": "fcdba99b335508f5ccbe7099da7c78ce7f83ed8558d2b33a5d1ea27bd93082ae",
           "importsFiles": [
             "packages/eyes/src/ai_eyes_mcp/__init__.py",
             "packages/eyes/src/ai_eyes_mcp/engine.py",
-            "packages/eyes/src/ai_eyes_mcp/server.py"
+            "packages/eyes/src/ai_eyes_mcp/server.py",
+            "packages/eyes/tests/conftest.py"
           ],
           "path": "packages/eyes/tests/test_server_ci.py",
           "testFramework": "pytest"
@@ -1490,7 +1537,7 @@
       "unresolvedSites": 0
     },
     {
-      "dynamicReads": 0,
+      "dynamicReads": 4,
       "dynamicSpawns": 0,
       "dynamicSpawnsInTests": 0,
       "dynamicWrites": 0,
@@ -1508,6 +1555,172 @@
           "hash": "82ddf51c6b859e079f22577c180800001bf501c3dad30be4fb6726d10f19e25f",
           "path": "tools/coverage_bar.py",
           "sequences": []
+        },
+        {
+          "exports": [
+            "apply_temperature",
+            "assert_question",
+            "assign_folds",
+            "assign_outer",
+            "binom_cdf",
+            "bootstrap_edges",
+            "build_phrase",
+            "call_jev",
+            "clopper_accuracy_lower",
+            "clopper_upper",
+            "decide",
+            "fit_temperature",
+            "load_items",
+            "main",
+            "mark_overlaps",
+            "median",
+            "pav",
+            "percentile",
+            "phrase_label",
+            "run_study",
+            "selective_bound",
+            "slice_phrase",
+            "temperature_grid",
+            "write_report"
+          ],
+          "failurePaths": [
+            {
+              "in": "clopper_upper",
+              "kind": "raise",
+              "line": 165
+            },
+            {
+              "in": "clopper_upper",
+              "kind": "raise",
+              "line": 167
+            },
+            {
+              "in": "percentile",
+              "kind": "raise",
+              "line": 336
+            },
+            {
+              "in": "median",
+              "kind": "raise",
+              "line": 353
+            },
+            {
+              "in": "run_study",
+              "kind": "raise",
+              "line": 487
+            },
+            {
+              "in": "assert_question",
+              "kind": "raise",
+              "line": 619
+            },
+            {
+              "in": "build_phrase",
+              "kind": "raise",
+              "line": 625
+            },
+            {
+              "in": "build_phrase",
+              "kind": "raise",
+              "line": 628
+            },
+            {
+              "in": "build_phrase",
+              "kind": "raise",
+              "line": 642
+            },
+            {
+              "in": "build_phrase",
+              "kind": "raise",
+              "line": 656
+            },
+            {
+              "in": "build_phrase",
+              "kind": "raise",
+              "line": 658
+            },
+            {
+              "in": "_mark_times",
+              "kind": "raise",
+              "line": 675
+            },
+            {
+              "in": "_mark_times",
+              "kind": "raise",
+              "line": 685
+            },
+            {
+              "in": "_mark_times",
+              "kind": "raise",
+              "line": 687
+            },
+            {
+              "in": "_mark_times",
+              "kind": "raise",
+              "line": 696
+            },
+            {
+              "in": "load_items",
+              "kind": "raise",
+              "line": 730
+            },
+            {
+              "in": "load_items",
+              "kind": "raise",
+              "line": 733
+            },
+            {
+              "in": "load_items",
+              "kind": "raise",
+              "line": 736
+            },
+            {
+              "in": "load_items",
+              "kind": "raise",
+              "line": 738
+            },
+            {
+              "in": "_forbid",
+              "kind": "raise",
+              "line": 992
+            },
+            {
+              "in": "write_report",
+              "kind": "raise",
+              "line": 1000
+            },
+            {
+              "in": "write_report",
+              "kind": "raise",
+              "line": 1049
+            },
+            {
+              "in": "main",
+              "kind": "except",
+              "line": 1078
+            },
+            {
+              "in": "main",
+              "kind": "except",
+              "line": 1081
+            },
+            {
+              "kind": "raise",
+              "line": 1090
+            }
+          ],
+          "hash": "ce03405f01ee3930b6faea0425e0d895c09d3a81448c281723ee0a8a2a0766e4",
+          "importOrder": [
+            "packages/ears/src/ai_ears/questions.py",
+            "packages/ears/src/ai_ears/record.py",
+            "packages/decisions/src/decisions/__init__.py"
+          ],
+          "importsFiles": [
+            "packages/decisions/src/decisions/__init__.py",
+            "packages/ears/src/ai_ears/questions.py",
+            "packages/ears/src/ai_ears/record.py"
+          ],
+          "path": "tools/phrase_calibration.py"
         }
       ],
       "globs": [
@@ -1518,19 +1731,20 @@
       "origin": "authored",
       "outsidePlaces": [
         {
-          "reads": 1,
+          "reads": 3,
           "where": [
             "caller"
           ],
-          "writes": 0
+          "writes": 1
         }
       ],
-      "outsideReads": 1,
+      "outsideReads": 3,
+      "outsideWrites": 1,
       "role": "code",
       "testRunners": [
         "pytest"
       ],
-      "testedBy": 1,
+      "testedBy": 2,
       "unresolvedSites": 0
     }
   ],
@@ -1646,7 +1860,7 @@
         {
           "boundary": "ears",
           "depth": 0,
-          "files": 4
+          "files": 5
         },
         {
           "boundary": "eyes",
@@ -1656,7 +1870,7 @@
         {
           "boundary": "tools",
           "depth": 0,
-          "files": 1
+          "files": 2
         }
       ],
       "readers": [],
@@ -1708,7 +1922,7 @@
         {
           "config": "pyproject.toml",
           "coverage": true,
-          "files": 12,
+          "files": 13,
           "job": "pytest",
           "runner": "pytest",
           "step": "pytest"
@@ -1839,12 +2053,28 @@
       "from": "ears",
       "kind": "file",
       "to": "decisions"
+    },
+    {
+      "from": "ears",
+      "fromTests": true,
+      "kind": "file",
+      "to": "tools"
+    },
+    {
+      "from": "tools",
+      "kind": "file",
+      "to": "decisions"
+    },
+    {
+      "from": "tools",
+      "kind": "file",
+      "to": "ears"
     }
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "503d57acb4f1b53f69337c86afda5e58b3c71531",
-    "tracked": 96
+    "commit": "e4e89f53aaa86793b84e0669a32572c0221d083a",
+    "tracked": 101
   },
   "landings": [
     {
@@ -1967,6 +2197,72 @@
     {
       "readers": [
         {
+          "by": "tools/phrase_calibration.py",
+          "call": "read_text",
+          "confidence": "ast"
+        }
+      ],
+      "target": "docs/calibration.md",
+      "writers": [
+        {
+          "by": "tools/phrase_calibration.py",
+          "confidence": "ast",
+          "stamps": true,
+          "unless": [
+            "main"
+          ],
+          "untrackedInputs": true
+        }
+      ]
+    },
+    {
+      "readers": [],
+      "target": "docs/calibration/corp.svg",
+      "tracked": false,
+      "writers": [
+        {
+          "by": "tools/phrase_calibration.py",
+          "confidence": "ast",
+          "unless": [
+            "main"
+          ],
+          "untrackedInputs": true
+        }
+      ]
+    },
+    {
+      "readers": [],
+      "target": "docs/calibration/phrases.json",
+      "tracked": false,
+      "writers": [
+        {
+          "by": "tools/phrase_calibration.py",
+          "confidence": "ast",
+          "unless": [
+            "main"
+          ],
+          "untrackedInputs": true
+        }
+      ]
+    },
+    {
+      "readers": [],
+      "target": "docs/calibration/summary.json",
+      "tracked": false,
+      "writers": [
+        {
+          "by": "tools/phrase_calibration.py",
+          "confidence": "ast",
+          "unless": [
+            "main"
+          ],
+          "untrackedInputs": true
+        }
+      ]
+    },
+    {
+      "readers": [
+        {
           "by": "packages/ears/pyproject.toml",
           "call": "configuration",
           "confidence": "config"
@@ -1986,6 +2282,11 @@
           "by": "pyproject.toml",
           "call": "configuration",
           "confidence": "config"
+        },
+        {
+          "by": "tools/phrase_calibration.py",
+          "call": "literal",
+          "confidence": "ast"
         }
       ],
       "target": "packages/decisions/src",
@@ -2013,6 +2314,11 @@
           "by": "pyproject.toml",
           "call": "configuration",
           "confidence": "config"
+        },
+        {
+          "by": "tools/phrase_calibration.py",
+          "call": "literal",
+          "confidence": "ast"
         }
       ],
       "target": "packages/ears/src",
@@ -2269,6 +2575,6 @@
   "overlaps": [],
   "submodules": [],
   "symlinks": [],
-  "testFiles": 27,
+  "testFiles": 30,
   "unassigned": []
 }
