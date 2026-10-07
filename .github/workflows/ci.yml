@@ -1,11 +1,12 @@
 name: CI
 
 # pull_request has no paths filter because it is the required check: a
-# docs-only pull request still runs it. push is paths-gated so a commit that
-# does not touch the suite, the root config, or this workflow does not start
-# a run. workflow_dispatch covers a branch that has no pull request.
+# docs-only pull request still runs it. push is limited to main, and to the
+# paths that change the suite, the root config, or this workflow, so a
+# feature branch runs once, through the pull request.
 on:
   push:
+    branches: [main]
     paths:
       - 'packages/**'
       - 'pyproject.toml'
