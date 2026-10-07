@@ -46,7 +46,7 @@ Probabilities here are not a claim that Jev is calibrated on sung audio. A text 
 
 ## Decisions
 
-The only model string accepted is `typesafe/jev-1.13`. Every answer payload also stores the date `jev-1.13-20260917`. That date is ours, written beside the model so a later run can be compared with this one. It is not sent as a substitute model name. `jev-router`, a bare alias, or any other string fails before a request is made. A router would break replay.
+The request sends `typesafe/jev-1.13` and nothing else. Every answer payload stores that model and the date `jev-1.13-20260917`. The date is ours, written beside the model so a later run can be compared with this one. It is not sent as a substitute model name. An answer may echo `typesafe/jev-1.13-20260917`. That echo is this same pin, and it is accepted. `jev-router`, a bare alias, or any other string is refused. A request that names one of those fails before a call is made. A router would break replay.
 
 The live client is built only when the caller passes a key. Importing the package does not build one, and the tests never pass a live key. The allowance to spend OpenRouter on Jev in ai-playtest does not extend to this repo.
 

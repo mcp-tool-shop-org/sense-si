@@ -3,8 +3,10 @@
 The transport is the playtest client's shape: a state, named questions of
 three kinds, and a validated answer. This copy adds the pin. The model
 string on the wire is ``typesafe/jev-1.13``. The date is recorded on the
-result and is not sent as the model name, because the API would treat it
-as a different model. ``jev-router`` fails before any request.
+result and is not sent as the model name. An answer may echo
+``typesafe/jev-1.13-20260917``. That echo is this pin. ``jev-router`` and
+any other model string are refused. A request that names them fails before
+any request.
 """
 
 from __future__ import annotations
@@ -18,6 +20,8 @@ from typing import Callable, Mapping, Sequence, Union
 
 PINNED_MODEL = "typesafe/jev-1.13"
 PINNED_DATE = "jev-1.13-20260917"
+# The request sends PINNED_MODEL. The API may echo the dated snapshot.
+ACCEPTED_ANSWER_MODELS = frozenset({PINNED_MODEL, f"typesafe/{PINNED_DATE}"})
 DEFAULT_BASE = "https://openrouter.ai/api/alpha"
 
 
@@ -306,7 +310,7 @@ def create_decisions_client(
                 )
                 continue
             returned = parsed.get("model", PINNED_MODEL)
-            if returned != PINNED_MODEL:
+            if returned not in ACCEPTED_ANSWER_MODELS:
                 raise DecisionsError(
                     f"refused model {returned!r} on the answer; not replayable",
                     "the response model does not match the pin",

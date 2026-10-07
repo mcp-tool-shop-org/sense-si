@@ -5,8 +5,9 @@ One capped study of the question "is this phrase clean?" The uncertain band in
 
 The README still says a live call waits on a separate yes. This study is that
 yes: `typesafe/jev-1.13`, stamp `jev-1.13-20260917`, cap $0.25, key from the
-environment. It does not enable the client. Importing the package still spends
-nothing.
+environment. An answer that echoes `typesafe/jev-1.13-20260917` is this pin.
+The study still records `typesafe/jev-1.13` and the date. It does not enable
+the client. Importing the package still spends nothing.
 
 The rule below was locked before any phrase was scored. It follows the R&D
 entry `2026-10-07-calibrating-probabilistic-decision-layers`.

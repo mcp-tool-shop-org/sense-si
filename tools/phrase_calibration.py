@@ -31,7 +31,12 @@ for _extra in (
 
 from ai_ears.questions import _GATE_WORD, phrase_clean  # noqa: E402
 from ai_ears.record import EarsError, from_jam_take  # noqa: E402
-from decisions import PINNED_DATE, PINNED_MODEL, create_decisions_client  # noqa: E402
+from decisions import (  # noqa: E402
+    PINNED_DATE,
+    PINNED_MODEL,
+    DecisionsError,
+    create_decisions_client,
+)
 
 # Locked 2026-10-07, before any test phrase was scored.
 SEED = 20261007
@@ -1072,6 +1077,10 @@ def main(argv: list[str]) -> int:
             return 0
     except EarsError as err:
         print(f"FAILED {err}")
+        return 2
+    except DecisionsError as err:
+        # The HTTP message can echo the record. The hint does not.
+        print(f"FAILED decisions status={err.status} {err.hint}")
         return 2
     print("usage: phrase_calibration.py --dry-run|--call|--report")
     return 2
