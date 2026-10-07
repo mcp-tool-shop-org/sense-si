@@ -1,18 +1,14 @@
 # sense-si: how it works
 
-Mapped at 2026-10-07 from commit 14b3ef7 by Atlas 1.24.0.
+Mapped at 2026-10-07 from commit 5ad4c96 by Atlas 1.24.0.
 
 ## What this is
 
 6 parts, mostly Python (10 files). Work enters through 1 door; the busiest is CI, which reaches 3 parts.
 
-## What changed since 2026-10-07 (e2b6139)
+## What changed since 2026-10-07 (14b3ef7)
 
-- decisions now imports tools.
-- CI's push trigger now also names `codecov.yml` and `tools/**`.
-- CI now also runs tools/coverage_bar.py.
-- tools is a new part, drawn from `tools/**`.
-- 3 files added and 6 changed content, across 5 parts.
+Nothing structural changed since 2026-10-07; 1 file changed content.
 
 ## What comes in
 

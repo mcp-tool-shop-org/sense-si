@@ -28,61 +28,31 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 3,
-      "changed": 6,
+      "added": 0,
+      "changed": 1,
       "moved": 0,
-      "parts": 5,
+      "parts": 1,
       "removed": 0
     },
     "items": [
       {
-        "kind": "import-added",
-        "sentence": "decisions now imports tools.",
-        "subjects": [
-          "decisions",
-          "tools"
-        ]
-      },
-      {
-        "kind": "door",
-        "sentence": "CI's push trigger now also names `codecov.yml` and `tools/**`.",
-        "subjects": [
-          ".github/workflows/ci.yml"
-        ]
-      },
-      {
-        "kind": "door",
-        "sentence": "CI now also runs tools/coverage_bar.py.",
-        "subjects": [
-          ".github/workflows/ci.yml",
-          "tools/coverage_bar.py"
-        ]
-      },
-      {
-        "kind": "part",
-        "sentence": "tools is a new part, drawn from `tools/**`.",
-        "subjects": [
-          "tools"
-        ]
-      },
-      {
         "kind": "counts",
-        "sentence": "3 files added and 6 changed content, across 5 parts.",
+        "sentence": "Nothing structural changed since 2026-10-07; 1 file changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "e2b61390b2e80f615b5f7f95515d686848e08578",
-      "generatedAt": "2026-10-07T17:17:39.834Z"
+      "commit": "14b3ef777935f7b390c00338160786561a9d139e",
+      "generatedAt": "2026-10-07T17:47:42.343Z"
     },
-    "unchanged": false
+    "unchanged": true
   },
   "changesTogether": [],
   "changesTogetherNote": [
     "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "14b3ef777935f7b390c00338160786561a9d139e",
+  "commit": "5ad4c9677ea7192ce02075fbaf928b1d73a3f485",
   "defaultBranch": "main",
   "derived": "6 parts, mostly Python (10 files). Work enters through 1 door; the busiest is CI, which reaches 3 parts.",
   "doors": [
@@ -142,7 +112,7 @@
   ],
   "engine": "1.24.0",
   "generated": [],
-  "generatedAt": "2026-10-07T17:47:42.343Z",
+  "generatedAt": "2026-10-07T17:56:25.779Z",
   "limits": [
     "1 read goes to a path its caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
