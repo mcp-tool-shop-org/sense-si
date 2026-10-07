@@ -18,8 +18,11 @@ from decisions import (
 
 from ai_ears.record import EarsError, HearingRecord, reject_gate_keys
 
-# Placeholder. ai-playtest set its uncertain band from a measured Jev calibration.
-# This one has no sung-audio answer key yet, so 0.35–0.65 is not a measured frequency.
+# Kept after docs/calibration.md. 124 sung phrases, 73 clean and 51 not clean.
+# Geifman and El-Yaniv 2017, target risk 0.10, δ = 0.001. No interior band in
+# 1000 of 1000 inner resamples, so these edges stay. The product interval is
+# closed: 0.35 and 0.65 are too close to call. The study would have abstained
+# only strictly inside its edges.
 DEFAULT_BAND = (0.35, 0.65)
 _GATE_WORD = re.compile(r"\b(pass|fail|passed|failed)\b", re.IGNORECASE)
 

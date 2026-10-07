@@ -38,11 +38,11 @@ Callers supply the record and the question. Jev returns numbers, not an explanat
 
 **Which take.** A choice among the take ids handed in. The result is a probability per take, and confidence when the model gave one. There is no winner field for a script to apply.
 
-**Is this phrase clean.** A yes/no question. The caller writes what true and false mean. The result is P(yes). "Clean" is not a scale hidden in the package. P(yes) inside the uncertain band, 0.35 to 0.65 inclusive, is reported as too close to call. That band is a placeholder. It gets replaced when a calibration run on sung audio measures it, the way ai-playtest set its band from Jev's measured calibration.
+**Is this phrase clean.** A yes/no question. The caller writes what true and false mean. The result is P(yes). "Clean" is not a scale hidden in the package. P(yes) from 0.35 to 0.65 inclusive is reported as too close to call. A calibration on 124 sung phrases, 73 clean and 51 not clean, did not support a narrower band. The method is selective classification with the upper confidence bound of Geifman and El-Yaniv (2017), target risk 0.10, δ = 0.001. No interior band appeared in 1000 of 1000 resamples of the inner phrases, so 0.35–0.65 stays. The scores and the rule are in `docs/calibration.md`. The product interval is closed, so the endpoints count as too close to call. The study would have abstained only strictly inside its edges.
 
 A score question waits until there is an ordered scale and labels. One call does not discover a new defect.
 
-Probabilities here are not a claim that Jev is calibrated on sung audio. A text benchmark does not transfer. Calibration waits on an audio answer key.
+Probabilities here are not a claim that Jev is calibrated. The sung-audio study's Brier score did not support reading P(yes) as a frequency. A text benchmark does not transfer.
 
 ## Decisions
 
