@@ -3,6 +3,8 @@ import json
 import pytest
 
 from decisions import (
+    KEV_MODEL,
+    KEV_REVISION,
     PINNED_DATE,
     PINNED_MODEL,
     ChoiceAnswer,
@@ -291,3 +293,80 @@ def test_a_result_without_a_cost_omits_it_and_a_loaded_confidence_is_kept():
     assert "confidence" not in body
     loaded = load_question_result({**body, "confidence": 0.9})
     assert loaded.confidence == 0.9
+
+
+def test_an_explicit_jev_band_still_marks_a_clear_probability():
+    result = phrase_clean(
+        _take("take-a", cents=0, ms=0),
+        instructions=CLEAN,
+        true="yes",
+        false="no",
+        client=_stub(NoulAnswer(noul=0.5)),
+        band=(0.1, 0.2),
+    )
+    assert result.band == (0.1, 0.2)
+    assert result.uncertain is False
+    assert result.to_dict()["band"] == [0.1, 0.2]
+
+
+def test_kev_phrase_clean_stays_unanswered_and_refuses_a_passed_band():
+    record = _take("take-a", cents=0, ms=0)
+
+    def client(request):
+        return DecisionResult(
+            model=KEV_MODEL,
+            dated=KEV_REVISION,
+            answers={"phrase_clean": NoulAnswer(noul=0.92)},
+            cost=None,
+        )
+
+    result = phrase_clean(record, instructions=CLEAN, true="yes", false="no", client=client)
+    assert result.uncertain is True
+    assert result.band == (0.0, 1.0)
+    assert result.model == KEV_MODEL
+    assert result.dated == KEV_REVISION
+    assert result.probabilities == {"yes": 0.92}
+    assert result.to_dict()["band"] == [0.0, 1.0]
+    with pytest.raises(EarsError, match="Kev threshold"):
+        phrase_clean(
+            record,
+            instructions=CLEAN,
+            true="yes",
+            false="no",
+            client=client,
+            band=(0.35, 0.65),
+        )
+    with pytest.raises(EarsError, match="pinned"):
+        phrase_clean(
+            record,
+            instructions=CLEAN,
+            true="yes",
+            false="no",
+            client=_result(NoulAnswer(noul=0.92), model=KEV_MODEL, dated=PINNED_DATE),
+        )
+
+
+def test_kev_which_take_stays_unanswered():
+    probs = {"take-a": 0.7, "take-b": 0.3}
+    answer = ChoiceAnswer(choice="take-a", probabilities=probs, confidence=0.9)
+    result = which_take(
+        _pair(),
+        instructions=INSTRUCTIONS,
+        client=_result(answer, model=KEV_MODEL, dated=KEV_REVISION),
+    )
+    assert result.uncertain is True
+    assert result.band == (0.0, 1.0)
+    assert result.probabilities == probs
+    with pytest.raises(EarsError, match="Kev threshold"):
+        which_take(
+            _pair(),
+            instructions=INSTRUCTIONS,
+            client=_result(answer, model=KEV_MODEL, dated=KEV_REVISION),
+            band=(0.35, 0.65),
+        )
+    with pytest.raises(EarsError, match="pinned"):
+        which_take(
+            _pair(),
+            instructions=INSTRUCTIONS,
+            client=_result(answer, model="other", dated=KEV_REVISION),
+        )

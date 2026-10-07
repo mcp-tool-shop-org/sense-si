@@ -1,7 +1,7 @@
 [project]
 name = "sense-si"
 version = "0.0.0"
-description = "Python instruments for seeing and hearing. Jev answers questions over their records."
+description = "Python instruments for seeing and hearing. A pinned local engine answers questions over their records."
 requires-python = ">=3.10"
 readme = "README.md"
 
@@ -16,6 +16,7 @@ pythonpath = [
 ]
 markers = [
     "dogfood: requires the SigLIP2 weights and a GPU, and is not part of CI",
+    "kev: live Kev-4B checkpoint, not part of CI",
 ]
 
 [tool.coverage.run]

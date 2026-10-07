@@ -50,13 +50,21 @@ Probabilities here are not a claim that Jev is calibrated. The sung-audio study'
 
 ## Decisions
 
-The request sends `typesafe/jev-1.13` and nothing else. Every answer payload stores that model and the date `jev-1.13-20260917`. The date is ours, written beside the model so a later run can be compared with this one. It is not sent as a substitute model name. An answer may echo `typesafe/jev-1.13-20260917`. That echo is this same pin, and it is accepted. `jev-router`, a bare alias, or any other string is refused. A request that names one of those fails before a call is made. A router would break replay.
+The local engine is Kev-4B. The checkpoint is `jaredpalmer/kev-4b` at revision `6cfce5c2fa4b4bd64026336ab649c5ca78857d52`. The client posts to `/v1/systemone` on this machine, sends that pin, and accepts only an echo of the same pin. No key. Kev is Apache-2.0. The base it was adapted from is `Qwen/Qwen3.5-4B-Base` at `1001bb4d826a52d1f399e183466143f4da7b741b`. That revision is provenance, not a phrase-clean threshold. The serve implementation measured with the cap is library revision `5e42a7a03f28134853dd3ff77461457e921e5ec1`. It is not vendored. The helper's default listen address is `127.0.0.1` port 8009.
 
-The live client is built only when the caller passes a key. Importing the package does not build one, and the tests never pass a live key. The allowance to spend OpenRouter on Jev in ai-playtest does not extend to this repo.
+Before the checkpoint allocates, the process that loads it sets a PyTorch per-process memory fraction. The default is 0.82. An argument overrides `KEV_MEMORY_FRACTION`, which overrides the default. A fraction outside (0, 1] is refused. On a CPU process the fraction is recorded and CUDA is not called. A child process does not inherit the fraction.
+
+Hosted Jev stays the optional comparison. That client sends `typesafe/jev-1.13` and nothing else. Every Jev answer payload stores that model and the date `jev-1.13-20260917`. The date is ours, written beside the model so a later run can be compared with this one. It is not sent as a substitute model name. An answer may echo `typesafe/jev-1.13-20260917`. That echo is this same pin, and it is accepted. `jev-router`, a bare alias, or any other string is refused. A request that names one of those fails before a call is made. A router would break replay.
+
+The live Jev client is built only when the caller passes a key. Importing the package does not build one, and the tests never pass a live key. The allowance to spend OpenRouter on Jev in ai-playtest does not extend to this repo. A live Kev call is a separate opt-in against a server that is already running the capped pin. The suite does not load the checkpoint.
+
+OpenJev (`openjev/openjev`, CC BY-NC) stays research-only. It is not imported and it is not a dependency.
+
+Kev's probabilities are not Jev's. The 0.35–0.65 band is the Jev question's band. A Kev result is stored with the unanswered range 0–1 and `uncertain` true. That range is the unanswered state, not a fitted threshold. A caller who passes a band into a Kev question is refused. When a Kev threshold exists, it is fitted on Kev's own leave-one-mix-out folds. The phrase-clean layer stays insufficient evidence until new labels arrive. The research seat measured this checkpoint against hosted Jev on the same 124 phrases (rnd v1.1.0.0.0, `experiments/openjev-vs-jev/results/compare-all.json`): correlation 0.67, about 0.43 seconds a phrase, and once calibrated the probabilities sat at the base rate. The engine change is cost, speed, and the Apache-2.0 licence.
 
 The answer schema has probabilities, the model pin, the date, the uncertain band, and the cost when a call reported one. It has no `pass` field and no `fail` field. A payload that carries either is rejected.
 
-A confident probability that disagrees with a jam gate is a mark for a person to read. It does not override the gate, and it does not pick the take. A consumer that thresholds Jev into a gate is outside this tool.
+A confident probability that disagrees with a jam gate is a mark for a person to read. It does not override the gate, and it does not pick the take. A consumer that thresholds a probability into a gate is outside this tool.
 
 ## What stays outside
 

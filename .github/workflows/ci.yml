@@ -55,7 +55,7 @@ jobs:
 
       - name: pytest
         run: |
-          python -m pytest -m "not dogfood" --cov=ai_ears --cov=decisions --cov=ai_eyes_mcp --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=90
+          python -m pytest -m "not dogfood and not kev" --cov=ai_ears --cov=decisions --cov=ai_eyes_mcp --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=90
           python tools/coverage_bar.py coverage.xml 90
 
       - name: Upload coverage
