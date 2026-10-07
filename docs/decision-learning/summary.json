@@ -1,0 +1,2896 @@
+{
+  "model": "typesafe/jev-1.13",
+  "dated": "jev-1.13-20260917",
+  "band": [
+    0.35,
+    0.65
+  ],
+  "holdout_seed": 20261008,
+  "holdout_n": 20,
+  "prior_spend_usd": 0.021653,
+  "new_spend_usd": 0.157877706,
+  "labels": {
+    "brier_extended": 0.3340733870967742,
+    "brier_strict": 0.3863314516129032,
+    "brier_without_edge": 0.48010126582278484,
+    "extended_minus_strict": {
+      "mean": -0.05225806451612902,
+      "low": -0.07984274193548387,
+      "high": -0.027245967741935516,
+      "resolvable": true
+    },
+    "edge_shift": {
+      "mean": -0.14602787872601064,
+      "low": -0.18111434429871445,
+      "high": -0.11130248020541748,
+      "resolvable": true
+    },
+    "n_edge": 45,
+    "n_mid": 6,
+    "n_certain": 73,
+    "n_extended_clean": 73,
+    "n_strict_clean": 87,
+    "n_flip": 14
+  },
+  "models": [
+    {
+      "model": "base-rate",
+      "status": "ok",
+      "brier": 0.2776832193116886,
+      "log_loss": 0.7512588674827136,
+      "within_brier": 0.27853666757690976,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.4236111111111112,
+          "log_loss": 1.0552905898831129
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.2469993141289438,
+          "log_loss": 0.6871765278951649
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.2469993141289438,
+          "log_loss": 0.6871765278951649
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.22299382716049376,
+          "log_loss": 0.6390799592896694
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.3284948224852072,
+          "log_loss": 0.8553405744731257
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.24018121301775147,
+          "log_loss": 0.6733865343599611
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.24047707100591706,
+          "log_loss": 0.6740989855892505
+        }
+      ],
+      "fold_brier": [
+        0.4236111111111112,
+        0.2469993141289438,
+        0.2469993141289438,
+        0.22299382716049376,
+        0.3284948224852072,
+        0.24018121301775147,
+        0.24047707100591706
+      ],
+      "fold_log_loss": [
+        1.0552905898831129,
+        0.6871765278951649,
+        0.6871765278951649,
+        0.6390799592896694,
+        0.8553405744731257,
+        0.6733865343599611,
+        0.6740989855892505
+      ],
+      "name": "base-rate",
+      "label": "extended",
+      "family": "prevalence",
+      "n_features": 0,
+      "versus_logistic": {
+        "mean": -0.22907777045429834,
+        "low": -0.5080126519101036,
+        "high": 0.04985711100150697,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.5018792171652879,
+      "log_loss": 2.718774907825211,
+      "within_brier": 0.5076144380312081,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.9374991855141209,
+          "log_loss": 12.952041210564575
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.32644580699756165,
+          "log_loss": 0.9145093359060433
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.37207411490484776,
+          "log_loss": 1.0889884890817876
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.572230491551824,
+          "log_loss": 1.4563875399693051
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.37802131115423554,
+          "log_loss": 1.0052131237641462
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.2710347292580445,
+          "log_loss": 0.7389485321390697
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.6959954268378226,
+          "log_loss": 1.982701512195727
+        }
+      ],
+      "fold_brier": [
+        0.9374991855141209,
+        0.32644580699756165,
+        0.37207411490484776,
+        0.572230491551824,
+        0.37802131115423554,
+        0.2710347292580445,
+        0.6959954268378226
+      ],
+      "fold_log_loss": [
+        12.952041210564575,
+        0.9145093359060433,
+        1.0889884890817876,
+        1.4563875399693051,
+        1.0052131237641462,
+        0.7389485321390697,
+        1.982701512195727
+      ],
+      "name": "logistic",
+      "label": "extended",
+      "family": "receipt",
+      "n_features": 22,
+      "versus_logistic": null
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.3109343719234857,
+      "log_loss": 1.8295226257437458,
+      "within_brier": 0.322370021622066,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.9374084797668172,
+          "log_loss": 9.638656761540709
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.1978150879956631,
+          "log_loss": 0.638398826943518
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.3002557373552978,
+          "log_loss": 1.0047380254491578
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.2085059220264724,
+          "log_loss": 0.5850586647979267
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.1699995451265933,
+          "log_loss": 0.5746416007201874
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.17706604768558,
+          "log_loss": 0.508577182292204
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.26553933139803826,
+          "log_loss": 0.7663396736137777
+        }
+      ],
+      "fold_brier": [
+        0.9374084797668172,
+        0.1978150879956631,
+        0.3002557373552978,
+        0.2085059220264724,
+        0.1699995451265933,
+        0.17706604768558,
+        0.26553933139803826
+      ],
+      "fold_log_loss": [
+        9.638656761540709,
+        0.638398826943518,
+        1.0047380254491578,
+        0.5850586647979267,
+        0.5746416007201874,
+        0.508577182292204,
+        0.7663396736137777
+      ],
+      "name": "logistic-all",
+      "label": "extended",
+      "family": "all",
+      "n_features": 41,
+      "versus_logistic": {
+        "mean": -0.1852444164091421,
+        "low": -0.4014821811792644,
+        "high": 0.030993348360980166,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.3359083583506363,
+      "log_loss": 0.9294497293871482,
+      "within_brier": 0.3418916530310164,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.7388403861762581,
+          "log_loss": 2.05642872270455
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.28780182537433985,
+          "log_loss": 0.7794801497488124
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.2574232080529739,
+          "log_loss": 0.7078590372377478
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.2689833276122758,
+          "log_loss": 0.7323447072906552
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.4170806471233403,
+          "log_loss": 1.1163086335605832
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.24031138629036541,
+          "log_loss": 0.6748765004382873
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.18280079058756157,
+          "log_loss": 0.5505130946160335
+        }
+      ],
+      "fold_brier": [
+        0.7388403861762581,
+        0.28780182537433985,
+        0.2574232080529739,
+        0.2689833276122758,
+        0.4170806471233403,
+        0.24031138629036541,
+        0.18280079058756157
+      ],
+      "fold_log_loss": [
+        2.05642872270455,
+        0.7794801497488124,
+        0.7078590372377478,
+        0.7323447072906552,
+        1.1163086335605832,
+        0.6748765004382873,
+        0.5505130946160335
+      ],
+      "name": "logistic-timing",
+      "label": "extended",
+      "family": "timing",
+      "n_features": 5,
+      "versus_logistic": {
+        "mean": -0.16572278500019172,
+        "low": -0.426363945397315,
+        "high": 0.09491837539693154,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.3882455604462047,
+      "log_loss": 2.1518092873197996,
+      "within_brier": 0.4000071325418846,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.9374796172402096,
+          "log_loss": 10.960746430556847
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.32854362081805927,
+          "log_loss": 0.9300726713656745
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.348610493261616,
+          "log_loss": 1.0495001588792319
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.3500035338137283,
+          "log_loss": 0.902040817891015
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.28301332392979656,
+          "log_loss": 0.7664852430134355
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.26707849115913546,
+          "log_loss": 0.7309051784180653
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.285320847570647,
+          "log_loss": 0.7699390969970537
+        }
+      ],
+      "fold_brier": [
+        0.9374796172402096,
+        0.32854362081805927,
+        0.348610493261616,
+        0.3500035338137283,
+        0.28301332392979656,
+        0.26707849115913546,
+        0.285320847570647
+      ],
+      "fold_log_loss": [
+        10.960746430556847,
+        0.9300726713656745,
+        1.0495001588792319,
+        0.902040817891015,
+        0.7664852430134355,
+        0.7309051784180653,
+        0.7699390969970537
+      ],
+      "name": "logistic-pitch",
+      "label": "extended",
+      "family": "pitch",
+      "n_features": 8,
+      "versus_logistic": {
+        "mean": -0.10760730548932355,
+        "low": -0.32052549071659514,
+        "high": 0.10531087973794805,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.2937558326408833,
+      "log_loss": 0.7881282435469184,
+      "within_brier": 0.295738459176975,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.4233450307075475,
+          "log_loss": 1.0573302338079913
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.25992500478215536,
+          "log_loss": 0.7137046105001662
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.298997519326326,
+          "log_loss": 0.7977358286243215
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.26214770451070996,
+          "log_loss": 0.7174971099143042
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.34012074257216446,
+          "log_loss": 0.8948391178393342
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.21902645076009403,
+          "log_loss": 0.629479695511397
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.26660676157982743,
+          "log_loss": 0.7330620703627351
+        }
+      ],
+      "fold_brier": [
+        0.4233450307075475,
+        0.25992500478215536,
+        0.298997519326326,
+        0.26214770451070996,
+        0.34012074257216446,
+        0.21902645076009403,
+        0.26660676157982743
+      ],
+      "fold_log_loss": [
+        1.0573302338079913,
+        0.7137046105001662,
+        0.7977358286243215,
+        0.7174971099143042,
+        0.8948391178393342,
+        0.629479695511397,
+        0.7330620703627351
+      ],
+      "name": "logistic-transcript",
+      "label": "extended",
+      "family": "transcript",
+      "n_features": 9,
+      "versus_logistic": {
+        "mean": -0.2118759788542332,
+        "low": -0.48689087085603233,
+        "high": 0.06313891314756592,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.437896970619222,
+      "log_loss": 2.481970360842916,
+      "within_brier": 0.4485839324034324,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.9374977576286737,
+          "log_loss": 12.674129276115293
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.3170759191699165,
+          "log_loss": 0.8817668451320306
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.32582568627560726,
+          "log_loss": 0.9681213761858078
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.5452321818500577,
+          "log_loss": 1.3645825071171471
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.35567395103179067,
+          "log_loss": 0.9479480939542055
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.27134251262161213,
+          "log_loss": 0.7411432934414331
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.3874395182463691,
+          "log_loss": 0.9882448461902218
+        }
+      ],
+      "fold_brier": [
+        0.9374977576286737,
+        0.3170759191699165,
+        0.32582568627560726,
+        0.5452321818500577,
+        0.35567395103179067,
+        0.27134251262161213,
+        0.3874395182463691
+      ],
+      "fold_log_loss": [
+        12.674129276115293,
+        0.8817668451320306,
+        0.9681213761858078,
+        1.3645825071171471,
+        0.9479480939542055,
+        0.7411432934414331,
+        0.9882448461902218
+      ],
+      "name": "logistic-timing-pitch",
+      "label": "extended",
+      "family": "timing-pitch",
+      "n_features": 13,
+      "versus_logistic": {
+        "mean": 0.12621391078136643,
+        "low": -0.026062315695491917,
+        "high": 0.2784901372582248,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic-all"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.3964267590018313,
+      "log_loss": 2.296483046637815,
+      "within_brier": 0.40713809981940585,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.9374934203109805,
+          "log_loss": 11.91287922601039
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.28436311609369896,
+          "log_loss": 0.7785851215018579
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.30373700589156816,
+          "log_loss": 0.9006795473226872
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.43501042232618964,
+          "log_loss": 1.095676797923269
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.3634444582386276,
+          "log_loss": 1.0532523505281377
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.2820619617756825,
+          "log_loss": 0.7665830656398586
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.2438563140990937,
+          "log_loss": 0.6681029187798917
+        }
+      ],
+      "fold_brier": [
+        0.9374934203109805,
+        0.28436311609369896,
+        0.30373700589156816,
+        0.43501042232618964,
+        0.3634444582386276,
+        0.2820619617756825,
+        0.2438563140990937
+      ],
+      "fold_log_loss": [
+        11.91287922601039,
+        0.7785851215018579,
+        0.9006795473226872,
+        1.095676797923269,
+        1.0532523505281377,
+        0.7665830656398586,
+        0.6681029187798917
+      ],
+      "name": "logistic-plus-joins",
+      "label": "extended",
+      "family": "plus-joins",
+      "n_features": 15,
+      "versus_logistic": {
+        "mean": 0.08476807819733986,
+        "low": -0.04849729480288509,
+        "high": 0.21803345119756481,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic-all"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.3276373188431592,
+      "log_loss": 2.0637171773520886,
+      "within_brier": 0.3394203725657806,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.9374810160586051,
+          "log_loss": 11.10734397113101
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.19497636159861575,
+          "log_loss": 0.5698540886890922
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.33072364297961576,
+          "log_loss": 1.108854802493824
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.25977513502754823,
+          "log_loss": 0.7193370524271688
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.2793654677498315,
+          "log_loss": 0.8952404608130925
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.19002004294896307,
+          "log_loss": 0.5586764160143387
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.18360094159728482,
+          "log_loss": 0.5368176909626441
+        }
+      ],
+      "fold_brier": [
+        0.9374810160586051,
+        0.19497636159861575,
+        0.33072364297961576,
+        0.25977513502754823,
+        0.2793654677498315,
+        0.19002004294896307,
+        0.18360094159728482
+      ],
+      "fold_log_loss": [
+        11.10734397113101,
+        0.5698540886890922,
+        1.108854802493824,
+        0.7193370524271688,
+        0.8952404608130925,
+        0.5586764160143387,
+        0.5368176909626441
+      ],
+      "name": "logistic-plus-segment",
+      "label": "extended",
+      "family": "plus-segment",
+      "n_features": 23,
+      "versus_logistic": {
+        "mean": 0.017050350943714602,
+        "low": -0.062327113641769,
+        "high": 0.0964278155291982,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic-all"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.2831488855296051,
+      "log_loss": 1.395223007418076,
+      "within_brier": 0.2967643103566678,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.9357842082022096,
+          "log_loss": 6.890862479875304
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.19854436993893865,
+          "log_loss": 0.6043102478146801
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.28326613974440545,
+          "log_loss": 0.9451513172713922
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.19154069318006034,
+          "log_loss": 0.5539228296303923
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.16583269460903255,
+          "log_loss": 0.568240708148618
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.16883677801085328,
+          "log_loss": 0.4892097441885904
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.13354528881117442,
+          "log_loss": 0.3975346939814487
+        }
+      ],
+      "fold_brier": [
+        0.9357842082022096,
+        0.19854436993893865,
+        0.28326613974440545,
+        0.19154069318006034,
+        0.16583269460903255,
+        0.16883677801085328,
+        0.13354528881117442
+      ],
+      "fold_log_loss": [
+        6.890862479875304,
+        0.6043102478146801,
+        0.9451513172713922,
+        0.5539228296303923,
+        0.568240708148618,
+        0.4892097441885904,
+        0.3975346939814487
+      ],
+      "name": "logistic-plus-measures",
+      "label": "extended",
+      "family": "plus-measures",
+      "n_features": 32,
+      "versus_logistic": {
+        "mean": -0.025605711265398245,
+        "low": -0.09021619859172558,
+        "high": 0.039004776060929086,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic-all"
+      }
+    },
+    {
+      "model": "gbdt",
+      "status": "ok",
+      "brier": 0.3287526480099211,
+      "log_loss": 1.0585886809727663,
+      "within_brier": 0.34286669051511093,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.8838658413391366,
+          "log_loss": 3.4717556070776756
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.23402992430968425,
+          "log_loss": 0.674324106536264
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.2459558899540806,
+          "log_loss": 0.6931003319156718
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.44515042411842726,
+          "log_loss": 1.1492715973493257
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.24068190140161985,
+          "log_loss": 0.6945527816724216
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.2577386808721394,
+          "log_loss": 0.7391161521193017
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.09264417161068852,
+          "log_loss": 0.3388195739362797
+        }
+      ],
+      "fold_brier": [
+        0.8838658413391366,
+        0.23402992430968425,
+        0.2459558899540806,
+        0.44515042411842726,
+        0.24068190140161985,
+        0.2577386808721394,
+        0.09264417161068852
+      ],
+      "fold_log_loss": [
+        3.4717556070776756,
+        0.674324106536264,
+        0.6931003319156718,
+        1.1492715973493257,
+        0.6945527816724216,
+        0.7391161521193017,
+        0.3388195739362797
+      ],
+      "name": "gbdt",
+      "label": "extended",
+      "family": "receipt",
+      "n_features": 22,
+      "versus_logistic": {
+        "mean": -0.16474774751609722,
+        "low": -0.4352293439081254,
+        "high": 0.10573384887593096,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "model": "gbdt",
+      "status": "ok",
+      "brier": 0.25416159514448494,
+      "log_loss": 0.7170584320897404,
+      "within_brier": 0.2608013751538201,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.5386074880134439,
+          "log_loss": 1.3631902372450824
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.23298024744927873,
+          "log_loss": 0.6756117433907359
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.2751783265519062,
+          "log_loss": 0.7784247014427028
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.20227261889004666,
+          "log_loss": 0.5881751011994069
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.25105982984059955,
+          "log_loss": 0.7260790948835167
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.20697808870561468,
+          "log_loss": 0.6142925786493231
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.11853302662585112,
+          "log_loss": 0.3810691788012038
+        }
+      ],
+      "fold_brier": [
+        0.5386074880134439,
+        0.23298024744927873,
+        0.2751783265519062,
+        0.20227261889004666,
+        0.25105982984059955,
+        0.20697808870561468,
+        0.11853302662585112
+      ],
+      "fold_log_loss": [
+        1.3631902372450824,
+        0.6756117433907359,
+        0.7784247014427028,
+        0.5881751011994069,
+        0.7260790948835167,
+        0.6142925786493231,
+        0.3810691788012038
+      ],
+      "name": "gbdt-all",
+      "label": "extended",
+      "family": "all",
+      "n_features": 41,
+      "versus_logistic": {
+        "mean": -0.06156864646824588,
+        "low": -0.28643166517761065,
+        "high": 0.16329437224111887,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic-all"
+      },
+      "versus_base": {
+        "mean": -0.017735292423089636,
+        "low": -0.12089871095823934,
+        "high": 0.08542812611206008,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "base-rate",
+        "pooled": -0.02352162416720366
+      }
+    },
+    {
+      "model": "tabpfn",
+      "status": "not-run",
+      "reason": "fit",
+      "name": "tabpfn",
+      "label": "extended",
+      "family": "receipt",
+      "n_features": 22,
+      "versus_logistic": null
+    },
+    {
+      "model": "tabpfn",
+      "status": "not-run",
+      "reason": "fit",
+      "name": "tabpfn-all",
+      "label": "extended",
+      "family": "all",
+      "n_features": 41,
+      "versus_logistic": null
+    },
+    {
+      "model": "featllm",
+      "status": "ok",
+      "brier": 0.28117320085483527,
+      "log_loss": 0.7773388039500695,
+      "within_brier": 0.28372755046323456,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.4760791921344358,
+          "log_loss": 1.2399401614645051
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.23349919504101316,
+          "log_loss": 0.6572261853654718
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.2903425637728337,
+          "log_loss": 0.8537193975178313
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.2141740887650362,
+          "log_loss": 0.6185997011885285
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.3197041178819856,
+          "log_loss": 0.8378315690396467
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.22731029954102017,
+          "log_loss": 0.6465122134633724
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.22498339610631732,
+          "log_loss": 0.639568445558341
+        }
+      ],
+      "fold_brier": [
+        0.4760791921344358,
+        0.23349919504101316,
+        0.2903425637728337,
+        0.2141740887650362,
+        0.3197041178819856,
+        0.22731029954102017,
+        0.22498339610631732
+      ],
+      "fold_log_loss": [
+        1.2399401614645051,
+        0.6572261853654718,
+        0.8537193975178313,
+        0.6185997011885285,
+        0.8378315690396467,
+        0.6465122134633724,
+        0.639568445558341
+      ],
+      "name": "featllm",
+      "label": "extended",
+      "family": "rules",
+      "n_features": 9,
+      "versus_logistic": {
+        "mean": -0.2238868875679736,
+        "low": -0.492168901256782,
+        "high": 0.044395126120834794,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "model": "logistic",
+      "status": "ok",
+      "brier": 0.39784357525219877,
+      "log_loss": 2.3675095844290173,
+      "within_brier": 0.4036501490317624,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.8749995942572888,
+          "log_loss": 12.088571863193637
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.24846453620124476,
+          "log_loss": 0.7544926577629041
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.24807167857605186,
+          "log_loss": 0.8315649097756403
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.42306857425894295,
+          "log_loss": 1.103023722358361
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.23068615513371732,
+          "log_loss": 0.6692791392750741
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.19072334175562183,
+          "log_loss": 0.5536788134086799
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.6095371630394693,
+          "log_loss": 1.6334789483037142
+        }
+      ],
+      "fold_brier": [
+        0.8749995942572888,
+        0.24846453620124476,
+        0.24807167857605186,
+        0.42306857425894295,
+        0.23068615513371732,
+        0.19072334175562183,
+        0.6095371630394693
+      ],
+      "fold_log_loss": [
+        12.088571863193637,
+        0.7544926577629041,
+        0.8315649097756403,
+        1.103023722358361,
+        0.6692791392750741,
+        0.5536788134086799,
+        1.6334789483037142
+      ],
+      "name": "logistic-strict",
+      "label": "strict",
+      "family": "receipt",
+      "n_features": 22,
+      "versus_logistic": null
+    }
+  ],
+  "split": "leave-one-mix-out",
+  "shot_pool_n": 20,
+  "jev": {
+    "name": "jev-full-0",
+    "model": "jev",
+    "status": "ok",
+    "label": "extended",
+    "family": "published",
+    "n_features": 0,
+    "brier": 0.3340733870967742,
+    "log_loss": 0.8834275525023219,
+    "within_brier": 0.3309946428571428,
+    "within": [
+      {
+        "mix": "amazing-grace-new-britain:phrase16",
+        "n": 16,
+        "brier": 0.09808125000000002,
+        "log_loss": 0.362796838714213
+      },
+      {
+        "mix": "amazing-grace-new-britain:phrase16w",
+        "n": 16,
+        "brier": 0.32979375,
+        "log_loss": 0.8685344433515155
+      },
+      {
+        "mix": "amazing-grace-new-britain:phrase16w2",
+        "n": 16,
+        "brier": 0.33557499999999996,
+        "log_loss": 0.8991279547435179
+      },
+      {
+        "mix": "amazing-grace-new-britain:pad16",
+        "n": 16,
+        "brier": 0.4650875,
+        "log_loss": 1.1517761144409415
+      },
+      {
+        "mix": "america-the-beautiful-materna:phrase16w",
+        "n": 20,
+        "brier": 0.213205,
+        "log_loss": 0.6241116194761089
+      },
+      {
+        "mix": "america-the-beautiful-materna:phrase16w2",
+        "n": 20,
+        "brier": 0.35059,
+        "log_loss": 0.9279784631102128
+      },
+      {
+        "mix": "america-the-beautiful-materna:pad16",
+        "n": 20,
+        "brier": 0.5246299999999999,
+        "log_loss": 1.2993724619279219
+      }
+    ],
+    "fold_brier": [
+      0.09808125000000002,
+      0.32979375,
+      0.33557499999999996,
+      0.4650875,
+      0.213205,
+      0.35059,
+      0.5246299999999999
+    ],
+    "fold_log_loss": [
+      0.362796838714213,
+      0.8685344433515155,
+      0.8991279547435179,
+      1.1517761144409415,
+      0.6241116194761089,
+      0.9279784631102128,
+      1.2993724619279219
+    ],
+    "versus_logistic": {
+      "mean": -0.17661979517406529,
+      "low": -0.5935096055586084,
+      "high": 0.24027001521047792,
+      "resolvable": false,
+      "ratio": 0.16707366707366705,
+      "reference": "logistic"
+    }
+  },
+  "holdout": [],
+  "mix_probe": {
+    "receipt": {
+      "status": "ok",
+      "n_features": 22,
+      "accuracy": 0.47661290322580646,
+      "majority": 0.16129032258064516,
+      "macro_recall": 0.485,
+      "identified": true
+    },
+    "all": {
+      "status": "ok",
+      "n_features": 41,
+      "accuracy": 0.7225806451612903,
+      "majority": 0.16129032258064516,
+      "macro_recall": 0.7169642857142857,
+      "identified": true
+    }
+  },
+  "warp": {
+    "n_scored": 108,
+    "n_mixes": 6,
+    "models": [
+      {
+        "model": "base-rate",
+        "status": "ok",
+        "brier": 0.2530962442781484,
+        "log_loss": 0.7068027668662538,
+        "within_brier": 0.2502937086972144,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.261046786389414,
+            "log_loss": 0.7180833678347206
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.261046786389414,
+            "log_loss": 0.7180833678347208
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.15311909262759918,
+            "log_loss": 0.4964368863138909
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.4125,
+            "log_loss": 1.0567106745194577
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.24669421487603302,
+            "log_loss": 0.6878482730748644
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 0.1673553719008264,
+            "log_loss": 0.5260930958967791
+          }
+        ],
+        "fold_brier": [
+          0.261046786389414,
+          0.261046786389414,
+          0.15311909262759918,
+          0.4125,
+          0.24669421487603302,
+          0.1673553719008264
+        ],
+        "fold_log_loss": [
+          0.7180833678347206,
+          0.7180833678347208,
+          0.4964368863138909,
+          1.0567106745194577,
+          0.6878482730748644,
+          0.5260930958967791
+        ],
+        "name": "base-rate",
+        "label": "extended",
+        "family": "prevalence",
+        "n_features": 0,
+        "versus_logistic": {
+          "mean": 0.034337047421513,
+          "low": -0.0964474073205141,
+          "high": 0.1651215021635401,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.21409735909395455,
+        "log_loss": 0.6158487439251419,
+        "within_brier": 0.21595666127570146,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.24048472952935615,
+            "log_loss": 0.6956898892745009
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.30466126960998585,
+            "log_loss": 0.8155898904675586
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.15292514359492823,
+            "log_loss": 0.46812788494379826
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.3107103497331142,
+            "log_loss": 0.9217640971817046
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.2869580341317199,
+            "log_loss": 0.8198844173183183
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 4.410551042083425e-07,
+            "log_loss": 0.000408570947056211
+          }
+        ],
+        "fold_brier": [
+          0.24048472952935615,
+          0.30466126960998585,
+          0.15292514359492823,
+          0.3107103497331142,
+          0.2869580341317199,
+          4.410551042083425e-07
+        ],
+        "fold_log_loss": [
+          0.6956898892745009,
+          0.8155898904675586,
+          0.46812788494379826,
+          0.9217640971817046,
+          0.8198844173183183,
+          0.000408570947056211
+        ],
+        "name": "logistic",
+        "label": "extended",
+        "family": "receipt",
+        "n_features": 22,
+        "versus_logistic": null
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.19356709494361665,
+        "log_loss": 0.7940734768445454,
+        "within_brier": 0.1959205414747054,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.22192987895424576,
+            "log_loss": 0.9668169739002869
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.31104583533764024,
+            "log_loss": 0.9439799022212918
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.11832896647162569,
+            "log_loss": 0.373386507102429
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.28998787006885085,
+            "log_loss": 1.7976951364717437
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.2342029734235258,
+            "log_loss": 0.660750299894928
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 2.7724592343971888e-05,
+            "log_loss": 0.002204632014669785
+          }
+        ],
+        "fold_brier": [
+          0.22192987895424576,
+          0.31104583533764024,
+          0.11832896647162569,
+          0.28998787006885085,
+          0.2342029734235258,
+          2.7724592343971888e-05
+        ],
+        "fold_log_loss": [
+          0.9668169739002869,
+          0.9439799022212918,
+          0.373386507102429,
+          1.7976951364717437,
+          0.660750299894928,
+          0.002204632014669785
+        ],
+        "name": "logistic-all",
+        "label": "extended",
+        "family": "all",
+        "n_features": 41,
+        "versus_logistic": {
+          "mean": -0.020036119800996028,
+          "low": -0.05406505787909435,
+          "high": 0.013992818277102293,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.2589921521433038,
+        "log_loss": 0.7230252286004194,
+        "within_brier": 0.25737439394631395,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.24716420175415355,
+            "log_loss": 0.6873506850280077
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.279275693026215,
+            "log_loss": 0.7547821930552496
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.20200381573984622,
+            "log_loss": 0.5952051909599618
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.41613919743265193,
+            "log_loss": 1.1015512780435732
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.23272199341642197,
+            "log_loss": 0.6562676988676758
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 0.16694146230859502,
+            "log_loss": 0.5166468022964403
+          }
+        ],
+        "fold_brier": [
+          0.24716420175415355,
+          0.279275693026215,
+          0.20200381573984622,
+          0.41613919743265193,
+          0.23272199341642197,
+          0.16694146230859502
+        ],
+        "fold_log_loss": [
+          0.6873506850280077,
+          0.7547821930552496,
+          0.5952051909599618,
+          1.1015512780435732,
+          0.6562676988676758,
+          0.5166468022964403
+        ],
+        "name": "logistic-timing",
+        "label": "extended",
+        "family": "timing",
+        "n_features": 5,
+        "versus_logistic": {
+          "mean": 0.04141773267061253,
+          "low": -0.08841774788593407,
+          "high": 0.1712532132271591,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.21047526938860556,
+        "log_loss": 0.5906002563839566,
+        "within_brier": 0.21053396753096673,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.2485909736663164,
+            "log_loss": 0.6859484408954482
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.2870847971334859,
+            "log_loss": 0.7728235022687817
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.09751098163685155,
+            "log_loss": 0.36397209154692356
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.3426877278101925,
+            "log_loss": 0.9590028634858818
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.2873292748902282,
+            "log_loss": 0.7718499318918888
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 5.004872575036923e-08,
+            "log_loss": 0.0001933613266732969
+          }
+        ],
+        "fold_brier": [
+          0.2485909736663164,
+          0.2870847971334859,
+          0.09751098163685155,
+          0.3426877278101925,
+          0.2873292748902282,
+          5.004872575036923e-08
+        ],
+        "fold_log_loss": [
+          0.6859484408954482,
+          0.7728235022687817,
+          0.36397209154692356,
+          0.9590028634858818,
+          0.7718499318918888,
+          0.0001933613266732969
+        ],
+        "name": "logistic-pitch",
+        "label": "extended",
+        "family": "pitch",
+        "n_features": 8,
+        "versus_logistic": {
+          "mean": -0.005422693744734697,
+          "low": -0.05106253328211616,
+          "high": 0.040217145792646763,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.27260537787437317,
+        "log_loss": 0.7596239098819612,
+        "within_brier": 0.2712469004102339,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.29483144401200334,
+            "log_loss": 0.8397879318874942
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.3038202828804838,
+            "log_loss": 0.8131223106915317
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.1784100828064527,
+            "log_loss": 0.547839398196651
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.4159741040540683,
+            "log_loss": 1.0946189780900057
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.23245852691929683,
+            "log_loss": 0.6558762402624407
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 0.2019869617890983,
+            "log_loss": 0.5908741823896013
+          }
+        ],
+        "fold_brier": [
+          0.29483144401200334,
+          0.3038202828804838,
+          0.1784100828064527,
+          0.4159741040540683,
+          0.23245852691929683,
+          0.2019869617890983
+        ],
+        "fold_log_loss": [
+          0.8397879318874942,
+          0.8131223106915317,
+          0.547839398196651,
+          1.0946189780900057,
+          0.6558762402624407,
+          0.5908741823896013
+        ],
+        "name": "logistic-transcript",
+        "label": "extended",
+        "family": "transcript",
+        "n_features": 9,
+        "versus_logistic": {
+          "mean": 0.05529023913453246,
+          "low": -0.08423866631284366,
+          "high": 0.19481914458190858,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.21848669754348934,
+        "log_loss": 0.6156603143538985,
+        "within_brier": 0.2205111092991285,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.22180978508286534,
+            "log_loss": 0.6302398275243486
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.3182479789340948,
+            "log_loss": 0.8475476964357156
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.17613468128268542,
+            "log_loss": 0.5304604994446711
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.3252989909005012,
+            "log_loss": 0.9466859524561381
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.2815751994975509,
+            "log_loss": 0.7711697129639503
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 2.009707340897216e-08,
+            "log_loss": 0.00011161336717430798
+          }
+        ],
+        "fold_brier": [
+          0.22180978508286534,
+          0.3182479789340948,
+          0.17613468128268542,
+          0.3252989909005012,
+          0.2815751994975509,
+          2.009707340897216e-08
+        ],
+        "fold_log_loss": [
+          0.6302398275243486,
+          0.8475476964357156,
+          0.5304604994446711,
+          0.9466859524561381,
+          0.7711697129639503,
+          0.00011161336717430798
+        ],
+        "name": "logistic-timing-pitch",
+        "label": "extended",
+        "family": "timing-pitch",
+        "n_features": 13,
+        "versus_logistic": {
+          "mean": 0.024590567824423117,
+          "low": -0.01516421883333573,
+          "high": 0.06434535448218197,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic-all"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.2261909072975028,
+        "log_loss": 0.6432383357224206,
+        "within_brier": 0.2278543273311392,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.21923047655294364,
+            "log_loss": 0.6249752169599275
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.32164147286638695,
+            "log_loss": 0.8555332284247749
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.18760337348226933,
+            "log_loss": 0.5543403851550049
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.3537413277943287,
+            "log_loss": 1.0596176507148325
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.284909285444725,
+            "log_loss": 0.7858550954393098
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 2.784618165919382e-08,
+            "log_loss": 0.0001352023151623983
+          }
+        ],
+        "fold_brier": [
+          0.21923047655294364,
+          0.32164147286638695,
+          0.18760337348226933,
+          0.3537413277943287,
+          0.284909285444725,
+          2.784618165919382e-08
+        ],
+        "fold_log_loss": [
+          0.6249752169599275,
+          0.8555332284247749,
+          0.5543403851550049,
+          1.0596176507148325,
+          0.7858550954393098,
+          0.0001352023151623983
+        ],
+        "name": "logistic-plus-joins",
+        "label": "extended",
+        "family": "plus-joins",
+        "n_features": 15,
+        "versus_logistic": {
+          "mean": 0.031933785856433826,
+          "low": -0.01942964291920935,
+          "high": 0.08329721463207701,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic-all"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.1968400116114092,
+        "log_loss": 0.6062955054246517,
+        "within_brier": 0.20183722901373768,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.19846272712586113,
+            "log_loss": 0.5743493830135717
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.3689302106081728,
+            "log_loss": 1.1505791308557878
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.1730436191700468,
+            "log_loss": 0.5038464685551525
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.27887088104900176,
+            "log_loss": 0.9309991078535559
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.1917151078117995,
+            "log_loss": 0.5594620710944105
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 8.283175440728822e-07,
+            "log_loss": 0.0005145644055416592
+          }
+        ],
+        "fold_brier": [
+          0.19846272712586113,
+          0.3689302106081728,
+          0.1730436191700468,
+          0.27887088104900176,
+          0.1917151078117995,
+          8.283175440728822e-07
+        ],
+        "fold_log_loss": [
+          0.5743493830135717,
+          1.1505791308557878,
+          0.5038464685551525,
+          0.9309991078535559,
+          0.5594620710944105,
+          0.0005145644055416592
+        ],
+        "name": "logistic-plus-segment",
+        "label": "extended",
+        "family": "plus-segment",
+        "n_features": 23,
+        "versus_logistic": {
+          "mean": 0.005916687539032296,
+          "low": -0.058742388429728384,
+          "high": 0.07057576350779297,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic-all"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.19126517777019406,
+        "log_loss": 0.7623707686358365,
+        "within_brier": 0.1934038071790181,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.2158522797506582,
+            "log_loss": 0.6285583723162204
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.3055851937380691,
+            "log_loss": 0.9329439800043049
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.11651694208657541,
+            "log_loss": 0.3780443825091434
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.2940550667401199,
+            "log_loss": 1.943157038676722
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.22841113769032956,
+            "log_loss": 0.6210837466305824
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 2.223068356470013e-06,
+            "log_loss": 0.0009239774624776908
+          }
+        ],
+        "fold_brier": [
+          0.2158522797506582,
+          0.3055851937380691,
+          0.11651694208657541,
+          0.2940550667401199,
+          0.22841113769032956,
+          2.223068356470013e-06
+        ],
+        "fold_log_loss": [
+          0.6285583723162204,
+          0.9329439800043049,
+          0.3780443825091434,
+          1.943157038676722,
+          0.6210837466305824,
+          0.0009239774624776908
+        ],
+        "name": "logistic-plus-measures",
+        "label": "extended",
+        "family": "plus-measures",
+        "n_features": 32,
+        "versus_logistic": {
+          "mean": -0.002516734295687284,
+          "low": -0.008830189212838242,
+          "high": 0.0037967206214636747,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic-all"
+        }
+      },
+      {
+        "model": "gbdt",
+        "status": "ok",
+        "brier": 0.19615271328792286,
+        "log_loss": 0.5831055928437459,
+        "within_brier": 0.19925210351128966,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.22453222947011545,
+            "log_loss": 0.6529407345100179
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.2485758849495916,
+            "log_loss": 0.7249721259759293
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.20833173214506753,
+            "log_loss": 0.5947866279851911
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.24566430613423976,
+            "log_loss": 0.717304132711577
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.2536776779493167,
+            "log_loss": 0.7374189908031684
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 0.014730790419407034,
+            "log_loss": 0.11588748706457153
+          }
+        ],
+        "fold_brier": [
+          0.22453222947011545,
+          0.2485758849495916,
+          0.20833173214506753,
+          0.24566430613423976,
+          0.2536776779493167,
+          0.014730790419407034
+        ],
+        "fold_log_loss": [
+          0.6529407345100179,
+          0.7249721259759293,
+          0.5947866279851911,
+          0.717304132711577,
+          0.7374189908031684,
+          0.11588748706457153
+        ],
+        "name": "gbdt",
+        "label": "extended",
+        "family": "receipt",
+        "n_features": 22,
+        "versus_logistic": {
+          "mean": -0.016704557764411734,
+          "low": -0.08758545706480331,
+          "high": 0.05417634153597983,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic"
+        }
+      },
+      {
+        "model": "gbdt",
+        "status": "ok",
+        "brier": 0.19386923112314516,
+        "log_loss": 0.5823984873666261,
+        "within_brier": 0.19753775233771106,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.2415571035731776,
+            "log_loss": 0.7047874976649818
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.27744492952777655,
+            "log_loss": 0.8205308008534258
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.17266129670545632,
+            "log_loss": 0.5213580366442738
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.23260944199837125,
+            "log_loss": 0.6608996910225123
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.21550041211435098,
+            "log_loss": 0.63044800224393
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 0.04545333010713366,
+            "log_loss": 0.21626307038319253
+          }
+        ],
+        "fold_brier": [
+          0.2415571035731776,
+          0.27744492952777655,
+          0.17266129670545632,
+          0.23260944199837125,
+          0.21550041211435098,
+          0.04545333010713366
+        ],
+        "fold_log_loss": [
+          0.7047874976649818,
+          0.8205308008534258,
+          0.5213580366442738,
+          0.6608996910225123,
+          0.63044800224393,
+          0.21626307038319253
+        ],
+        "name": "gbdt-all",
+        "label": "extended",
+        "family": "all",
+        "n_features": 41,
+        "versus_logistic": {
+          "mean": 0.0016172108630056747,
+          "low": -0.06859243281040449,
+          "high": 0.07182685453641584,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic-all"
+        },
+        "versus_base": {
+          "mean": -0.05275595635950336,
+          "low": -0.178400449105012,
+          "high": 0.07288853638600526,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "base-rate",
+          "pooled": -0.059227013155003255
+        }
+      },
+      {
+        "model": "tabpfn",
+        "status": "not-run",
+        "reason": "fit",
+        "name": "tabpfn",
+        "label": "extended",
+        "family": "receipt",
+        "n_features": 22,
+        "versus_logistic": null
+      },
+      {
+        "model": "tabpfn",
+        "status": "not-run",
+        "reason": "fit",
+        "name": "tabpfn-all",
+        "label": "extended",
+        "family": "all",
+        "n_features": 41,
+        "versus_logistic": null
+      },
+      {
+        "model": "featllm",
+        "status": "ok",
+        "brier": 0.2544836394160716,
+        "log_loss": 0.738759297195392,
+        "within_brier": 0.25327205877334086,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.2781034597854804,
+            "log_loss": 0.8309137693965891
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.3025738833399004,
+            "log_loss": 0.8651089101450353
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.14642615584090754,
+            "log_loss": 0.4766550093761131
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.39655152942413063,
+            "log_loss": 1.080447888365636
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.22332191891813488,
+            "log_loss": 0.6358980513247304
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 0.1726554053314912,
+            "log_loss": 0.5348121140305556
+          }
+        ],
+        "fold_brier": [
+          0.2781034597854804,
+          0.3025738833399004,
+          0.14642615584090754,
+          0.39655152942413063,
+          0.22332191891813488,
+          0.1726554053314912
+        ],
+        "fold_log_loss": [
+          0.8309137693965891,
+          0.8651089101450353,
+          0.4766550093761131,
+          1.080447888365636,
+          0.6358980513247304,
+          0.5348121140305556
+        ],
+        "name": "featllm",
+        "label": "extended",
+        "family": "rules",
+        "n_features": 9,
+        "versus_logistic": {
+          "mean": 0.03731539749763942,
+          "low": -0.09177749365575669,
+          "high": 0.16640828865103555,
+          "resolvable": false,
+          "ratio": 0.20059288537549405,
+          "reference": "logistic"
+        }
+      },
+      {
+        "model": "logistic",
+        "status": "ok",
+        "brier": 0.1486441122144346,
+        "log_loss": 0.42537531591314204,
+        "within_brier": 0.1518617059115728,
+        "within": [
+          {
+            "mix": "amazing-grace-new-britain:phrase16w",
+            "n": 16,
+            "brier": 0.15460153106394647,
+            "log_loss": 0.45455578170653077
+          },
+          {
+            "mix": "amazing-grace-new-britain:phrase16w2",
+            "n": 16,
+            "brier": 0.25981756042386916,
+            "log_loss": 0.7024130451712247
+          },
+          {
+            "mix": "amazing-grace-new-britain:pad16",
+            "n": 16,
+            "brier": 0.1280410560696357,
+            "log_loss": 0.38082205272423375
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w",
+            "n": 20,
+            "brier": 0.17091057574353635,
+            "log_loss": 0.5013891097326113
+          },
+          {
+            "mix": "america-the-beautiful-materna:phrase16w2",
+            "n": 20,
+            "brier": 0.19779922634325825,
+            "log_loss": 0.5650841659007135
+          },
+          {
+            "mix": "america-the-beautiful-materna:pad16",
+            "n": 20,
+            "brier": 2.858251910603782e-07,
+            "log_loss": 0.0003207266160510197
+          }
+        ],
+        "fold_brier": [
+          0.15460153106394647,
+          0.25981756042386916,
+          0.1280410560696357,
+          0.17091057574353635,
+          0.19779922634325825,
+          2.858251910603782e-07
+        ],
+        "fold_log_loss": [
+          0.45455578170653077,
+          0.7024130451712247,
+          0.38082205272423375,
+          0.5013891097326113,
+          0.5650841659007135,
+          0.0003207266160510197
+        ],
+        "name": "logistic-strict",
+        "label": "strict",
+        "family": "receipt",
+        "n_features": 22,
+        "versus_logistic": null
+      }
+    ],
+    "jev": {
+      "name": "jev-full-0",
+      "model": "jev",
+      "status": "ok",
+      "label": "extended",
+      "family": "published",
+      "n_features": 0,
+      "brier": 0.36903518518518513,
+      "log_loss": 0.9605580286190788,
+      "within_brier": 0.36981354166666663,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.32979375,
+          "log_loss": 0.8685344433515155
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.33557499999999996,
+          "log_loss": 0.8991279547435179
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.4650875,
+          "log_loss": 1.1517761144409415
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.213205,
+          "log_loss": 0.6241116194761089
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.35059,
+          "log_loss": 0.9279784631102128
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.5246299999999999,
+          "log_loss": 1.2993724619279219
+        }
+      ],
+      "fold_brier": [
+        0.32979375,
+        0.33557499999999996,
+        0.4650875,
+        0.213205,
+        0.35059,
+        0.5246299999999999
+      ],
+      "fold_log_loss": [
+        0.8685344433515155,
+        0.8991279547435179,
+        1.1517761144409415,
+        0.6241116194761089,
+        0.9279784631102128,
+        1.2993724619279219
+      ],
+      "versus_logistic": {
+        "mean": 0.1538568803909652,
+        "low": -0.19666216025839947,
+        "high": 0.5043759210403299,
+        "resolvable": false,
+        "ratio": 0.20059288537549405,
+        "reference": "logistic"
+      }
+    }
+  },
+  "cells": [
+    "pruned-0",
+    "rows-0",
+    "pruned-4",
+    "pruned-8",
+    "pruned-16",
+    "full-4",
+    "full-8",
+    "rows-4",
+    "rows-8",
+    "rows-16"
+  ],
+  "serialisation": [
+    {
+      "name": "pruned-0",
+      "status": "ok",
+      "brier": 0.25950967741935477,
+      "log_loss": 0.7177735591622875,
+      "within_brier": 0.26088535714285715,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.3732875,
+          "log_loss": 0.9604782655984035
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.26905625,
+          "log_loss": 0.7370217859813858
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.3259500000000001,
+          "log_loss": 0.8717469381296699
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.11789375000000002,
+          "log_loss": 0.41516878094400206
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.3542600000000001,
+          "log_loss": 0.9154302800558337
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.247195,
+          "log_loss": 0.6883863650604826
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.138555,
+          "log_loss": 0.4588468051670934
+        }
+      ],
+      "fold_brier": [
+        0.3732875,
+        0.26905625,
+        0.3259500000000001,
+        0.11789375000000002,
+        0.3542600000000001,
+        0.247195,
+        0.138555
+      ],
+      "fold_log_loss": [
+        0.9604782655984035,
+        0.7370217859813858,
+        0.8717469381296699,
+        0.41516878094400206,
+        0.9154302800558337,
+        0.6883863650604826,
+        0.4588468051670934
+      ],
+      "versus_logistic": {
+        "mean": -0.24672908088835097,
+        "low": -0.6053882613972087,
+        "high": 0.11193009962050673,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "name": "rows-0",
+      "status": "ok",
+      "brier": 0.27082903225806443,
+      "log_loss": 0.7456408524472207,
+      "within_brier": 0.27285857142857145,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.3889,
+          "log_loss": 0.9961210675436003
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.27584375,
+          "log_loss": 0.7479176878209219
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.376375,
+          "log_loss": 1.0009509251782074
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.11323125,
+          "log_loss": 0.40520175829275845
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.33057,
+          "log_loss": 0.8693306009819237
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.24225499999999997,
+          "log_loss": 0.6819674209633219
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.18283500000000003,
+          "log_loss": 0.5515221121591289
+        }
+      ],
+      "fold_brier": [
+        0.3889,
+        0.27584375,
+        0.376375,
+        0.11323125,
+        0.33057,
+        0.24225499999999997,
+        0.18283500000000003
+      ],
+      "fold_log_loss": [
+        0.9961210675436003,
+        0.7479176878209219,
+        1.0009509251782074,
+        0.40520175829275845,
+        0.8693306009819237,
+        0.6819674209633219,
+        0.5515221121591289
+      ],
+      "versus_logistic": {
+        "mean": -0.23475586660263673,
+        "low": -0.5842159713800882,
+        "high": 0.11470423817481476,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "name": "pruned-4",
+      "status": "ok",
+      "brier": 0.17192177419354843,
+      "log_loss": 0.5288607217939308,
+      "within_brier": 0.16979767857142858,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.12166874999999998,
+          "log_loss": 0.4136712349517869
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.17628125000000003,
+          "log_loss": 0.5298748879403031
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.2158,
+          "log_loss": 0.6732165327922806
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.09959375000000001,
+          "log_loss": 0.3259711108139107
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.21718499999999996,
+          "log_loss": 0.6262925708058924
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.26772000000000007,
+          "log_loss": 0.7654241799551
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.090335,
+          "log_loss": 0.3330327111627536
+        }
+      ],
+      "fold_brier": [
+        0.12166874999999998,
+        0.17628125000000003,
+        0.2158,
+        0.09959375000000001,
+        0.21718499999999996,
+        0.26772000000000007,
+        0.090335
+      ],
+      "fold_log_loss": [
+        0.4136712349517869,
+        0.5298748879403031,
+        0.6732165327922806,
+        0.3259711108139107,
+        0.6262925708058924,
+        0.7654241799551,
+        0.3330327111627536
+      ],
+      "versus_logistic": {
+        "mean": -0.33781675945977957,
+        "low": -0.7426073765255172,
+        "high": 0.06697385760595814,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "name": "pruned-8",
+      "status": "ok",
+      "brier": 0.18809193548387096,
+      "log_loss": 0.5694296187718509,
+      "within_brier": 0.1862705357142857,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.1397125,
+          "log_loss": 0.4861818116854804
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.1772625,
+          "log_loss": 0.53425577159419
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.24204375,
+          "log_loss": 0.7421138901647274
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.12960000000000002,
+          "log_loss": 0.41833230365999946
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.22760499999999997,
+          "log_loss": 0.6441971908985479
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.25170499999999996,
+          "log_loss": 0.6961204786953177
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.135965,
+          "log_loss": 0.44543894510809307
+        }
+      ],
+      "fold_brier": [
+        0.1397125,
+        0.1772625,
+        0.24204375,
+        0.12960000000000002,
+        0.22760499999999997,
+        0.25170499999999996,
+        0.135965
+      ],
+      "fold_log_loss": [
+        0.4861818116854804,
+        0.53425577159419,
+        0.7421138901647274,
+        0.41833230365999946,
+        0.6441971908985479,
+        0.6961204786953177,
+        0.44543894510809307
+      ],
+      "versus_logistic": {
+        "mean": -0.3213439023169224,
+        "low": -0.7087815852752235,
+        "high": 0.06609378064137866,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "name": "pruned-16",
+      "status": "ok",
+      "brier": 0.18041774193548388,
+      "log_loss": 0.548700432354075,
+      "within_brier": 0.17888928571428572,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.173775,
+          "log_loss": 0.5452700670728433
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.16641875000000003,
+          "log_loss": 0.516752373853182
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.23103125,
+          "log_loss": 0.6860574791703236
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.09695000000000001,
+          "log_loss": 0.3571324260151339
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.22182,
+          "log_loss": 0.6311738751554763
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.24550500000000003,
+          "log_loss": 0.6852019493857651
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.11672500000000001,
+          "log_loss": 0.401396979164837
+        }
+      ],
+      "fold_brier": [
+        0.173775,
+        0.16641875000000003,
+        0.23103125,
+        0.09695000000000001,
+        0.22182,
+        0.24550500000000003,
+        0.11672500000000001
+      ],
+      "fold_log_loss": [
+        0.5452700670728433,
+        0.516752373853182,
+        0.6860574791703236,
+        0.3571324260151339,
+        0.6311738751554763,
+        0.6852019493857651,
+        0.401396979164837
+      ],
+      "versus_logistic": {
+        "mean": -0.32872515231692245,
+        "low": -0.7054384977576644,
+        "high": 0.04798819312381952,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "name": "full-4",
+      "status": "ok",
+      "brier": 0.23663951612903222,
+      "log_loss": 0.6759772404523502,
+      "within_brier": 0.23341285714285712,
+      "within": [
+        {
+          "mix": "amazing-grace-new-britain:phrase16",
+          "n": 16,
+          "brier": 0.098925,
+          "log_loss": 0.3484039327687029
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w",
+          "n": 16,
+          "brier": 0.23981874999999997,
+          "log_loss": 0.6896855562398401
+        },
+        {
+          "mix": "amazing-grace-new-britain:phrase16w2",
+          "n": 16,
+          "brier": 0.25894999999999996,
+          "log_loss": 0.7254312504511006
+        },
+        {
+          "mix": "amazing-grace-new-britain:pad16",
+          "n": 16,
+          "brier": 0.23593124999999995,
+          "log_loss": 0.6919394488822426
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w",
+          "n": 20,
+          "brier": 0.20305,
+          "log_loss": 0.5870813183327421
+        },
+        {
+          "mix": "america-the-beautiful-materna:phrase16w2",
+          "n": 20,
+          "brier": 0.365375,
+          "log_loss": 0.9849469606450171
+        },
+        {
+          "mix": "america-the-beautiful-materna:pad16",
+          "n": 20,
+          "brier": 0.23183999999999996,
+          "log_loss": 0.6546624611533025
+        }
+      ],
+      "fold_brier": [
+        0.098925,
+        0.23981874999999997,
+        0.25894999999999996,
+        0.23593124999999995,
+        0.20305,
+        0.365375,
+        0.23183999999999996
+      ],
+      "fold_log_loss": [
+        0.3484039327687029,
+        0.6896855562398401,
+        0.7254312504511006,
+        0.6919394488822426,
+        0.5870813183327421,
+        0.9849469606450171,
+        0.6546624611533025
+      ],
+      "versus_logistic": {
+        "mean": -0.274201580888351,
+        "low": -0.6923180250899141,
+        "high": 0.14391486331321213,
+        "resolvable": false,
+        "ratio": 0.16707366707366705,
+        "reference": "logistic"
+      }
+    },
+    {
+      "name": "full-8",
+      "status": "partial"
+    },
+    {
+      "name": "rows-4",
+      "status": "partial"
+    },
+    {
+      "name": "rows-8",
+      "status": "partial"
+    },
+    {
+      "name": "rows-16",
+      "status": "partial"
+    }
+  ]
+}

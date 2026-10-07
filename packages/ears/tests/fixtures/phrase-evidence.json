@@ -1,0 +1,90 @@
+{
+  "schema": "ai-jam-sessions/phrase-evidence/v1",
+  "revision": "1",
+  "instruments": {
+    "mel": {
+      "sr": 16000,
+      "hop_s": 0.005,
+      "n_mels": 40
+    },
+    "f0": "fcpe",
+    "params": {
+      "jump_half_s": 0.015,
+      "repeat_win_s": 0.12,
+      "repeat_lag_s": [
+        0.03,
+        0.6
+      ],
+      "click_s": 0.01,
+      "click_context_s": 0.2,
+      "f0_s": 0.02,
+      "octave_cents": 900,
+      "controls": 60,
+      "control_clear_s": 0.2,
+      "seed": 7
+    }
+  },
+  "controls": {
+    "spectral_jump": {
+      "n": 60,
+      "median": 1.56
+    },
+    "repeat_similarity": {
+      "n": 60,
+      "median": 0.157
+    },
+    "click_z": {
+      "n": 60,
+      "median": 3.242
+    },
+    "step_cents": {
+      "n": 48,
+      "median": 5.5
+    }
+  },
+  "phrases": [
+    {
+      "index": 0,
+      "start": 0.0,
+      "end": 21.458,
+      "syllables": 8,
+      "takes": [
+        "take-05"
+      ],
+      "joins": 1,
+      "switches": 1,
+      "air_ms_max": 146.7,
+      "shift_diff_ms_max": 0,
+      "shift_spread_ms": 354.6,
+      "stretch_min": 0.702,
+      "stretch_max": 1.137,
+      "segment_boundary_s": null,
+      "spectral_jump_max": 8.998,
+      "repeat_similarity_max": 0.358,
+      "click_z_max": -0.516,
+      "f0_step_cents_max": null,
+      "pct_max": 1.0,
+      "octave_jumps": 0,
+      "pitch_step_cents_max": 524.9,
+      "at_joins": [
+        {
+          "spectral_jump": 8.998,
+          "repeat_similarity": 0.358,
+          "click_z": -0.516,
+          "step_cents": null,
+          "octave": false,
+          "voicing_flip": false,
+          "t": 21.547,
+          "switch": true,
+          "air_ms": 146.7,
+          "shift_diff_ms": 0,
+          "stretch": null,
+          "spectral_jump_pct": 1.0,
+          "repeat_similarity_pct": 0.967,
+          "click_z_pct": 0.017,
+          "step_cents_pct": null
+        }
+      ]
+    }
+  ]
+}

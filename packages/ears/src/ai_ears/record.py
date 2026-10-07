@@ -184,6 +184,96 @@ class Provenance:
         return body
 
 
+EVIDENCE_SCHEMA = "ai-jam-sessions/phrase-evidence/v1"
+EVIDENCE_INSTRUMENT = "phrase-evidence"
+
+
+@dataclass(frozen=True)
+class JoinReading:
+    """One join, and its percentile against the non-join controls in the take."""
+
+    t: float
+    spectral_jump: float | None
+    repeat_similarity: float | None
+    click_z: float | None
+    step_cents: float | None
+    spectral_jump_pct: float | None
+    repeat_similarity_pct: float | None
+    click_z_pct: float | None
+    step_cents_pct: float | None
+    octave: bool
+    voicing_flip: bool
+    switch: bool
+    air_ms: float | None
+    shift_diff_ms: float | None
+    stretch: float | None
+
+    def to_state(self) -> dict:
+        return {
+            "t": self.t,
+            "spectral_jump": self.spectral_jump,
+            "repeat_similarity": self.repeat_similarity,
+            "click_z": self.click_z,
+            "step_cents": self.step_cents,
+            "spectral_jump_pct": self.spectral_jump_pct,
+            "repeat_similarity_pct": self.repeat_similarity_pct,
+            "click_z_pct": self.click_z_pct,
+            "step_cents_pct": self.step_cents_pct,
+            "octave": self.octave,
+            "voicing_flip": self.voicing_flip,
+            "switch": self.switch,
+            "air_ms": self.air_ms,
+            "shift_diff_ms": self.shift_diff_ms,
+            "stretch": self.stretch,
+        }
+
+
+@dataclass(frozen=True)
+class PhraseEvidence:
+    """Phrase-level join and segment readings. The file's directory is not stored."""
+
+    instrument: str
+    revision: str
+    joins: int
+    switches: int
+    air_ms_max: float | None
+    shift_diff_ms_max: float | None
+    shift_spread_ms: float | None
+    stretch_min: float | None
+    stretch_max: float | None
+    segment_boundary_s: float | None
+    spectral_jump_max: float | None
+    repeat_similarity_max: float | None
+    click_z_max: float | None
+    f0_step_cents_max: float | None
+    pct_max: float | None
+    octave_jumps: int
+    pitch_step_cents_max: float | None
+    at_joins: tuple[JoinReading, ...] = ()
+
+    def to_state(self) -> dict:
+        return {
+            "instrument": self.instrument,
+            "revision": self.revision,
+            "joins": self.joins,
+            "switches": self.switches,
+            "air_ms_max": self.air_ms_max,
+            "shift_diff_ms_max": self.shift_diff_ms_max,
+            "shift_spread_ms": self.shift_spread_ms,
+            "stretch_min": self.stretch_min,
+            "stretch_max": self.stretch_max,
+            "segment_boundary_s": self.segment_boundary_s,
+            "spectral_jump_max": self.spectral_jump_max,
+            "repeat_similarity_max": self.repeat_similarity_max,
+            "click_z_max": self.click_z_max,
+            "f0_step_cents_max": self.f0_step_cents_max,
+            "pct_max": self.pct_max,
+            "octave_jumps": self.octave_jumps,
+            "pitch_step_cents_max": self.pitch_step_cents_max,
+            "at_joins": [item.to_state() for item in self.at_joins],
+        }
+
+
 @dataclass(frozen=True)
 class HearingRecord:
     take_id: str
@@ -194,6 +284,7 @@ class HearingRecord:
     marks: tuple[ReviewMark, ...] = ()
     tuning: TakeTuning | None = None
     provenance: Provenance | None = None
+    evidence: PhraseEvidence | None = None
 
     def __post_init__(self) -> None:
         if not self.take_id or not self.phrase_id:
@@ -215,6 +306,8 @@ class HearingRecord:
             body["tuning"] = self.tuning.to_state()
         if self.provenance is not None and self.provenance.to_state():
             body["provenance"] = self.provenance.to_state()
+        if self.evidence is not None:
+            body["evidence"] = self.evidence.to_state()
         reject_gate_keys(body, "hearing record")
         return body
 
@@ -474,3 +567,105 @@ def from_jam_take(
     )
     json.dumps(record.to_state())
     return record
+
+
+def _evidence_number(value: object) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return float(value)
+
+
+def _evidence_count(value: object, where: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise EarsError(f"phrase evidence {where} is not a count")
+    return value
+
+
+def evidence_revision(document: dict) -> str:
+    """The instrument revision is the schema, the file revision, and the parameters."""
+    instruments = document.get("instruments") if isinstance(document.get("instruments"), dict) else {}
+    body = {
+        "schema": document.get("schema"),
+        "revision": document.get("revision"),
+        "f0": instruments.get("f0"),
+        "mel": instruments.get("mel"),
+        "params": instruments.get("params"),
+    }
+    return json.dumps(body, sort_keys=True, separators=(",", ":"))
+
+
+def phrase_evidence(document: dict, index: int) -> PhraseEvidence:
+    """Read one phrase from phrase-evidence.json. The directory and any marks are refused."""
+    if not isinstance(document, dict):
+        raise EarsError("phrase evidence must be an object")
+    if document.get("schema") != EVIDENCE_SCHEMA:
+        raise EarsError("phrase evidence schema is not the pinned v1")
+    if str(document.get("revision")) != "1":
+        raise EarsError("phrase evidence revision is not 1")
+    if "marks" in document:
+        raise EarsError("phrase evidence carries marks")
+    phrases = document.get("phrases")
+    if not isinstance(phrases, list):
+        raise EarsError("phrase evidence has no phrases")
+    found = None
+    for row in phrases:
+        if isinstance(row, dict) and row.get("index") == index:
+            found = row
+            break
+    if not isinstance(found, dict):
+        raise EarsError("phrase evidence has no phrase at that index")
+    if "marks" in found:
+        raise EarsError("phrase evidence carries marks")
+    readings: list[JoinReading] = []
+    raw_joins = found.get("at_joins")
+    if not isinstance(raw_joins, list):
+        raise EarsError("phrase evidence joins are not a list")
+    for join in raw_joins:
+        if not isinstance(join, dict) or _evidence_number(join.get("t")) is None:
+            raise EarsError("a join reading needs a time")
+        readings.append(
+            JoinReading(
+                t=float(join["t"]),
+                spectral_jump=_evidence_number(join.get("spectral_jump")),
+                repeat_similarity=_evidence_number(join.get("repeat_similarity")),
+                click_z=_evidence_number(join.get("click_z")),
+                step_cents=_evidence_number(join.get("step_cents")),
+                spectral_jump_pct=_evidence_number(join.get("spectral_jump_pct")),
+                repeat_similarity_pct=_evidence_number(join.get("repeat_similarity_pct")),
+                click_z_pct=_evidence_number(join.get("click_z_pct")),
+                step_cents_pct=_evidence_number(join.get("step_cents_pct")),
+                octave=join.get("octave") is True,
+                voicing_flip=join.get("voicing_flip") is True,
+                switch=join.get("switch") is True,
+                air_ms=_evidence_number(join.get("air_ms")),
+                shift_diff_ms=_evidence_number(join.get("shift_diff_ms")),
+                stretch=_evidence_number(join.get("stretch")),
+            )
+        )
+    evidence = PhraseEvidence(
+        instrument=EVIDENCE_INSTRUMENT,
+        revision=evidence_revision(document),
+        joins=_evidence_count(found.get("joins"), "joins"),
+        switches=_evidence_count(found.get("switches"), "switches"),
+        air_ms_max=_evidence_number(found.get("air_ms_max")),
+        shift_diff_ms_max=_evidence_number(found.get("shift_diff_ms_max")),
+        shift_spread_ms=_evidence_number(found.get("shift_spread_ms")),
+        stretch_min=_evidence_number(found.get("stretch_min")),
+        stretch_max=_evidence_number(found.get("stretch_max")),
+        segment_boundary_s=_evidence_number(found.get("segment_boundary_s")),
+        spectral_jump_max=_evidence_number(found.get("spectral_jump_max")),
+        repeat_similarity_max=_evidence_number(found.get("repeat_similarity_max")),
+        click_z_max=_evidence_number(found.get("click_z_max")),
+        f0_step_cents_max=_evidence_number(found.get("f0_step_cents_max")),
+        pct_max=_evidence_number(found.get("pct_max")),
+        octave_jumps=_evidence_count(found.get("octave_jumps"), "octave_jumps"),
+        pitch_step_cents_max=_evidence_number(found.get("pitch_step_cents_max")),
+        at_joins=tuple(readings),
+    )
+    if evidence.joins != len(readings):
+        raise EarsError("phrase evidence join count does not match the readings")
+    state = evidence.to_state()
+    if "dir" in state or "marks" in state:
+        raise EarsError("phrase evidence kept a path or a mark")
+    reject_gate_keys(state, "phrase evidence")
+    return evidence

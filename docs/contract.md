@@ -20,6 +20,10 @@ The listener's transcript is advisory text. The question sent with a record must
 
 This is not a CLAP-style score of a caption against a waveform. The record is text and numbers from instruments that already exist. A discriminative audio model can be added later as another instrument id. The questions do not need it.
 
+### Joins
+
+A join is a boundary between consecutive placed cuts of one take. The jam file `phrase-evidence.json`, schema `ai-jam-sessions/phrase-evidence/v1`, revision 1, carries the join count, the switch count, the segment readings, and the maxima of four join measurements for each phrase: a spectral jump, a repeat or skip, a click or noise burst, and an F0 break. Percentiles against the non-join controls in that take sit on each join. The fields are specified in `docs/join-evidence.md`. This repo maps that file. It does not compute the audio, and it does not invent a missing reading.
+
 ### Timing
 
 Vowel-onset offset in milliseconds against the score clock. A row whose `err_ms` is null is the measurement state `undated`: the detector found no vowel onset, the value is null, and the row's reason stays beside `t_score`. A row whose method is `rise`, including a row with no method, is recorded as `rise_onset`. The receipt's `detector` object (band, rise fraction, envelope window and hop, slope) is that instrument's revision. `aligner_err_ms`, when the gate ran with the aligner, is the HubertFA cross-check, already corrected by the offset in `checks.aligner_cross_check`. That offset and the syllable count it was measured on travel with the cross-check. The receipt does not pin a HubertFA build, so the cross-check stays incomplete. Jam's `cross_check` token (rescued, both_off, unconfirmed, disputed) is kept as jam's interpretation, separate from the numbers. A raw `verify-energy.json` has no aligner reading, and none is invented.
