@@ -77,65 +77,62 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 3,
-      "changed": 8,
+      "added": 9,
+      "changed": 12,
       "moved": 0,
-      "parts": 4,
+      "parts": 7,
       "removed": 0
     },
     "items": [
       {
-        "kind": "door",
-        "sentence": "ai-eyes-mcp (packages/eyes/pyproject.toml) is no longer a command.",
+        "kind": "landing",
+        "sentence": "docs/decision-learning.md is now written by tools/decision_learning.py.",
         "subjects": [
-          "packages/eyes/pyproject.toml"
+          "docs/decision-learning.md",
+          "tools/decision_learning.py"
         ]
       },
       {
         "kind": "landing",
-        "sentence": "docs/calibration/ is now read by tools/phrase_calibration.py.",
+        "sentence": "docs/decision-learning/phrases.json is now written by tools/decision_learning.py.",
         "subjects": [
-          "docs/calibration/",
-          "tools/phrase_calibration.py"
+          "docs/decision-learning/phrases.json",
+          "tools/decision_learning.py"
         ]
       },
       {
+        "kind": "landing",
+        "sentence": "docs/decision-learning/summary.json is now written by tools/decision_learning.py.",
+        "subjects": [
+          "docs/decision-learning/summary.json",
+          "tools/decision_learning.py"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "And 3 more new writers and readers of places.",
+        "subjects": []
+      },
+      {
         "kind": "counts",
-        "sentence": "3 files added and 8 changed content, across 4 parts.",
+        "sentence": "9 files added and 12 changed content, across 7 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "e4e89f53aaa86793b84e0669a32572c0221d083a",
-      "generatedAt": "2026-10-07T19:47:51.798Z"
+      "commit": "def7716f28e82d395a4975aeed47e765886fc2a5",
+      "generatedAt": "2026-10-07T20:00:40.655Z"
     },
     "unchanged": false
   },
-  "changesTogether": [
-    {
-      "a": "src/ai_eyes_mcp/server.py",
-      "b": "tests/test_server_ci.py",
-      "either": 14,
-      "partLabels": [
-        null,
-        null
-      ],
-      "parts": [
-        null,
-        null
-      ],
-      "relation": "unassigned",
-      "shared": 7
-    }
-  ],
+  "changesTogether": [],
   "changesTogetherNote": [
-    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
-    "Window: 180 days; a pair counts from 3 shared commits, since 2 source files reach 10 revisions; the floor rises to 10 when 25 do."
+    "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "def7716f28e82d395a4975aeed47e765886fc2a5",
+  "commit": "f16e8ea7f293a329a90779df860ceb9f3e770354",
   "defaultBranch": "main",
-  "derived": "7 parts, mostly Python (24 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 2 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes.",
+  "derived": "7 parts, mostly Python (28 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 2 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes.",
   "doors": [
     {
       "checks": [],
@@ -150,12 +147,12 @@
         {
           "boundary": "decisions",
           "depth": 0,
-          "files": 4
+          "files": 6
         },
         {
           "boundary": "ears",
           "depth": 0,
-          "files": 5
+          "files": 6
         },
         {
           "boundary": "eyes",
@@ -165,7 +162,7 @@
         {
           "boundary": "tools",
           "depth": 0,
-          "files": 2
+          "files": 3
         }
       ],
       "runs": [
@@ -244,11 +241,31 @@
     }
   ],
   "engine": "1.24.0",
-  "generated": [],
-  "generatedAt": "2026-10-07T20:00:40.655Z",
+  "generated": [
+    {
+      "block": true,
+      "place": "docs/decision-learning.md",
+      "writers": [
+        "tools/decision_learning.py"
+      ]
+    },
+    {
+      "place": "docs/decision-learning/phrases.json",
+      "writers": [
+        "tools/decision_learning.py"
+      ]
+    },
+    {
+      "place": "docs/decision-learning/summary.json",
+      "writers": [
+        "tools/decision_learning.py"
+      ]
+    }
+  ],
+  "generatedAt": "2026-10-15T02:52:53.591Z",
   "limits": [
-    "4 reads use paths built at run time and are not named here.",
-    "1 write and 3 reads go to a path their caller passes, not to this repository.",
+    "6 reads use paths built at run time and are not named here.",
+    "3 writes and 11 reads go to a path their caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/ci.yml",
@@ -273,12 +290,12 @@
   "startReason": "This path follows ai-eyes (a command people run) from its entry, since CI runs only tests and scripts that import no code here.",
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 30,
+  "testFiles": 33,
   "testedBy": {
-    "decisions": 3,
-    "ears": 3,
+    "decisions": 5,
+    "ears": 4,
     "eyes": 8,
-    "tools": 2
+    "tools": 3
   },
   "unnamedWrites": 0,
   "unread": [
@@ -299,11 +316,23 @@
       "writers": [
         "tools/phrase_calibration.py"
       ]
+    },
+    {
+      "place": "docs/decision-learning/phrases.json",
+      "writers": [
+        "tools/decision_learning.py"
+      ]
+    },
+    {
+      "place": "docs/decision-learning/summary.json",
+      "writers": [
+        "tools/decision_learning.py"
+      ]
     }
   ],
   "unreadFiles": 0,
   "unreadNote": [],
   "untested": [],
   "untestedNote": [],
-  "written": 4
+  "written": 7
 }

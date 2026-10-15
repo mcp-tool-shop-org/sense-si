@@ -36,7 +36,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "decisions",
-      "qualifyingSourceCommits": 3,
+      "qualifyingSourceCommits": 4,
       "rebaseline": null
     },
     {
@@ -70,7 +70,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "ears",
-      "qualifyingSourceCommits": 6,
+      "qualifyingSourceCommits": 10,
       "rebaseline": null
     },
     {
@@ -121,7 +121,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "tools",
-      "qualifyingSourceCommits": 3,
+      "qualifyingSourceCommits": 6,
       "rebaseline": null
     }
   ],
@@ -129,8 +129,8 @@
     "definition": "commits is how many commits in the window touch the file, including merges and commits dropped from coupling. lines is added plus deleted in those commits.",
     "files": [
       {
-        "commits": 19,
-        "lines": 476,
+        "commits": 17,
+        "lines": 490,
         "path": ".github/workflows/ci.yml"
       },
       {
@@ -139,18 +139,18 @@
         "path": ".github/workflows/pages.yml"
       },
       {
-        "commits": 6,
-        "lines": 20,
+        "commits": 7,
+        "lines": 53,
         "path": ".gitignore"
       },
       {
-        "commits": 4,
-        "lines": 266,
+        "commits": 3,
+        "lines": 287,
         "path": "CHANGELOG.md"
       },
       {
-        "commits": 2,
-        "lines": 42,
+        "commits": 3,
+        "lines": 63,
         "path": "LICENSE"
       },
       {
@@ -179,8 +179,8 @@
         "path": "README.ja.md"
       },
       {
-        "commits": 16,
-        "lines": 226,
+        "commits": 12,
+        "lines": 397,
         "path": "README.md"
       },
       {
@@ -194,13 +194,18 @@
         "path": "README.zh.md"
       },
       {
-        "commits": 7,
-        "lines": 36,
+        "commits": 1,
+        "lines": 34,
+        "path": "SECURITY.md"
+      },
+      {
+        "commits": 4,
+        "lines": 83,
         "path": "SHIP_GATE.md"
       },
       {
-        "commits": 15,
-        "lines": 506,
+        "commits": 17,
+        "lines": 568,
         "path": "atlas/README.md"
       },
       {
@@ -209,18 +214,18 @@
         "path": "atlas/boundaries.yaml"
       },
       {
-        "commits": 15,
-        "lines": 1564,
+        "commits": 17,
+        "lines": 1856,
         "path": "atlas/page.json"
       },
       {
-        "commits": 15,
-        "lines": 48099,
+        "commits": 17,
+        "lines": 48361,
         "path": "atlas/statistics.json"
       },
       {
-        "commits": 15,
-        "lines": 7851,
+        "commits": 17,
+        "lines": 8083,
         "path": "atlas/structure.json"
       },
       {
@@ -229,8 +234,8 @@
         "path": "codecov.yml"
       },
       {
-        "commits": 2,
-        "lines": 29,
+        "commits": 1,
+        "lines": 27,
         "path": "docs/README.md"
       },
       {
@@ -269,9 +274,24 @@
         "path": "docs/calibration/summary.json"
       },
       {
-        "commits": 11,
-        "lines": 85,
+        "commits": 18,
+        "lines": 127,
         "path": "docs/contract.md"
+      },
+      {
+        "commits": 7,
+        "lines": 832,
+        "path": "docs/decision-learning.md"
+      },
+      {
+        "commits": 3,
+        "lines": 4724,
+        "path": "docs/decision-learning/phrases.json"
+      },
+      {
+        "commits": 4,
+        "lines": 7746,
+        "path": "docs/decision-learning/summary.json"
       },
       {
         "commits": 1,
@@ -284,14 +304,14 @@
         "path": "docs/install-and-validate.md"
       },
       {
+        "commits": 3,
+        "lines": 98,
+        "path": "docs/join-evidence.md"
+      },
+      {
         "commits": 1,
         "lines": 0,
         "path": "docs/logo.png"
-      },
-      {
-        "commits": 2,
-        "lines": 50,
-        "path": "docs/logo.svg"
       },
       {
         "commits": 1,
@@ -299,13 +319,13 @@
         "path": "docs/tools.md"
       },
       {
-        "commits": 1,
-        "lines": 15,
+        "commits": 3,
+        "lines": 19,
         "path": "packages/decisions/pyproject.toml"
       },
       {
-        "commits": 1,
-        "lines": 37,
+        "commits": 3,
+        "lines": 81,
         "path": "packages/decisions/src/decisions/__init__.py"
       },
       {
@@ -314,14 +334,24 @@
         "path": "packages/decisions/src/decisions/client.py"
       },
       {
-        "commits": 5,
-        "lines": 646,
+        "commits": 2,
+        "lines": 710,
+        "path": "packages/decisions/src/decisions/kev.py"
+      },
+      {
+        "commits": 7,
+        "lines": 658,
         "path": "packages/decisions/tests/test_client.py"
       },
       {
         "commits": 2,
         "lines": 66,
         "path": "packages/decisions/tests/test_coverage_bar.py"
+      },
+      {
+        "commits": 2,
+        "lines": 710,
+        "path": "packages/decisions/tests/test_kev.py"
       },
       {
         "commits": 1,
@@ -334,14 +364,19 @@
         "path": "packages/ears/src/ai_ears/__init__.py"
       },
       {
-        "commits": 3,
-        "lines": 212,
+        "commits": 5,
+        "lines": 296,
         "path": "packages/ears/src/ai_ears/questions.py"
       },
       {
-        "commits": 5,
-        "lines": 516,
+        "commits": 7,
+        "lines": 906,
         "path": "packages/ears/src/ai_ears/record.py"
+      },
+      {
+        "commits": 2,
+        "lines": 180,
+        "path": "packages/ears/tests/fixtures/phrase-evidence.json"
       },
       {
         "commits": 1,
@@ -379,13 +414,18 @@
         "path": "packages/ears/tests/test_calibration_rule.py"
       },
       {
-        "commits": 3,
-        "lines": 403,
+        "commits": 4,
+        "lines": 826,
+        "path": "packages/ears/tests/test_decision_learning.py"
+      },
+      {
+        "commits": 5,
+        "lines": 561,
         "path": "packages/ears/tests/test_questions.py"
       },
       {
-        "commits": 7,
-        "lines": 696,
+        "commits": 9,
+        "lines": 852,
         "path": "packages/ears/tests/test_record.py"
       },
       {
@@ -439,8 +479,8 @@
         "path": "packages/eyes/README.ja.md"
       },
       {
-        "commits": 4,
-        "lines": 672,
+        "commits": 5,
+        "lines": 676,
         "path": "packages/eyes/README.md"
       },
       {
@@ -514,8 +554,8 @@
         "path": "packages/eyes/docs/honest-judgment.md"
       },
       {
-        "commits": 4,
-        "lines": 97,
+        "commits": 5,
+        "lines": 98,
         "path": "packages/eyes/docs/install-and-validate.md"
       },
       {
@@ -529,8 +569,8 @@
         "path": "packages/eyes/docs/tools.md"
       },
       {
-        "commits": 4,
-        "lines": 109,
+        "commits": 5,
+        "lines": 110,
         "path": "packages/eyes/pyproject.toml"
       },
       {
@@ -559,8 +599,8 @@
         "path": "packages/eyes/site/src/content.config.ts"
       },
       {
-        "commits": 3,
-        "lines": 176,
+        "commits": 4,
+        "lines": 182,
         "path": "packages/eyes/site/src/content/docs/handbook/getting-started.md"
       },
       {
@@ -749,8 +789,8 @@
         "path": "packages/eyes/verify.sh"
       },
       {
-        "commits": 11,
-        "lines": 71,
+        "commits": 10,
+        "lines": 117,
         "path": "pyproject.toml"
       },
       {
@@ -829,9 +869,14 @@
         "path": "site/tsconfig.json"
       },
       {
-        "commits": 4,
-        "lines": 17,
+        "commits": 1,
+        "lines": 16,
         "path": "src/ai_eyes_mcp/__init__.py"
+      },
+      {
+        "commits": 1,
+        "lines": 6,
+        "path": "src/ai_eyes_mcp/__main__.py"
       },
       {
         "commits": 1,
@@ -849,13 +894,18 @@
         "path": "src/ai_eyes_mcp/assets/selftest/knight.png"
       },
       {
-        "commits": 13,
-        "lines": 667,
+        "commits": 2,
+        "lines": 851,
         "path": "src/ai_eyes_mcp/engine.py"
       },
       {
-        "commits": 13,
-        "lines": 490,
+        "commits": 1,
+        "lines": 0,
+        "path": "src/ai_eyes_mcp/py.typed"
+      },
+      {
+        "commits": 2,
+        "lines": 586,
         "path": "src/ai_eyes_mcp/server.py"
       },
       {
@@ -914,38 +964,38 @@
         "path": "tests/assets/sprites/knight_sword_left.png"
       },
       {
-        "commits": 4,
-        "lines": 271,
+        "commits": 1,
+        "lines": 212,
         "path": "tests/conftest.py"
       },
       {
-        "commits": 5,
+        "commits": 3,
         "lines": 254,
         "path": "tests/test_ci_gates.py"
       },
       {
-        "commits": 7,
-        "lines": 248,
+        "commits": 1,
+        "lines": 394,
         "path": "tests/test_edge_cases.py"
       },
       {
-        "commits": 7,
+        "commits": 2,
         "lines": 615,
         "path": "tests/test_engine_ci.py"
       },
       {
-        "commits": 9,
-        "lines": 356,
+        "commits": 2,
+        "lines": 853,
         "path": "tests/test_engine_dogfood.py"
       },
       {
-        "commits": 8,
-        "lines": 503,
+        "commits": 3,
+        "lines": 471,
         "path": "tests/test_server_ci.py"
       },
       {
-        "commits": 7,
-        "lines": 234,
+        "commits": 2,
+        "lines": 426,
         "path": "tests/test_tools_dogfood.py"
       },
       {
@@ -954,13 +1004,18 @@
         "path": "tools/coverage_bar.py"
       },
       {
+        "commits": 4,
+        "lines": 3872,
+        "path": "tools/decision_learning.py"
+      },
+      {
         "commits": 3,
         "lines": 2184,
         "path": "tools/phrase_calibration.py"
       },
       {
-        "commits": 2,
-        "lines": 18,
+        "commits": 1,
+        "lines": 41,
         "path": "verify.sh"
       }
     ]
@@ -969,63 +1024,84 @@
     "level": "low",
     "reason": "fewer than 25 source files reach 10 revisions in the window"
   },
-  "generatedAt": "2026-10-07T20:00:40.655Z",
+  "generatedAt": "2026-10-15T02:52:53.591Z",
   "generatedFrom": {
-    "commit": "def7716f28e82d395a4975aeed47e765886fc2a5"
+    "commit": "f16e8ea7f293a329a90779df860ceb9f3e770354"
   },
   "pairs": [
     {
+      "a": ".github/workflows/ci.yml",
+      "b": "atlas/README.md",
+      "either": 12,
+      "shared": 6,
+      "strength": 0.5
+    },
+    {
+      "a": ".github/workflows/ci.yml",
+      "b": "atlas/page.json",
+      "either": 12,
+      "shared": 6,
+      "strength": 0.5
+    },
+    {
+      "a": ".github/workflows/ci.yml",
+      "b": "atlas/statistics.json",
+      "either": 12,
+      "shared": 6,
+      "strength": 0.5
+    },
+    {
+      "a": ".github/workflows/ci.yml",
+      "b": "atlas/structure.json",
+      "either": 12,
+      "shared": 6,
+      "strength": 0.5
+    },
+    {
       "a": "atlas/README.md",
       "b": "atlas/page.json",
-      "either": 8,
-      "shared": 8,
+      "either": 9,
+      "shared": 9,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/statistics.json",
-      "either": 8,
-      "shared": 8,
+      "either": 9,
+      "shared": 9,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/structure.json",
-      "either": 8,
-      "shared": 8,
+      "either": 9,
+      "shared": 9,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/statistics.json",
-      "either": 8,
-      "shared": 8,
+      "either": 9,
+      "shared": 9,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/structure.json",
-      "either": 8,
-      "shared": 8,
+      "either": 9,
+      "shared": 9,
       "strength": 1
     },
     {
       "a": "atlas/statistics.json",
       "b": "atlas/structure.json",
-      "either": 8,
-      "shared": 8,
+      "either": 9,
+      "shared": 9,
       "strength": 1
-    },
-    {
-      "a": "src/ai_eyes_mcp/server.py",
-      "b": "tests/test_server_ci.py",
-      "either": 14,
-      "shared": 7,
-      "strength": 0.5
     }
   ],
   "parameters": {
-    "appliedChangesetLimit": 27.25,
+    "appliedChangesetLimit": 29.5,
     "changeset": 50,
     "changesetFraction": 0.25,
     "cohesionDrop": 0.2,
@@ -1034,16 +1110,16 @@
     "floor": "fallen",
     "floorHeld": false,
     "floorTrigger": "revision-depth",
-    "headDate": "2026-10-07T16:00:25-04:00",
-    "inScopeFiles": 109,
+    "headDate": "2026-10-07T15:31:36-07:00",
+    "inScopeFiles": 118,
     "pinnedStart": null,
     "priorFloor": "fallen",
-    "qualifyingCommits": 66,
+    "qualifyingCommits": 43,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-04-10T20:00:25.000Z",
+    "since": "2026-04-10T22:31:36.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",
@@ -1059,7 +1135,7 @@
     ],
     "sourceFileReach": 20,
     "sourceFileRise": 25,
-    "sourceFilesReachingStrongFloor": 2,
+    "sourceFilesReachingStrongFloor": 0,
     "strength": 0.5,
     "windowDays": 180
   },
