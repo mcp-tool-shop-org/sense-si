@@ -9,7 +9,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "17301e017ff79547d6895a526bf52b48d12fc0b6c777e04a0fca31a9d6176707",
+          "hash": "86e50ecd339bd31bb3596c8ccf11ce8175194996a713896b99df81aceb37bd5a",
           "path": ".github/workflows/ci.yml"
         }
       ],
@@ -32,13 +32,14 @@
       "externals": 0,
       "files": [
         {
-          "hash": "18317f6773fc70ab4bd026224bfd66c7bb4fe64441ee972880332e478756ba65",
+          "hash": "e6b29810ee8ea0d7544534da067646a3e1e873618a360cc07d51528988708f50",
           "path": "packages/decisions/pyproject.toml"
         },
         {
-          "hash": "37966e8b1c7c269c7dc366d0225b990510c283e678f5579191b53a0ca72967f3",
+          "hash": "478f74701953eef3104530ec740bd45b7228f7cd132c3885c46c5b9e30dd319c",
           "importsFiles": [
-            "packages/decisions/src/decisions/client.py"
+            "packages/decisions/src/decisions/client.py",
+            "packages/decisions/src/decisions/kev.py"
           ],
           "path": "packages/decisions/src/decisions/__init__.py"
         },
@@ -145,6 +146,117 @@
         },
         {
           "exports": [
+            "apply_memory_cap",
+            "create_kev_client",
+            "fit_lomo",
+            "resolve_memory_fraction",
+            "serve_capped"
+          ],
+          "failurePaths": [
+            {
+              "in": "resolve_memory_fraction",
+              "kind": "except",
+              "line": 55
+            },
+            {
+              "in": "resolve_memory_fraction",
+              "kind": "raise",
+              "line": 56
+            },
+            {
+              "in": "resolve_memory_fraction",
+              "kind": "raise",
+              "line": 63
+            },
+            {
+              "in": "resolve_memory_fraction",
+              "kind": "raise",
+              "line": 66
+            },
+            {
+              "in": "_default_cuda",
+              "kind": "except",
+              "line": 76
+            },
+            {
+              "in": "serve_capped",
+              "kind": "raise",
+              "line": 161
+            },
+            {
+              "in": "serve_capped",
+              "kind": "raise",
+              "line": 166
+            },
+            {
+              "in": "_wire_model",
+              "kind": "raise",
+              "line": 186
+            },
+            {
+              "in": "_default_fetch",
+              "kind": "except",
+              "line": 202
+            },
+            {
+              "in": "_default_fetch",
+              "kind": "except",
+              "line": 204
+            },
+            {
+              "in": "_default_fetch",
+              "kind": "raise",
+              "line": 205
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 224
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 244
+            },
+            {
+              "in": "client",
+              "kind": "except",
+              "line": 251
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 252
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 254
+            },
+            {
+              "in": "client",
+              "kind": "raise",
+              "line": 257
+            },
+            {
+              "in": "fit_lomo",
+              "kind": "raise",
+              "line": 314
+            },
+            {
+              "in": "fit_lomo",
+              "kind": "raise",
+              "line": 321
+            }
+          ],
+          "hash": "730adab9f3f3eca0430319a8d80d9f292bbd9618730cecab7d33c65eaa1129f3",
+          "importsFiles": [
+            "packages/decisions/src/decisions/client.py"
+          ],
+          "path": "packages/decisions/src/decisions/kev.py"
+        },
+        {
+          "exports": [
             "test_a_dead_transport_or_a_bad_body_is_not_turned_into_an_answer",
             "test_a_refused_date_never_calls",
             "test_accepts_the_dated_snapshot_when_the_answer_echoes_it",
@@ -169,10 +281,11 @@
             "test_the_default_transport_reports_an_unreachable_host",
             "test_usage_that_is_not_a_number_is_left_blank"
           ],
-          "hash": "fb3beccafa08f169d558445a2dd0a87f7d150d86db715dc3c263385ef66de001",
+          "hash": "e8d81a9bfe648c587d443021132e0dfb30576de441ed6f617e2274f0838b28aa",
           "importsFiles": [
             "packages/decisions/src/decisions/__init__.py",
-            "packages/decisions/src/decisions/client.py"
+            "packages/decisions/src/decisions/client.py",
+            "packages/decisions/src/decisions/kev.py"
           ],
           "path": "packages/decisions/tests/test_client.py",
           "testFramework": "pytest"
@@ -186,6 +299,32 @@
             "tools/coverage_bar.py"
           ],
           "path": "packages/decisions/tests/test_coverage_bar.py"
+        },
+        {
+          "exports": [
+            "test_an_uncapped_call_uses_the_fake_torch_and_not_the_card",
+            "test_client_accepts_a_base_that_already_names_the_path",
+            "test_client_posts_systemone_and_stamps_the_revision",
+            "test_client_refuses_a_third_model_a_bad_echo_and_a_bad_body",
+            "test_client_uses_the_local_fetch_when_no_stub_is_passed",
+            "test_default_cuda_and_setter_do_not_need_a_gpu",
+            "test_default_fetch_reads_a_body_and_reports_a_down_server",
+            "test_live_checkpoint_answers_one_question",
+            "test_lomo_fits_a_temperature_per_mix_and_does_not_adopt",
+            "test_memory_fraction_defaults_and_refuses_a_bad_cap",
+            "test_one_class_training_does_not_invent_a_temperature",
+            "test_serve_refuses_an_unpinned_run_and_launches_the_pin",
+            "test_the_cap_is_applied_only_when_cuda_is_there",
+            "test_the_pin_is_a_revision_hash_and_not_jevs_band"
+          ],
+          "hash": "e1f4a0fff95f7172c837379c35cdc7944dc0be4280399e39dcf038bd3a63cdf8",
+          "importsFiles": [
+            "packages/decisions/src/decisions/__init__.py",
+            "packages/decisions/src/decisions/client.py",
+            "packages/decisions/src/decisions/kev.py"
+          ],
+          "path": "packages/decisions/tests/test_kev.py",
+          "testFramework": "pytest"
         }
       ],
       "globs": [
@@ -198,7 +337,7 @@
       "testRunners": [
         "pytest"
       ],
-      "testedBy": 3,
+      "testedBy": 5,
       "unresolvedSites": 0
     },
     {
@@ -230,8 +369,24 @@
           "path": "docs/calibration/summary.json"
         },
         {
-          "hash": "6818de824b2f8c850ccccc1e45263320a3ce4d01fdabc92c8c02105f34b93655",
+          "hash": "ecd6645f419f28f28b0baa742905d6b983c6ca63793d1e70e756f92f6fa294ed",
           "path": "docs/contract.md"
+        },
+        {
+          "hash": "52d4a9d30298efdee994f4803d2dff1781a397b83ef49a209b4c1ec430e2e28f",
+          "path": "docs/decision-learning.md"
+        },
+        {
+          "hash": "286d6a693a44c369cd1aa0334a68fe48de61ddfb97aaa219e9d726ee97d60595",
+          "path": "docs/decision-learning/phrases.json"
+        },
+        {
+          "hash": "45a04ee0598051cac4c83ff653283160376ad2d34356e9928f872efe5e4eea16",
+          "path": "docs/decision-learning/summary.json"
+        },
+        {
+          "hash": "74f67faaf7b16f0a85934b4ff132efbb009fb6b269515b0429a315e28a7d7083",
+          "path": "docs/join-evidence.md"
         }
       ],
       "globs": [
@@ -274,52 +429,52 @@
             {
               "in": "load_question_result",
               "kind": "raise",
-              "line": 72
+              "line": 75
             },
             {
               "in": "_check_instructions",
               "kind": "raise",
-              "line": 93
+              "line": 96
             },
             {
               "in": "_check_instructions",
               "kind": "raise",
-              "line": 95
+              "line": 98
             },
             {
               "in": "_check_pin",
               "kind": "raise",
-              "line": 100
+              "line": 106
+            },
+            {
+              "in": "_answered_band",
+              "kind": "raise",
+              "line": 115
             },
             {
               "in": "_probabilities",
               "kind": "raise",
-              "line": 105
+              "line": 122
             },
             {
               "in": "_probabilities",
               "kind": "raise",
-              "line": 109
+              "line": 126
             },
             {
               "in": "_probabilities",
               "kind": "raise",
-              "line": 112
+              "line": 129
             },
             {
               "in": "which_take",
               "kind": "raise",
-              "line": 127
+              "line": 144
             },
             {
               "in": "which_take",
               "kind": "raise",
-              "line": 131
-            },
-            {
-              "in": "which_take",
-              "kind": "raise",
-              "line": 133
+              "line": 148
             },
             {
               "in": "which_take",
@@ -327,22 +482,27 @@
               "line": 150
             },
             {
-              "in": "phrase_clean",
+              "in": "which_take",
               "kind": "raise",
-              "line": 178
+              "line": 168
             },
             {
               "in": "phrase_clean",
               "kind": "raise",
-              "line": 180
+              "line": 196
             },
             {
               "in": "phrase_clean",
               "kind": "raise",
-              "line": 191
+              "line": 198
+            },
+            {
+              "in": "phrase_clean",
+              "kind": "raise",
+              "line": 210
             }
           ],
-          "hash": "419d4a2ef1cecc5539f98252150b98943e07b1ab4a168aa33f7d3add992d364c",
+          "hash": "08b1799bcaaec8cdf3d6aacef54879af00e1bc04a3cd70407d32c346fc91573d",
           "importsFiles": [
             "packages/decisions/src/decisions/__init__.py",
             "packages/ears/src/ai_ears/record.py"
@@ -352,7 +512,9 @@
         {
           "exports": [
             "detector_revision",
+            "evidence_revision",
             "from_jam_take",
+            "phrase_evidence",
             "reject_gate_keys",
             "review_marks",
             "transcript_from_scores"
@@ -371,86 +533,150 @@
             {
               "in": "__post_init__",
               "kind": "raise",
-              "line": 200
+              "line": 291
             },
             {
               "in": "__post_init__",
               "kind": "raise",
-              "line": 202
+              "line": 293
             },
             {
               "in": "_timing_rows",
               "kind": "raise",
-              "line": 237
+              "line": 330
             },
             {
               "in": "_timing_rows",
               "kind": "raise",
-              "line": 246
+              "line": 339
             },
             {
               "in": "_pitch_rows",
               "kind": "raise",
-              "line": 296
+              "line": 389
             },
             {
               "in": "_pitch_rows",
               "kind": "raise",
-              "line": 302
+              "line": 395
             },
             {
               "in": "_pitch_rows",
               "kind": "raise",
-              "line": 322
+              "line": 415
             },
             {
               "in": "transcript_from_scores",
               "kind": "raise",
-              "line": 360
+              "line": 453
             },
             {
               "in": "transcript_from_scores",
               "kind": "except",
-              "line": 363
+              "line": 456
             },
             {
               "in": "transcript_from_scores",
               "kind": "raise",
-              "line": 364
+              "line": 457
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 392
+              "line": 485
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 404
+              "line": 497
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 406
+              "line": 499
             },
             {
               "in": "review_marks",
               "kind": "raise",
-              "line": 410
+              "line": 503
             },
             {
               "in": "from_jam_take",
               "kind": "raise",
-              "line": 443
+              "line": 536
             },
             {
               "in": "from_jam_take",
               "kind": "raise",
-              "line": 449
+              "line": 542
+            },
+            {
+              "in": "_evidence_count",
+              "kind": "raise",
+              "line": 580
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 600
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 602
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 604
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 606
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 609
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 616
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 618
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 622
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 625
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 666
+            },
+            {
+              "in": "phrase_evidence",
+              "kind": "raise",
+              "line": 669
             }
           ],
-          "hash": "ad3836e240ac02847c34559bc5dfaa34b69693481bedcfc4b75a53da19dd39c7",
+          "hash": "f5c8a65e582a764d979eb4ac06b9840ec3a644f40cecf7bf2cb57d847086d52e",
           "path": "packages/ears/src/ai_ears/record.py"
+        },
+        {
+          "hash": "6cf6f276da906fa431b0c6403b9cf41b05a862ae90949e811e888567179a7691",
+          "path": "packages/ears/tests/fixtures/phrase-evidence.json"
         },
         {
           "hash": "57b4f9278f0bef6db952532406ab0a7923268525a3c8f23a34e2e9054d67a2cf",
@@ -500,10 +726,40 @@
         },
         {
           "exports": [
+            "test_base_rate_reads_the_extended_and_strict_fields",
+            "test_cap_counts_the_recorded_calibration_spend",
+            "test_evidence_features_flag_the_three_missing_readings",
+            "test_frozen_holdout_is_twenty_sorted_indices_and_leaves_the_rest",
+            "test_full_state_omits_evidence_and_pruned_keeps_the_receipt_features",
+            "test_leave_one_mix_out_holds_the_whole_mix_and_the_probe_bar_is_locked",
+            "test_pruned_and_row_states_carry_no_text_and_empty_marks",
+            "test_rules_are_the_nine_thresholds_and_a_missing_cent_does_not_fire",
+            "test_similarity_shots_skip_the_query_and_break_ties_by_index",
+            "test_strict_window_ignores_the_lag_and_tags_follow_the_locked_priority",
+            "test_student_t_and_nadeau_bengio_match_the_locked_small_case",
+            "test_warp_items_drop_only_the_cut_placement_mix",
+            "test_zero_spend_does_not_claim_a_call_and_an_edge_drop_can_be_unresolvable"
+          ],
+          "hash": "5c084ab1808c8fa9a3b9366d5bd506a2a2d0addeaef9c356fc1c62f5a44d5d1a",
+          "importOrder": [
+            "tools/decision_learning.py",
+            "packages/ears/src/ai_ears/record.py"
+          ],
+          "importsFiles": [
+            "packages/ears/src/ai_ears/record.py",
+            "tools/decision_learning.py"
+          ],
+          "path": "packages/ears/tests/test_decision_learning.py"
+        },
+        {
+          "exports": [
             "test_a_gate_word_in_the_question_never_calls",
             "test_a_result_without_a_cost_omits_it_and_a_loaded_confidence_is_kept",
+            "test_an_explicit_jev_band_still_marks_a_clear_probability",
             "test_band_edges_are_uncertain",
             "test_empty_instructions_never_call",
+            "test_kev_phrase_clean_stays_unanswered_and_refuses_a_passed_band",
+            "test_kev_which_take_stays_unanswered",
             "test_load_rejects_pass_and_fail_and_a_winner",
             "test_missing_confidence_is_too_close_to_call",
             "test_phrase_clean_refuses_blank_criteria_and_a_choice_answer",
@@ -513,7 +769,7 @@
             "test_which_take_returns_probabilities_and_no_winner",
             "test_which_take_through_the_real_client_never_leaves_the_machine"
           ],
-          "hash": "514575f652371b9d6bc5d0103f9f7a4b0c5f794ebb9e15483069c834d09e3baf",
+          "hash": "ea1f83d64926e36a56ab4852fbe9493b3489e38fe3d35205a168f20911a09ff4",
           "importsFiles": [
             "packages/decisions/src/decisions/__init__.py",
             "packages/decisions/src/decisions/client.py",
@@ -532,6 +788,8 @@
             "test_an_unvoiced_row_with_no_median_stays_unvoiced",
             "test_gate_keys_are_rejected_on_a_result_shaped_object",
             "test_listener_transcript_must_stay_advisory",
+            "test_phrase_evidence_keeps_the_readings_and_drops_the_directory",
+            "test_phrase_evidence_refuses_marks_and_a_missing_phrase",
             "test_phrase_scores_and_marks_that_are_the_wrong_shape_are_refused",
             "test_phrase_scores_keep_a_string_note_and_skip_empty_values",
             "test_pitch_states_and_a_different_vocal_hash_are_kept",
@@ -544,7 +802,7 @@
             "test_take_id_cannot_be_a_gate_word",
             "test_tracker_name_is_read_from_the_receipt"
           ],
-          "hash": "322a125699e698ba5a0aa5910a33985d020170c93eab9d34e0c4b3d95d208232",
+          "hash": "d13e955a23d2f55f7e3decc8f855043ea97225cfa565982fae04a3ff4b192e05",
           "importsFiles": [
             "packages/ears/src/ai_ears/record.py"
           ],
@@ -562,7 +820,7 @@
       "testRunners": [
         "pytest"
       ],
-      "testedBy": 3,
+      "testedBy": 4,
       "unresolvedSites": 0
     },
     {
@@ -696,7 +954,7 @@
           "path": "packages/eyes/site/astro.config.mjs"
         },
         {
-          "hash": "0607a19c4f60b635244a906c7ad2424359b50e20c4a83bc140f202abce4a941e",
+          "hash": "1be0148ea2a3b47ec21f091b74d4135dbd06aa34d69b5643bb4fe65d8dad4b64",
           "path": "packages/eyes/site/package-lock.json"
         },
         {
@@ -1526,7 +1784,7 @@
           "path": "LICENSE"
         },
         {
-          "hash": "16dfc3df5295a68a341ef6e182d77da88ede20a07fef5b5f776bd8775c98b9fb",
+          "hash": "f65a339bb97e72bbdc1da3a6b5ff6dd6faff3ca1d7b9150be94626bafbf21d77",
           "path": "README.md"
         },
         {
@@ -1534,7 +1792,7 @@
           "path": "codecov.yml"
         },
         {
-          "hash": "751c4b6a8a40988234169fbe18c570bdc01d823371d96d36e3bc18929534b815",
+          "hash": "87a0475d473f4de7040fd263bf84f99609af9265d33b18e57f86e38c35ca1d4f",
           "path": "pyproject.toml"
         }
       ],
@@ -1549,7 +1807,7 @@
       "unresolvedSites": 0
     },
     {
-      "dynamicReads": 4,
+      "dynamicReads": 6,
       "dynamicSpawns": 0,
       "dynamicSpawnsInTests": 0,
       "dynamicWrites": 0,
@@ -1567,6 +1825,140 @@
           "hash": "82ddf51c6b859e079f22577c180800001bf501c3dad30be4fb6726d10f19e25f",
           "path": "tools/coverage_bar.py",
           "sequences": []
+        },
+        {
+          "exports": [
+            "bootstrap_delta",
+            "brier",
+            "call_cells",
+            "cell_name",
+            "compare_folds",
+            "compare_grouped",
+            "cosine_neighbors",
+            "edge_shift",
+            "evidence_feature_row",
+            "feature_row",
+            "fixed_fold_scores",
+            "fixed_grouped_scores",
+            "frozen_test_indices",
+            "grouped_predictions",
+            "leave_one_mix_out",
+            "log_loss",
+            "main",
+            "mix_identified",
+            "mix_name",
+            "mix_probe",
+            "nadeau_bengio",
+            "prepare",
+            "regularized_beta",
+            "render_result",
+            "repeated_predictions",
+            "room_for_cell",
+            "rule_row",
+            "run_models",
+            "serialisation_table",
+            "serialised_state",
+            "state_ok",
+            "strict_label",
+            "strict_overlaps",
+            "student_t_975",
+            "tag_phrase",
+            "warp_items",
+            "write_report"
+          ],
+          "failurePaths": [
+            {
+              "in": "frozen_test_indices",
+              "kind": "raise",
+              "line": 195
+            },
+            {
+              "in": "student_t_975",
+              "kind": "raise",
+              "line": 255
+            },
+            {
+              "in": "_fit_sklearn",
+              "kind": "raise",
+              "line": 487
+            },
+            {
+              "in": "mix_probe",
+              "kind": "except",
+              "line": 734
+            },
+            {
+              "in": "serialised_state",
+              "kind": "raise",
+              "line": 841
+            },
+            {
+              "in": "_model_missing",
+              "kind": "except",
+              "line": 986
+            },
+            {
+              "in": "_label_values",
+              "kind": "raise",
+              "line": 993
+            },
+            {
+              "in": "_fit_scope",
+              "kind": "raise",
+              "line": 1000
+            },
+            {
+              "in": "_fit_scope",
+              "kind": "except",
+              "line": 1009
+            },
+            {
+              "in": "_once",
+              "kind": "except",
+              "line": 1049
+            },
+            {
+              "in": "call_cells",
+              "kind": "except",
+              "line": 1345
+            },
+            {
+              "in": "_ask",
+              "kind": "raise",
+              "line": 1377
+            },
+            {
+              "in": "_forbid",
+              "kind": "raise",
+              "line": 1710
+            },
+            {
+              "in": "main",
+              "kind": "except",
+              "line": 1807
+            },
+            {
+              "in": "main",
+              "kind": "except",
+              "line": 1810
+            },
+            {
+              "kind": "raise",
+              "line": 1818
+            }
+          ],
+          "hash": "1100d2c858c3244f4cd48c6b561c897e537ae356079ab1669086469081c90106",
+          "importOrder": [
+            "tools/phrase_calibration.py",
+            "packages/decisions/src/decisions/__init__.py",
+            "packages/ears/src/ai_ears/record.py"
+          ],
+          "importsFiles": [
+            "packages/decisions/src/decisions/__init__.py",
+            "packages/ears/src/ai_ears/record.py",
+            "tools/phrase_calibration.py"
+          ],
+          "path": "tools/decision_learning.py"
         },
         {
           "exports": [
@@ -1743,20 +2135,20 @@
       "origin": "authored",
       "outsidePlaces": [
         {
-          "reads": 3,
+          "reads": 11,
           "where": [
             "caller"
           ],
-          "writes": 1
+          "writes": 3
         }
       ],
-      "outsideReads": 3,
-      "outsideWrites": 1,
+      "outsideReads": 11,
+      "outsideWrites": 3,
       "role": "code",
       "testRunners": [
         "pytest"
       ],
-      "testedBy": 2,
+      "testedBy": 3,
       "unresolvedSites": 0
     }
   ],
@@ -1867,12 +2259,12 @@
         {
           "boundary": "decisions",
           "depth": 0,
-          "files": 4
+          "files": 6
         },
         {
           "boundary": "ears",
           "depth": 0,
-          "files": 5
+          "files": 6
         },
         {
           "boundary": "eyes",
@@ -1882,7 +2274,7 @@
         {
           "boundary": "tools",
           "depth": 0,
-          "files": 2
+          "files": 3
         }
       ],
       "readers": [],
@@ -1934,7 +2326,7 @@
         {
           "config": "pyproject.toml",
           "coverage": true,
-          "files": 13,
+          "files": 15,
           "job": "pytest",
           "runner": "pytest",
           "step": "pytest"
@@ -2043,8 +2435,8 @@
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "def7716f28e82d395a4975aeed47e765886fc2a5",
-    "tracked": 104
+    "commit": "f16e8ea7f293a329a90779df860ceb9f3e770354",
+    "tracked": 113
   },
   "landings": [
     {
@@ -2241,6 +2633,63 @@
     {
       "readers": [
         {
+          "by": "tools/decision_learning.py",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "docs/decision-learning",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "tools/decision_learning.py",
+          "call": "read_text",
+          "confidence": "ast"
+        }
+      ],
+      "target": "docs/decision-learning.md",
+      "writers": [
+        {
+          "by": "tools/decision_learning.py",
+          "confidence": "ast",
+          "stamps": true,
+          "unless": [
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "readers": [],
+      "target": "docs/decision-learning/phrases.json",
+      "writers": [
+        {
+          "by": "tools/decision_learning.py",
+          "confidence": "ast",
+          "unless": [
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "readers": [],
+      "target": "docs/decision-learning/summary.json",
+      "writers": [
+        {
+          "by": "tools/decision_learning.py",
+          "confidence": "ast",
+          "unless": [
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "readers": [
+        {
           "by": "packages/ears/pyproject.toml",
           "call": "configuration",
           "confidence": "config"
@@ -2268,6 +2717,18 @@
         }
       ],
       "target": "packages/decisions/src",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "packages/decisions/tests/test_kev.py",
+          "call": "open",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "packages/decisions/src/decisions/kev.py",
       "writers": []
     },
     {
@@ -2553,6 +3014,6 @@
   "overlaps": [],
   "submodules": [],
   "symlinks": [],
-  "testFiles": 30,
+  "testFiles": 33,
   "unassigned": []
 }

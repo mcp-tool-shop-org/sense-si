@@ -1,16 +1,18 @@
 # sense-si: how it works
 
-Mapped at 2026-10-07 from commit def7716 by Atlas 1.24.0.
+Mapped at 2026-10-15 from commit f16e8ea by Atlas 1.24.0.
 
 ## What this is
 
-7 parts, mostly Python (24 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 2 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes.
+7 parts, mostly Python (28 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 2 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes.
 
-## What changed since 2026-10-07 (e4e89f5)
+## What changed since 2026-10-07 (def7716)
 
-- ai-eyes-mcp (packages/eyes/pyproject.toml) is no longer a command.
-- docs/calibration/ is now read by tools/phrase_calibration.py.
-- 3 files added and 8 changed content, across 4 parts.
+- docs/decision-learning.md is now written by tools/decision_learning.py.
+- docs/decision-learning/phrases.json is now written by tools/decision_learning.py.
+- docs/decision-learning/summary.json is now written by tools/decision_learning.py.
+- And 3 more new writers and readers of places.
+- 9 files added and 12 changed content, across 7 parts.
 
 ## What comes in
 
@@ -39,11 +41,9 @@ CI writes nothing this map can see.
 
 ## What tends to change together
 
-- **src/ai_eyes_mcp/server.py** and **tests/test_server_ci.py** changed together in 7 of 14 commits.
+No two source files changed together often enough to name.
 
-Confidence is low: fewer than 25 source files reach 10 revisions in the window.
-
-Window: 180 days; a pair counts from 3 shared commits, since 2 source files reach 10 revisions; the floor rises to 10 when 25 do.
+Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do.
 
 ## What no test touches
 
@@ -54,6 +54,8 @@ Every code part is imported by at least one test.
 - **docs/calibration/corp.svg** is written by tools/phrase_calibration.py and read by nothing else in this repository.
 - **docs/calibration/phrases.json** is written by tools/phrase_calibration.py and read by nothing else in this repository.
 - **docs/calibration/summary.json** is written by tools/phrase_calibration.py and read by nothing else in this repository.
+- **docs/decision-learning/phrases.json** is written by tools/decision_learning.py and read by nothing else in this repository.
+- **docs/decision-learning/summary.json** is written by tools/decision_learning.py and read by nothing else in this repository.
 
 ## Helpers that look duplicated
 
@@ -61,7 +63,9 @@ No two parts export a helper that looks alike.
 
 ## Generated, never hand-edited
 
-Every tracked place code writes here is edited by people too; see Hand-authored.
+- **docs/decision-learning.md** has a block written by tools/decision_learning.py.
+- **docs/decision-learning/phrases.json** is written by tools/decision_learning.py.
+- **docs/decision-learning/summary.json** is written by tools/decision_learning.py.
 
 ## Hand-authored
 
@@ -80,8 +84,8 @@ Read those in order to follow one run of ai-eyes end to end. This path follows a
 
 ## What this map cannot see
 
-- 4 reads use paths built at run time and are not named here.
-- 1 write and 3 reads go to a path their caller passes, not to this repository.
+- 6 reads use paths built at run time and are not named here.
+- 3 writes and 11 reads go to a path their caller passes, not to this repository.
 - Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window.
 
 Regenerate with `npx --yes @dogfood-lab/atlas map`.
