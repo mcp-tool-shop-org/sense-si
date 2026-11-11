@@ -9,7 +9,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "86e50ecd339bd31bb3596c8ccf11ce8175194996a713896b99df81aceb37bd5a",
+          "hash": "065c25817ad4adc5aeb4cc1d0c272968ec84568b9c3b5833fc4aaa7b9aaa31d7",
           "path": ".github/workflows/ci.yml"
         }
       ],
@@ -954,11 +954,11 @@
           "path": "packages/eyes/site/astro.config.mjs"
         },
         {
-          "hash": "1be0148ea2a3b47ec21f091b74d4135dbd06aa34d69b5643bb4fe65d8dad4b64",
+          "hash": "01b4c7259256650c2f468783bdaf2d5edbf6ac868174322bc113e2b7667c47bb",
           "path": "packages/eyes/site/package-lock.json"
         },
         {
-          "hash": "ede5fe47605b55555e8d3ed7b2eb904e0c9b03a975348882ae0a870ef5b98bb7",
+          "hash": "de4b9d60c9cb82ead73c183b6eeda0850e6028dda883f1d55cbf6706f44d40cb",
           "path": "packages/eyes/site/package.json"
         },
         {
@@ -2433,9 +2433,9 @@
       "to": "ears"
     }
   ],
-  "engine": "1.24.0",
+  "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "f16e8ea7f293a329a90779df860ceb9f3e770354",
+    "commit": "c52316e31cbb086128f7cd7f22cb836ce6bee663",
     "tracked": 113
   },
   "landings": [
