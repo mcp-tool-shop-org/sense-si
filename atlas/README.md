@@ -1,18 +1,14 @@
 # sense-si: how it works
 
-Mapped at 2026-10-15 from commit f16e8ea by Atlas 1.24.0.
+Mapped at 2026-11-11 from commit c52316e by Atlas 1.26.0.
 
 ## What this is
 
 7 parts, mostly Python (28 files), CSS (2), TypeScript (2), Astro (1), JavaScript (1) and shell (1). Work enters through 2 doors; the busiest is CI, which reaches 4 parts. People run ai-eyes.
 
-## What changed since 2026-10-07 (def7716)
+## What changed since 2026-10-15 (f16e8ea)
 
-- docs/decision-learning.md is now written by tools/decision_learning.py.
-- docs/decision-learning/phrases.json is now written by tools/decision_learning.py.
-- docs/decision-learning/summary.json is now written by tools/decision_learning.py.
-- And 3 more new writers and readers of places.
-- 9 files added and 12 changed content, across 7 parts.
+Nothing structural changed since 2026-10-15; 3 files changed content.
 
 ## What comes in
 
@@ -41,9 +37,11 @@ CI writes nothing this map can see.
 
 ## What tends to change together
 
-No two source files changed together often enough to name.
+- **src/ai_eyes_mcp/server.py** and **tests/test_server_ci.py** changed together in 7 of 14 commits.
 
-Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do.
+Confidence is low: fewer than 25 source files reach 10 revisions in the window.
+
+Window: 180 days; a pair counts from 3 shared commits, since 2 source files reach 10 revisions; the floor rises to 10 when 25 do.
 
 ## What no test touches
 
